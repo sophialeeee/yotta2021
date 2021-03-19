@@ -1,0 +1,20 @@
+.wrapper{
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.cascader{
+    width: 30%;
+}
+
+.hint{
+    margin: auto 2rem;
+    text-decoration: underline;
+}
+
+.chart{
+    flex: auto;
+    margin-top: 1rem;
+}

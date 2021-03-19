@@ -1,0 +1,28 @@
+.row {
+    height: calc(100vh - 64px - 70px);
+    padding-top: 1rem;
+    overflow-y: auto;
+
+}
+
+.status{
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 1rem;
+}
+
+.steps{
+    margin-top: 1rem;
+}
+
+.divider {
+    position: relative;
+}
+.divider:after{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    content: '';
+    border-right: 1px solid gainsboro;
+
+}

@@ -1,0 +1,18 @@
+.card{
+    margin: 16px auto
+}
+
+.wrapper{
+    display: flex;
+    justify-content: space-between;
+}
+
+.data{
+    text-align: right;
+}
+
+.icon{
+    color: #FFFFFF;
+    padding: 10px 15px;
+    font-size: 40px;
+}
