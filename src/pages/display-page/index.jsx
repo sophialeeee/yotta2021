@@ -57,7 +57,7 @@ function DisplayPage() {
                 title: '学科和课程选择有误',
                 content: '请重新选择学科和课程！',
                 onOk() {
-                    history.push('/nav');
+                    history.push({pathname:'/nav',state:{login:true}});
                 },
             })
         }

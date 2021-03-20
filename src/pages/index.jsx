@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Layout, Menu} from 'antd';
 import {useHistory, Switch, Route, useLocation} from 'react-router-dom';
 
+import {Cascader, Modal, Input} from "antd";
+import {ExclamationCircleOutlined} from '@ant-design/icons'
 
 import classes from './index.module.css'
 
@@ -10,13 +12,16 @@ import ConstructPage from './construct-page';
 import CONSTS from "../constants";
 import Login from './Login';
 import DisplayPage from './display-page';
+import useConstructModel from '../models/construct-type';
+import useCurrentSubjectDomainModel from '../models/current-subject-domain';
 
 const {Header, Content, Footer} = Layout;
 
 function App() {
 
    
-    
+    const {setAutoConstructType} = useConstructModel();
+    const {confirm} = Modal;
     // data
     const menuList = [
         {
@@ -38,12 +43,59 @@ function App() {
 
     // hooks
     const history = useHistory();
+    const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const location = useLocation();
     const [menuKey, setMenuKey] = useState('/nav');
-    
+    function onAutoConstructClick(){
+        let subject = '';
+        let domain = '';
+        const onTextSubjectChange = (e) => {
+            subject = e.target.value;
+        };
+        const onTextDomainChange = (e) => {
+            domain = e.target.value;
+        };
+        
+
+        confirm({
+            title: '请选择构建学科，并输入要构建的课程',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                <span>
+                    学科：   
+                </span>
+                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange}/>
+                </div>
+                <div>
+                <span>
+                    课程：
+                </span>
+                    <Input placeholder={'请输入课程'} onChange={onTextDomainChange}/>
+                </div>
+            </>,
+            okText: '开始构建',
+            cancelText: '取消',
+            onOk() {
+                setAutoConstructType();
+                setCurrentSubjectDomain(subject, domain);
+                history.push('/construct-page');
+            },
+            onCancel() {
+                console.log('不构建了');
+            }
+        })
+    };
+
     //functions
     const onMenuItemClick = (e) => {
-        history.push(e.key);
+        console.log('e.key',e.key);
+        if(e.key!='/construct-page'){
+            history.push(e.key);
+        }
+        else{
+            onAutoConstructClick();
+        }
     };
 
     useEffect(() => {
@@ -71,11 +123,9 @@ function App() {
 
                 <Switch>
                     <Route exact path ={'/'} component={Login}></Route>
-                {
-                        menuList.map(ml => (
-                            <Route key={ml.key} exact path={ml.key} component={ml.component}/>
-                        ))
-                    }  
+                    <Route exact path ={'/nav'} component={HomePage}></Route>
+                    <Route exact path ={'/display-page'} component={DisplayPage}></Route>
+                    <Route exact path ={'/construct-page'} component={ConstructPage}></Route>
                 </Switch>
             </Content>
             <Footer className={classes.footer}>

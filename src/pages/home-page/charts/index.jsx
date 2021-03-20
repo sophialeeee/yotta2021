@@ -32,49 +32,7 @@ function Charts(props) {
         }
     });
 
-    const onAutoConstructClick = () => {
-        let subject = '';
-        let domain = '';
-        const onTextInputChange = (e) => {
-            domain = e.target.value;
-        };
-        const onCascaderChange = (e) => {
-            subject = e[0];
-        };
-
-        confirm({
-            title: '请选择构建学科，并输入要构建的课程',
-            icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                <span>
-                    学科：
-                </span>
-                    <Cascader
-                        options={subjectOptions}
-                        placeholder={'请选择学科'}
-                        onChange={onCascaderChange}>
-                    </Cascader>
-                </div>
-                <div>
-                <span>
-                    课程：
-                </span>
-                    <Input placeholder={'请输入课程'} onChange={onTextInputChange}/>
-                </div>
-            </>,
-            okText: '开始构建',
-            cancelText: '取消',
-            onOk() {
-                setAutoConstructType();
-                setCurrentSubjectDomain(subject, domain);
-                history.push('/construct-page');
-            },
-            onCancel() {
-                console.log('不构建了');
-            }
-        })
-    };
+   
 
     const onCascaderSADChange = async (e) => {
         setCurrentSubjectDomain(...e);
@@ -93,9 +51,6 @@ function Charts(props) {
                     className={classes.cascader}
                     onChange={onCascaderSADChange}
                 />
-                <a className={classes.hint} onClick={onAutoConstructClick}>
-                   试试自动构建
-                </a>
             </div>
             <div className={classes.chart}>
                 {gephi ? <Gephi subjectName={currentSubjectDomain.subject} gephi={gephi}/> : <div>该学科没有图谱</div>}

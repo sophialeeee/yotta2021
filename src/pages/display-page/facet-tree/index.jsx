@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from './index.module.css';
-import { drawTree } from '../../../modules/facetTree';
+import { drawTreeNumber } from '../../../modules/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import { useState } from 'react';
@@ -48,7 +48,7 @@ function FacetTree() {
 
     useEffect(() => {
         if (treeRef && treeData) {
-            drawTree(treeRef.current, treeData, d => { });
+            drawTreeNumber(treeRef.current, treeData, d => { });
         }
     }, [treeData])
 
