@@ -77,14 +77,14 @@ function ConstructPage() {
 
     // functions
     const onStepChange = (current) => {
-        if (constructType === 'auto' && current > constructStep) {
-            notification.warning({
-                message: '提示',
-                description: '请等待当前步骤构建完成',
-                placement: "bottomLeft"
-            });
-            return;
-        }
+        // if (constructType === 'auto' && current > constructStep) {
+        //     notification.warning({
+        //         message: '提示',
+        //         description: '请等待当前步骤构建完成',
+        //         placement: "bottomLeft"
+        //     });
+        //     return;
+        // }
         setStep(current);
     };
 

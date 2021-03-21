@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTreeNumber} from '../../../modules/facetTree';
-import {Card} from 'antd';
+import {Card,Alert} from 'antd';
 
 
 const {confirm} = Modal;
@@ -26,7 +26,7 @@ function Assemble() {
     const [assembles,setassembles] = useState();
     const [treeData,settreeData] = useState();
     const [assnum,setassnum] = useState(0);
-    
+   
  
       
     
@@ -102,7 +102,6 @@ function Assemble() {
     const treeRef = useRef();
 
     useEffect(() => {
-        console.log(currentTopic);
         async function fetchTreeData() {
             const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
             settreeData(treeData);
@@ -111,10 +110,10 @@ function Assemble() {
         fetchTreeData();
     }, [currentTopic]);
 
-
+   
     useEffect(() => {
         if (treeRef && treeData) {
-            drawTreeNumber(treeRef.current, treeData, d => { });
+            drawTreeNumber(treeRef.current, treeData, ()=>{});
         }
     }, [treeData])
 
@@ -140,7 +139,7 @@ function Assemble() {
         }
         fetchAssembleData();
         
-    },[currentTopic,currentSubjectDomain])
+    },[currentTopic])
    
     useEffect(() => {
         if (assembles ) {
@@ -152,7 +151,7 @@ function Assemble() {
 
     return (
         <>
-             <a className={classes.hint} onClick={onAutoConstructClick}>
+             <a className={classes.hint} onClick={onAutoConstructClick} style={{fontSize:'20px'}}>
                     请选择要装配的主题
              </a>
              <Card title="主题分面树" style={treeStyle}>
@@ -199,7 +198,7 @@ function Assemble() {
                   
                     ) :
                     (
-                        null
+                        <Alert style={{fontSize:'20px'}}message="请先选择需要装配的主题" type="info" />
                     )
                 }
              </Card>

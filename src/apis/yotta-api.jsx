@@ -38,14 +38,14 @@ const YottaAPI = {
     },
     // 根据用户名获取学科和课程
     getDomainsBySubject(userName) {
-        let result =  gets(`domain/getDomainsAndSubjectsByUserId?userName=${encodeURI(userName)}`);
+        let result =  axios.get(`http://47.95.145.72:8083/domain/getDomainsAndSubjectsByUseId?userName=${encodeURI(userName)}`);
         return result;
     },
     // 获取学科和课程
-    getDomainsBySubject() {
-        let result =  gets('domain/getDomainsGroupBySubject');
-        return result;
-    },
+    // getDomainsBySubject() {
+    //     let result =  gets('domain/getDomainsGroupBySubject');
+    //     return result;
+    // },
     // 统计知识主题
     async getCountTopic(){
         return await gets('statistics/countTopic');

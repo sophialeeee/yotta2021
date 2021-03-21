@@ -79,6 +79,7 @@ function App() {
             onOk() {
                 setAutoConstructType();
                 setCurrentSubjectDomain(subject, domain);
+                // ({pathname:'/construct-page',state:{login:true}});
                 history.push('/construct-page');
             },
             onCancel() {
@@ -91,7 +92,12 @@ function App() {
     const onMenuItemClick = (e) => {
         console.log('e.key',e.key);
         if(e.key!='/construct-page'){
-            history.push(e.key);
+            if(e.key=='./display-page'){
+                history.push({pathname:e.key,state:{login:true}});
+            }
+            else{
+                history.push({pathname:e.key,state:{login:true}});
+            }
         }
         else{
             onAutoConstructClick();
@@ -99,26 +105,32 @@ function App() {
     };
 
     useEffect(() => {
+        console.log('location.pathname',location.pathname);
         setMenuKey(location.pathname);
     }, [location]);
 
     return (
         <Layout className={classes.layout}>
-            <Header className={classes.header}>
-                <div className={classes.title}>
-                    {CONSTS.APP_NAME}
-                </div>
-                <Menu theme={"dark"} mode={"horizontal"} selectedKeys={[menuKey]}
-                      onClick={onMenuItemClick}>
-                    {
-                        menuList.map(menuItem => (
-                            <Menu.Item key={menuItem.key}>
-                                <span>{menuItem.title}</span>
-                            </Menu.Item>
-                        ))
-                    }
-                </Menu>
-            </Header>
+            {
+                location.pathname!='/'?(
+                    <Header className={classes.header}>
+                    <div className={classes.title}>
+                        {CONSTS.APP_NAME}
+                    </div>
+                    <Menu theme={"dark"} mode={"horizontal"} selectedKeys={[menuKey]}
+                          onClick={onMenuItemClick}>
+                        {
+                            menuList.map(menuItem => (
+                                <Menu.Item key={menuItem.key}>
+                                    <span>{menuItem.title}</span>
+                                </Menu.Item>
+                            ))
+                        }
+                    </Menu>
+                </Header>):(
+                    null
+                )
+            }
             <Content>
 
                 <Switch>

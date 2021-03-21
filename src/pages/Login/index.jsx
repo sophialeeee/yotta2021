@@ -3,12 +3,14 @@ import {UserOutlined,LockOutlined} from '@ant-design/icons';
 import {Input,Button} from "antd";
 import YottaAPI from '../../apis/yotta-api';
 import {useHistory} from 'react-router-dom';
+import useUserNameModel from '../../models/user-name';
 function Login(){
     const [userName,setuserName] = useState();
     const [password,setpassword] = useState();
     const [login,setlogin] = useState(false);
     const img = require('./bgNow.jpg');
     const history = useHistory();
+    const {setUserName} = useUserNameModel();
     const handleUsernameChange = (e)=>{
         setuserName(e.target.value);
     
@@ -25,8 +27,9 @@ function Login(){
         async function Login(userName,password){
           const res = await YottaAPI.Login(userName,password); 
           console.log('res.code',res.status);
+          setUserName(userName);
           if(res.status === 200){
-            history.push({pathname:'/nav',state:{login:true}});
+            history.push({pathname:'/nav',state:{login:true,userName:userName}});
           }
         }
         if(login&&userName&&password){
@@ -38,14 +41,14 @@ function Login(){
         <div>
         <img src={img} style={{zIndex:-1}}/>
         <div>
-          <h1 style={{position:'absolute',top:'300px',left:'980px',fontSize:'30px'}}>统一用户认证</h1>
-          <Input style={{width:350,height:50,position:'absolute',top:'380px',left:'900px'}}
+          <h1 style={{position:'absolute',top:'200px',left:'880px',fontSize:'30px'}}>统一用户认证</h1>
+          <Input style={{width:350,height:50,position:'absolute',top:'280px',left:'800px'}}
             prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)'}} />}
             placeholder="用户名"
             value={userName}
             onChange={handleUsernameChange}
           />
-          <Input style={{width:350,height:50,position:'absolute',top:'450px',left:'900px'}}
+          <Input style={{width:350,height:50,position:'absolute',top:'350px',left:'800px'}}
             prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
             type="password"
             placeholder="密码"
@@ -53,7 +56,7 @@ function Login(){
             onChange={handlePasswdChange}
           
           />  
-          <Button type="primary" onClick={handleLogin} style={{position:'absolute',top:'530px',left:'1030px'}}>
+          <Button type="primary" onClick={handleLogin} style={{position:'absolute',top:'430px',left:'930px'}}>
             登录
          </Button>
         </div>

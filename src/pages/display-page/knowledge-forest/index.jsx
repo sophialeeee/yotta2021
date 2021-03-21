@@ -10,9 +10,10 @@ import Leaf from '../../../components/Leaf'
 function KnowledgeForest() {
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     // const [mapdata,setmapdata] = useState();
+    const initialAssemble = useRef();
     const [learningPath,setlearningPath] = useState([]);
-    const [currentTopic,setcurrentTopic] = useState('树状数组');
-    const [assembles,setassembles] = useState();
+    const [currentTopic,setcurrentTopic] = useState('字符串');
+    const [assembles,setassembles] = useState(initialAssemble.current);
     const [assnum,setassnum] = useState(0);
     // const [facetId,setfacetId] = useState();
     const [facetName,setfacetName] = useState('摘要');
@@ -69,10 +70,11 @@ function KnowledgeForest() {
     },[assembles])
     
     if(!assembles){
-        YottaAPI.getASsembleByFacetId(2).then(
+        YottaAPI.getASsembleByFacetId(250).then(
             res=>
             {
-                console.log('res11111111111111111111111',res);
+                initialAssemble.current = res;
+                console.log('res',res);
                 setassembles(res);
             }
         );
@@ -80,7 +82,7 @@ function KnowledgeForest() {
     }
     return (
         <>
-            <Card title="主题间认知路径图" style={mapStyle}>
+            <Card title="知识森林概览" style={mapStyle}>
                 <div style={{ width: '100%', height: '700px' }} >
                   <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
                            <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'0',marginLeft:30,
