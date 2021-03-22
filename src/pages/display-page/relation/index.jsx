@@ -1,120 +1,99 @@
 import React from 'react';
-import {Card, Table} from 'antd';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import YottaAPI from '../../../apis/yotta-api';
+import classes from './index.module.css';
+import { drawTreeNumber } from '../../../modules/facetTree';
+import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import {drawMap} from '../../../modules/topicDependenceVisualization';
-import { useRef } from 'react';
-function Relation() {
+import { useState } from 'react';
+import YottaAPI from '../../../apis/yotta-api';
+import { Card } from 'antd';
+const topicsStyle = {
+    width: '35%',
+    height: '800px',
+    overflow: 'auto',
+    textAlign: 'center',
+};
+const treeStyle = {
+    width: '50%',
+    position: 'absolute',
+    left: '40%',
+    textAlign: 'center',
+    top: '5px'
+};
 
-    const {currentSubjectDomain} = useCurrentSubjectDomainModel();
-    const [data,setdata] =   useState([]);
-    const [data1,setdata1] = useState();
-    const [mapdata,setmapdata] = useState();
-    const [learningPath,setlearningPath] = useState([]);
-    const columns = [
-        {
-            title:'主题一',
-            dataIndex:'主题一',
-            key:'主题一',
-            align:'center',
-           
-        },
-        {
-            title:'主题二',
-            dataIndex:'主题二',
-            key:'主题二',
-            align:'center',
-            // render:text => <a>{text}</a>,
-        }
-    ]
-    const relationStyle = {
-        width: '40%',
-        position: 'absolute',
-        left: '0%',
-        textAlign: 'center',
-        top: '5px'
+function FacetTree() {
+
+    const { currentSubjectDomain } = useCurrentSubjectDomainModel();
+
+    const [topics, settopics] = useState([]);
+
+    const [treeData, settreeData] = useState();
+
+    const [currentTopic, setcurrentTopic] = useState();
+
+    const onClickTopic = (topicName) => {
+        setcurrentTopic(topicName);
     };
-    const mapStyle = {
-        width:'55%',
-        position:'absolute',
-        right:'0%',
-        textAlign:'center',
-        top:'5px'
-    }
-    const [relationData,setrelationData] = useState();
-    // 设置依赖列表的格式
-    const tableStyle = { 
-        width:'100%',
-        height:'700px',
-    }
 
-    const mapRef = useRef();
     const treeRef = useRef();
-    useEffect(()=>{
-        async function fetchrelationData(){
-            await YottaAPI.getDependences(currentSubjectDomain.domain).then(
-                res=>setrelationData(res)
-            )
-        }
-        fetchrelationData();
-    },[currentSubjectDomain.domain])
-    
-    useEffect(()=>{
-        if(relationData){
-            relationData.map((relation,index)=>{
-                data.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
-            })
-        }
-    },[relationData])
-    
-    
-    useEffect(()=>{
-        if(data){
-            setdata(data);
-            setdata1(data[0]);
-        }
-    })
-    
 
-    // 画认知关系图
-    useEffect(()=>{
-        async function fetchDependencesMap(){
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    setmapdata(res.data);
-                    if(res.data&&mapRef){
-                    console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
-                }
-            )
+    useEffect(() => {
+        console.log(currentTopic);
+        async function fetchTreeData() {
+            const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+            settreeData(treeData);
         }
-        fetchDependencesMap();
-        
-    },[currentSubjectDomain.domain])
-    
+        fetchTreeData();
+    }, [currentTopic]);
+
+
+    useEffect(() => {
+        console.log("调试用",treeData);
+        if (treeRef && treeData&&treeData.childrenNumber==0){
+            alert("该主题下无分面树！");
+        }
+        else if (treeRef && treeData&&treeData.childrenNumber!=0) {
+            drawTreeNumber(treeRef.current, treeData, d => { });
+        }
+        /* if (treeRef && treeData) {
+            drawTreeNumber(treeRef.current, treeData, d => { });
+        } */
+    }, [treeData])
+
+    useEffect(() => {
+        async function fetchTopicsData() {
+            const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+            settopics(topicsData.map((topic) => topic.topicName));
+        }
+        if (currentSubjectDomain.domain) {
+            fetchTopicsData();
+            setcurrentTopic('树状数组');
+        }
+    }, [])
+
+
     return (
         <>
-        <Card title="认知关系挖掘" style={relationStyle}>
-                <Card.Grid style={{ width: '100%', height: '730px' }} >
-                {(data && data1)?
-                (
-                 <Table style={tableStyle} columns={columns} dataSource={data} />
-                ):(
-                 <div>无数据</div>
-                )}
-                </Card.Grid>
-        </Card>
-        <Card title="主题间认知路径图" style={mapStyle}>
-                <div style={{ width: '100%', height: '680px' }} >
-                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%'}}></svg>
-                         <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0',marginLeft: 0,marginTop: 56}}></svg>
-                    
-                </div>
+            <Card className={classes.topicsStyle} title="主题列表" style={topicsStyle}>
+                {
+                    topics.map(
+                        (topicName, index) =>
+                            (
+                                <Card.Grid style={{ width: '100%', height: '80%' }} onClick={onClickTopic.bind(null, topicName)} key={index}>{topicName}</Card.Grid>
+                            )
+                    )
+                }
             </Card>
+            <Card title="主题分面树" style={treeStyle}>
+                <Card.Grid style={{ width: '100%', height: '730px' }} >
+                    <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
+
+                    </svg>
+                </Card.Grid>
+            </Card>
+
+
         </>
     );
 }
 
-export default Relation;
+export default FacetTree;

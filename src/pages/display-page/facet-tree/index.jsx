@@ -47,9 +47,16 @@ function FacetTree() {
 
 
     useEffect(() => {
-        if (treeRef && treeData) {
+        console.log("调试用",treeData);
+        if (treeRef && treeData&&treeData.childrenNumber==0){
+            alert("该主题下无分面树！");
+        }
+        else if (treeRef && treeData&&treeData.childrenNumber!=0) {
             drawTreeNumber(treeRef.current, treeData, d => { });
         }
+        /* if (treeRef && treeData) {
+            drawTreeNumber(treeRef.current, treeData, d => { });
+        } */
     }, [treeData])
 
     useEffect(() => {
