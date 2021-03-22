@@ -47,7 +47,7 @@ function FacetTree() {
 
 
     useEffect(() => {
-        console.log("调试用",treeData);
+        //console.log("调试用",treeData);
         if (treeRef && treeData&&treeData.childrenNumber==0){
             alert("该主题下无分面树！");
         }
