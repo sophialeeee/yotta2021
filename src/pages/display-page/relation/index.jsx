@@ -84,9 +84,13 @@ function Relation() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
-                    if(res.data&&mapRef){
+                    if(JSON.stringify(res.data.topics)=='{}'){
+                        alert("该课程下无依赖关系！");
+                    }
+                    else if(res.data.topics&&mapRef){
                     console.log('res.data',res.data);
                     drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+                    
                 }
             )
         }
