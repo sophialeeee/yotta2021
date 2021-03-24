@@ -123,7 +123,9 @@ function FacetTree() {
             insert(insertTopic1);
         }
     },[insertTopic1]) 
+
     const treeRef = useRef();
+
     useEffect(() => {   
 
         var myvar = setInterval(
@@ -178,7 +180,6 @@ function FacetTree() {
     useEffect(() => {
         async function fetchTopicsData() {
             const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
-            
             const topicsData = res.data.data;
             //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
             settopicsData(topicsData);
