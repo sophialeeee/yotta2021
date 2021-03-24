@@ -183,6 +183,10 @@ const YottaAPI = {
     async insertTopic(domainName,topicName){
         return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
+    //根据分面id删除该分面下子分面以及该分面下碎片
+    async deleteAssembleByFacetId(facetId){
+        return await gets((`facet/deleteFacetCompleteByFacetId?facetId=${encodeURI(facetId)}`))
+    }
 };
 
 export default YottaAPI;
