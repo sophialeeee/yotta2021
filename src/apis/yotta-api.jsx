@@ -127,9 +127,9 @@ const YottaAPI = {
     async getDynamicMulti(domainName,topicName,flag){
         let result = undefined;
         try{
-            // result = await axios.post(`http://10.181.204.48:8084/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            // result = await axios.post(`http://10.181.204.48:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             result = await axios.post(`http://47.95.145.72:8084/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
-            //  result = await axios.post(`http://10.181.58.80:8084/newSpiderFor2021/spiderTopicAndFragmentByDomainName?domainName=${encodeURI(domainName)}`)
+            //  result = await axios.post(`http://10.181.58.80:8083/newSpiderFor2021/spiderTopicAndFragmentByDomainName?domainName=${encodeURI(domainName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -181,43 +181,18 @@ const YottaAPI = {
 
     // 分面页添加API,添加主题
     async insertTopic(domainName,topicName){
-        return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
+        return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
 
-    async countUpdateAssemble(domainName){
-        return await gets((`assemble/countUpdateAssemble?domainName=${encodeURI(domainName)}`));
+    // 删除主题
+    async deleteTopic(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicCompleteByDomainNameAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
 
-    async appendAssemble(sourceName, domainName,facetId, assembleContent, url){
-        return await posts((`assemble/appendAssemble?sourceName=${encodeURI(sourceName)}&domainName=${encodeURI(domainName)}&facetId=${encodeURI(facetId)}&assembleContent=${encodeURI(assembleContent)}&url=${encodeURI(url)}`));
-    },
-
-    async deleteAssemble(assembleId){
-        return await gets((`assemble/deleteAssemble?assembleId=${encodeURI(assembleId)}`));
-    },
-
-    async updateAssemble(assembleId, assembleContent, sourceName, url){
-        return await posts((`assemble/updateAssemble?assembleId=${encodeURI(assembleId)}&assembleContent=${encodeURI(assembleContent)}&sourceName=${encodeURI(sourceName)}&url=${encodeURI(url)}`))
-    },
-
-
-    //获取分面
-    async getFacetByDomainName(domainName){
-        return await gets((`facet/getByDomainName?domainName=${encodeURI(domainName)}`));
-    },
-    
-    // 主题关系删除
-    async deleteRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/deleteDependencyByTopicName?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
-    },
-
-    // 主题关系插入
-    async insertRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
-    },
-    //根据分面id删除该分面下子分面以及该分面下碎片
-    async deleteAssembleByFacetId(facetId){
-        return await gets((`facet/deleteFacetCompleteByFacetId?facetId=${encodeURI(facetId)}`))
+    // 添加一级分面
+    async insertFirstLayerFacet(domainName,topicName,facetName){
+        return await gets((`facet/insertFirstLayerFacet?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}&facetName=${encodeURI(facetName)}`));
     }
 };
 

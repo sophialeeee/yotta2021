@@ -36,6 +36,13 @@ function FacetTree() {
     const {confirm} = Modal;
     const {TextArea} = Input;
     const resultTree = useRef();
+
+    const [topiclength, settopiclength] = useState();  //判断topic列表长度
+    const [deleteTopic1,setdeleteTopic1] = useState();
+    const [deleteTopic2,setdeleteTopic2] = useState();
+
+    const [insertFacet1,setinsertFacet1] = useState();
+    const [topicName2,settopicName2] = useState();
    
  
     const handleTextareaChange= (e)=>{
@@ -119,7 +126,67 @@ function FacetTree() {
                 
             }
         })
-    }; 
+    };
+
+    const onDeleteTopic = (deleteTopic1) => {
+        confirm({
+            title:"确认删除该主题吗？",
+            okText:'确定',
+            cancelText:'取消',
+            onOk(){
+                console.log("待删除的主题是",deleteTopic1);
+                setdeleteTopic1(deleteTopic1);
+            },
+            onCancel(){
+
+            }
+        })
+        // e.stopPropagation();
+    }
+
+    const onInsertFacet = (topicName2) => {
+        confirm({
+            title: '请输入分面名称',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <TextArea showCount maxLength={100} onChange={handleTextareaChange}/>
+            </>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                settopicName2(topicName2);
+                const insertFacet1 = textareaValueRef.current;
+                textareaValueRef.current = '';
+                setinsertFacet1(insertFacet1);
+            },
+            onCancel() {
+
+            }
+        })
+    };
+
+    // 删除主题
+    useEffect(()=>{
+        async function deleteTopic(){
+            await YottaAPI.deleteTopic(currentSubjectDomain.domain,deleteTopic1);
+            setdeleteTopic2(deleteTopic1);
+        }
+        if(deleteTopic1){
+            deleteTopic();
+        }
+    },[deleteTopic1])
+
+    // 插入分面
+    useEffect(()=>{
+        async function insertFacet(){
+            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+        }
+        if(topicName2 && insertFacet1){
+            insertFacet(topicName2, insertFacet1);
+        }
+    })
+
+    // 插入主题
     useEffect(()=>{
         async function insert(){
             await YottaAPI.insertTopic(currentSubjectDomain.domain,insertTopic1);
@@ -218,7 +285,7 @@ function FacetTree() {
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
         }
-    }, [insertTopic1])
+    }, [insertTopic1,deleteTopic2,topiclength])
   
     
     return (
@@ -229,7 +296,13 @@ function FacetTree() {
                     topics.map(
                         (topicName, index) =>
                             (
-                                <Card.Grid style={{ width: '100%', height: '80%',opacity:1}} onClick={onClickTopic.bind(null, topicName)} key={index}>{topicName}</Card.Grid>
+                                <>
+                                <div style={{textAlign:"right"}}>
+                                <EditOutlined onClick={onInsertFacet.bind(null,topicName)}/>
+                                <DeleteOutlined onClick={onDeleteTopic.bind(null,topicName)}/>
+                                </div>
+                                <Card.Grid style={{width: '100%', height: '80%',opacity:1}} onClick={onClickTopic.bind(null, topicName)} key={index}>{topicName}</Card.Grid>
+                                </>
                             )
                     )
                 }
