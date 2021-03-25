@@ -266,7 +266,7 @@ function Assemble() {
             console.log(treeData);
         }
         fetchTreeData();
-    }, [currentTopic]);
+    }, [currentTopic,appendAssembleContent, deleteAssemble, updateAssembleContent]);
 
    
     useEffect(() => {
