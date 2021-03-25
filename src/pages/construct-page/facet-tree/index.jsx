@@ -44,6 +44,7 @@ function FacetTree() {
    
     const onClickTopic = (topicName,e) => {
         emptyChildren(treeRef.current);
+        //console.log("重启时数据",treeRef.current.childNodes);
         setcurrentTopic(topicName);
         // 闪烁效果 
         e.persist();
@@ -67,6 +68,7 @@ function FacetTree() {
                        e.target.style.color = 'green'
                          clearInterval(myvar1);
                          clearInterval(my)
+                         //console.log("结束时数据",treeRef.current.childNodes);
                     }  
                  }
                 //  const result = await YottaAPI.getDynamicTreeData(currentSubjectDomain.domain,topicName,true);
@@ -166,19 +168,21 @@ function FacetTree() {
                 console.log('该主题下暂无数据');    
             }
             else{
-                //if(treeRef.current.childNodes.length === 0 ){
+                if(treeRef.current.childNodes.length === 0 ){
                     console.log('调用drawTree函数')
                     drawTree(treeRef.current,treeData,clickFacet,clickBranch);
-                //}
-                //else{
+                }
+                else{
+                    console.log("画树完成");
                     //console.log('调用drawTreeDel函数')
                     //drawTree(treeRef.current, treeData,clickBranch);
                     //drawTreeDel(treeRef.current,treeData,clickBranch);
-                 //}
+                 }
             }
         }
     }, [treeData])
     
+    //删除分面调用接口
     async function clickBranch(facetId){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         setassembles(res);
@@ -190,6 +194,8 @@ function FacetTree() {
         settreeData(treeData);
         
     }
+
+    //返回碎片调用接口
     async function clickFacet(facetId){
         const res = await YottaAPI.getASsembleByFacetId(facetId);
         setassembles(res);
