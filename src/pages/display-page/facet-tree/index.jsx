@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from './index.module.css';
-import { drawTreeNumber } from '../../../modules/facetTree';
+import { drawTreeNumber } from '../../../module/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import { useState } from 'react';

@@ -1,12 +1,12 @@
 import React from 'react';
-import { drawTree,drawTreeNumber } from '../../../modules/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../module/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import { useState } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import {ExclamationCircleOutlined,PlusOutlined} from '@ant-design/icons';
 import { Card,Input,Modal } from 'antd';
-
+//推上去？
 const topicsStyle = {
     width: '35%',
     height: '800px',
@@ -30,6 +30,7 @@ function FacetTree() {
     const [topicsData,settopicsData] = useState();
     const [currentTopic, setcurrentTopic] = useState();
     const [treeData, settreeData] = useState();
+    const [assembles,setassembles] = useState();
     const textareaValueRef = useRef('');
     const [insertTopic1,setinsertTopic1] = useState();
     const {confirm} = Modal;
@@ -43,6 +44,7 @@ function FacetTree() {
    
     const onClickTopic = (topicName,e) => {
         emptyChildren(treeRef.current);
+        //console.log("重启时数据",treeRef.current.childNodes);
         setcurrentTopic(topicName);
         // 闪烁效果 
         e.persist();
@@ -61,11 +63,12 @@ function FacetTree() {
                  if(result){
                     console.log('result.code',result.code);
                     if(result.code === 200 ){
-                       emptyChildren(treeRef.current)
+                       //emptyChildren(treeRef.current)
                        e.target.style.opacity = 1
                        e.target.style.color = 'green'
                          clearInterval(myvar1);
                          clearInterval(my)
+                         //console.log("结束时数据",treeRef.current.childNodes);
                     }  
                  }
                 //  const result = await YottaAPI.getDynamicTreeData(currentSubjectDomain.domain,topicName,true);
@@ -93,6 +96,8 @@ function FacetTree() {
             dom.removeChild(children[0]);
         }
     };
+
+    
    
     const onInsertTopic = () => {
         confirm({
@@ -167,15 +172,37 @@ function FacetTree() {
             else{
                 if(treeRef.current.childNodes.length === 0 ){
                     console.log('调用drawTree函数')
-                    drawTree(treeRef.current,treeData,d => { });
-                 }
-                 else{
-                    console.log('调用drawTreeNumber函数')
-                    drawTreeNumber(treeRef.current, treeData, d => { });
+                    drawTree(treeRef.current,treeData,clickFacet,clickBranch);
+                }
+                else{
+                    console.log("画树完成");
+                    //console.log('调用drawTreeDel函数')
+                    //drawTree(treeRef.current, treeData,clickBranch);
+                    //drawTreeDel(treeRef.current,treeData,clickBranch);
                  }
             }
         }
     }, [treeData])
+    
+    //删除分面调用接口
+    async function clickBranch(facetId){
+        const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+        setassembles(res);
+        console.log("branch函数有调用");
+        const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+            if(treeData){
+                settreeData(treeData)
+            }
+        settreeData(treeData);
+        
+    }
+
+    //返回碎片调用接口
+    async function clickFacet(facetId){
+        const res = await YottaAPI.getASsembleByFacetId(facetId);
+        setassembles(res);
+        console.log("Facet函数有调用");
+    }
     // 获取一个课程下所有的主题数据
     useEffect(() => {
         async function fetchTopicsData() {
