@@ -205,6 +205,16 @@ const YottaAPI = {
     async getFacetByDomainName(domainName){
         return await gets((`facet/getByDomainName?domainName=${encodeURI(domainName)}`));
     },
+    
+    // 主题关系删除
+    async deleteRelation(domainName, startTopicName, endTopicName){
+        return await axios.post((`http://47.95.145.72:8084/dependency/deleteDependencyByTopicName?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+    },
+
+    // 主题关系插入
+    async insertRelation(domainName, startTopicName, endTopicName){
+        return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+    },
 };
 
 export default YottaAPI;
