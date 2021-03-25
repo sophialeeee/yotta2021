@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import { useState } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
-import {ExclamationCircleOutlined,PlusOutlined} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
 import { Card,Input,Modal } from 'antd';
 //推上去？
 const topicsStyle = {
