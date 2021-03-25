@@ -121,7 +121,9 @@ function Assemble() {
     useEffect(() => {
         async function fetchTopicsData() {
             const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+            if(topicsData){
             settopics(topicsData.map((topic) => topic.topicName));
+            }
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
