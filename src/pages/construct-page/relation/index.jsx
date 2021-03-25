@@ -12,7 +12,7 @@ function Relation() {
 
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     var [data,setdata] =  useState([]);
-    var [dataTemp,setdataTemp] =  useState([]);
+    // var [dataTemp,setdataTemp] =  useState([]);
     const [data1,setdata1] = useState();
     var [deleteTopicStart,setDeleteTopic1] = useState();
     var [deleteTopicEnd,setDeleteTopic2] = useState();
@@ -67,6 +67,8 @@ function Relation() {
         top:'5px'
     }
     var [relationData,setrelationData] = useState();
+    // var [relationPart,setrelationPart] = useState();
+    // var [maxShow,setmaxShow] = useState();
     // 设置依赖列表的格式
     const tableStyle = { 
         width:'100%',
@@ -94,7 +96,10 @@ function Relation() {
     
     useEffect(()=>{
         if(relationData){
+            // setmaxShow(1);
             console.log('relationData', relationData);
+            // setrelationPart(relationData.slice(0, maxShow));
+            setrelationData(relationData);
             relationData.map((relation,index)=>{
                 data.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
 
@@ -159,6 +164,14 @@ function Relation() {
             await YottaAPI.insertRelation(currentSubjectDomain.domain, insertTopic1, insertTopic2);
             const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
             setrelationData(res);
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                (res) => {
+                    setmapdata(res.data);
+                    if(res.data&&mapRef){
+                    // console.log('res.data',res.data);
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+                }
+            ) 
         }
         if(insertTopic1){
             insertRelation(insertTopic1, insertTopic2);
@@ -170,14 +183,14 @@ function Relation() {
             await YottaAPI.deleteRelation(currentSubjectDomain.domain,deleteTopicStart, deleteTopicEnd);
             const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
             setrelationData(res);
-            // await YottaAPI.getMap(currentSubjectDomain.domain).then(
-            //     (res) => {
-            //         setmapdata(res.data);
-            //         if(res.data&&mapRef){
-            //         // console.log('res.data',res.data);
-            //         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
-            //     }
-            // ) 
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                (res) => {
+                    setmapdata(res.data);
+                    if(res.data&&mapRef){
+                    // console.log('res.data',res.data);
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+                }
+            ) 
         }
         if(deleteTopicStart){
             console.log('useEffect:', deleteTopicStart, deleteTopicEnd)
