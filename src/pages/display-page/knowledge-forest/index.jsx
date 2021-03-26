@@ -40,6 +40,9 @@ function KnowledgeForest() {
         async function fetchDependencesMap(){
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
+
+
+
                     // setmapdata(res.data);
                     if(res.data&&mapRef){
                         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
