@@ -40,6 +40,7 @@ function HomePage() {
         // 获取数据
         async function fetchData() {
             console.log('userName',UserName)
+            console.log(cookie.loadAll())
             var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
             domainsAndSubjects = domainsAndSubjects.data.data;
             // 统计数据
