@@ -6,7 +6,7 @@ import { useState } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
 import { Card,Input,Modal } from 'antd';
-//推上去？
+
 const topicsStyle = {
     width: '35%',
     height: '800px',
@@ -260,7 +260,6 @@ function FacetTree() {
             if(treeData){
                 settreeData(treeData)
             }
-        settreeData(treeData);
         
     }
 
