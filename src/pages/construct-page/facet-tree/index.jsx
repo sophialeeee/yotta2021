@@ -238,7 +238,7 @@ function FacetTree() {
             }
             else{
                 if(treeRef.current.childNodes.length === 0 ){
-                    console.log('调用drawTree函数')
+                    console.log('调用drawTree函数',treeRef)
                     drawTree(treeRef.current,treeData,clickFacet,clickBranch);
                 }
                 else{
@@ -296,13 +296,20 @@ function FacetTree() {
                     topics.map(
                         (topicName, index) =>
                             (
-                                <>
-                                <div style={{textAlign:"right"}}>
-                                <EditOutlined onClick={onInsertFacet.bind(null,topicName)}/>
-                                <DeleteOutlined onClick={onDeleteTopic.bind(null,topicName)}/>
-                                </div>
-                                <Card.Grid style={{width: '100%', height: '80%',opacity:1}} onClick={onClickTopic.bind(null, topicName)} key={index}>{topicName}</Card.Grid>
-                                </>
+                              
+                                
+                                <Card.Grid style={{width: '100%', height: '80%',opacity:1}} onClick={onClickTopic.bind(null, topicName)} key={index}>
+                                    {topicName}
+                                    
+                                    {/* <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onInsertFacet.bind(null,topicName)} style={{ position:"absolute", right:'15%'}}>
+                                        <EditOutlined />
+                                    </button> */}
+                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null,topicName)} style={{ position:"absolute", right:'5%'}}>
+                                        <DeleteOutlined />
+                                    </button>
+                                    
+                                </Card.Grid>
+                                
                             )
                     )
                 }

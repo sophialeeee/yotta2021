@@ -17,7 +17,7 @@ class Leaf extends React.Component {
   render() {
     const { assemble } = this.props;
     return (
-      <div style={{ borderRadius: 4, border: '1px solid #bfbfbf', marginBottom: 16 }}>
+      <div style={{ borderRadius: 4, border: '0px solid #bfbfbf', marginBottom: 8 }}>
        
         <div style={{ padding: '4px 8px' }} onClick={this.handleClick}>
           {
