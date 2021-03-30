@@ -40,35 +40,37 @@ function KnowledgeForest() {
         async function fetchDependencesMap(){
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
-                    // setmapdata(res.data);
-                    if(res.data&&mapRef){
+                    if(res.data&&mapRef&&(learningPath.length !== 0)){
                         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                    else {
+                        alert("该课程下无知识森林数据！")
+                    }
                 }
             )
         }
         fetchDependencesMap();
 
     },[currentSubjectDomain.domain]);
-    
 
-   
+
+
     async function clickFacet(facetId){
             const res = await YottaAPI.getASsembleByFacetId(facetId);
             setassembles(res);
             const res1 = await YottaAPI.getFacetName1(facetId);
             setfacetName(res1.facetName);
     }
-    
+
     async function clickTopic(topicId,topicName){
         setcurrentTopic(topicName);
     }
         // clickFacet();
     useEffect(()=>{
         if(assembles){
-            setassnum(assembles.length);   
+            setassnum(assembles.length);
     }
     },[assembles])
-    
+
     if(!assembles){
         YottaAPI.getASsembleByFacetId(250).then(
             res=>
@@ -78,7 +80,7 @@ function KnowledgeForest() {
                 setassembles(res);
             }
         );
-       
+
     }
     return (
         <>
@@ -91,12 +93,12 @@ function KnowledgeForest() {
             marginTop: 56}}></svg>
                 </div>
             </Card>
-            
+
             <Card  title="碎片" style={assembleStyle}>
-                
-                <Badge color="purple" text={'主题:'+currentTopic}/> &nbsp;&nbsp;&nbsp;  
-                <Badge color="purple" text={'分面:'+facetName}/> &nbsp;&nbsp;&nbsp;  
-                <Badge color="purple" text={'碎片数量:'+assnum}/> &nbsp;&nbsp; &nbsp; 
+
+                <Badge color="purple" text={'主题:'+currentTopic}/> &nbsp;&nbsp;&nbsp;
+                <Badge color="purple" text={'分面:'+facetName}/> &nbsp;&nbsp;&nbsp;
+                <Badge color="purple" text={'碎片数量:'+assnum}/> &nbsp;&nbsp; &nbsp;
                 <Divider></Divider>
                 {
                     assembles? (
@@ -111,7 +113,7 @@ function KnowledgeForest() {
                             null
                         )
                 }
-               
+
             </Card>
         </>
     );
