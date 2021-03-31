@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './index.module.css';
 import { Modal, Select} from "antd";
-import {ExclamationCircleOutlined,PlusOutlined, MinusOutlined, EditOutlined, CloseOutlined} from '@ant-design/icons'
+import {ExclamationCircleOutlined,PlusOutlined, MinusOutlined, EditOutlined, CloseOutlined,DeleteOutlined} from '@ant-design/icons'
 import YottaAPI from '../../../apis/yotta-api';
 import { useState } from 'react';
 import { useEffect, useRef } from 'react';
@@ -74,6 +74,7 @@ function Assemble() {
         height:'590px',
         overflow: 'auto',
     }
+
 
     const onAutoConstructClick = () => {
         let currentTopic1 = '';
@@ -267,19 +268,22 @@ function Assemble() {
             console.log(treeData);
         }
         fetchTreeData();
-    }, [currentTopic]);
+    }, [currentTopic,appendAssembleContent, deleteAssemble, updateAssembleContent]);
 
 
     useEffect(() => {
         if (treeRef && treeData) {
             drawTree(treeRef.current, treeData, d => { });
+            console.log("树",treeRef.current)
         }
     }, [treeData])
 
     useEffect(() => {
         async function fetchTopicsData() {
             const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+            if(topicsData){
             settopics(topicsData.map((topic) => topic.topicName));
+            }
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
@@ -347,13 +351,15 @@ function Assemble() {
                          assembles.map(
                                 (assemble)=>
                                    (
-                                       <>
-                                        <div style={{width:'100%', textAlign:"right"}}>
-                                        <MinusOutlined style={{top:'50px'}} onClick={onDeleteAssemble.bind(null,assemble.assembleId)}/>
-                                        <EditOutlined style={{top:'50px'}} onClick={onUpdateAssemble.bind(null,assemble.assembleId,assemble.assembleContent)}/>
-                                        </div>
-                                        <Leaf assemble={assemble} key={assemble.assembleId}></Leaf>
-                                       </>
+                                        <Card.Grid style={{width:"100%",height:"80%"}} >
+                                            <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute", right:'3%'}}>
+                                                <DeleteOutlined />
+                                            </button>
+                                            <Leaf style={{overflow: 'auto'}} assemble={assemble} key={assemble.assembleId}>
+                                                
+                                            </Leaf>
+                                            
+                                        </Card.Grid>
                                    )
                             ) 
                   

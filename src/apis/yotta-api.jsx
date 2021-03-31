@@ -33,7 +33,9 @@ const YottaAPI = {
     // 根据用户名和密码登录系统
     Login(userName,password){
        
-        let result =  axios.post(`http://47.95.145.72:8084/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
+        
+        // let result =  axios.post(`http://47.95.145.72:8084/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
+        let result = axios.post(`http://zscl.xjtudlc.com:8083/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
         return result;
     },
     // 根据用户名获取学科和课程
@@ -200,20 +202,12 @@ const YottaAPI = {
         return await posts((`assemble/updateAssemble?assembleId=${encodeURI(assembleId)}&assembleContent=${encodeURI(assembleContent)}&sourceName=${encodeURI(sourceName)}&url=${encodeURI(url)}`))
     },
 
-
-    //获取分面
+    // 添加一级分面
+    async insertFirstLayerFacet(domainName,topicName,facetName){
+        return await gets((`facet/insertFirstLayerFacet?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}&facetName=${encodeURI(facetName)}`));
+    },
     async getFacetByDomainName(domainName){
         return await gets((`facet/getByDomainName?domainName=${encodeURI(domainName)}`));
-    },
-    
-    // 主题关系删除
-    async deleteRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/deleteDependencyByTopicName?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
-    },
-
-    // 主题关系插入
-    async insertRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
     },
 };
 

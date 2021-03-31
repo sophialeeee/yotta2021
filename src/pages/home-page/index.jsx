@@ -4,7 +4,7 @@ import {Col, Row} from "antd";
 
 import Statistic from "./statistic";
 import Charts from "./charts";
-
+import cookie from 'react-cookies';
 import useConstructTypeModel from '../../models/construct-type';
 import useCurrentSubjectDomainModel from "../../models/current-subject-domain";
 import useUserNameModel from '../../models/user-name';
@@ -13,6 +13,7 @@ import YottaAPI from '../../apis/yotta-api';
 import {useLocation} from 'react-router-dom';
 import Login from '../Login';
 import {useHistory} from 'react-router-dom';
+import currentSubjectDomain from '../../models/current-subject-domain';
 
 function HomePage() {
     // hooks
@@ -27,10 +28,8 @@ function HomePage() {
     const {setDisplayConstructType} = useConstructTypeModel();
     const {setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const {UserName} = useUserNameModel();
-    console.log('u用户哈哈哈',UserName);
     const location = useLocation();
     const history = useHistory();
-    const userName = useRef();
     useEffect(()=>{
         if(!location.state){
             history.push('/');
@@ -40,10 +39,9 @@ function HomePage() {
     useEffect(() => {
         // 获取数据
         async function fetchData() {
-            // const domainsAndSubjects = await YottaAPI.getDomainsBySubject();
-            console.log('userName.current',userName.current);
-            var domainsAndSubjects = await YottaAPI.getDomainsBySubject(UserName);
-            console.log('ddd',domainsAndSubjects.data.data);
+            console.log('userName',UserName)
+            console.log(cookie.loadAll())
+            var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
             domainsAndSubjects = domainsAndSubjects.data.data;
             // 统计数据
             const subject = domainsAndSubjects.length;
@@ -70,7 +68,8 @@ function HomePage() {
         setCurrentSubjectDomain();
 
     }, []);
-   
+    
+    
 
     // function
     /**
