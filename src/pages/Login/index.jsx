@@ -4,6 +4,7 @@ import {Input,Button} from "antd";
 import YottaAPI from '../../apis/yotta-api';
 import {useHistory} from 'react-router-dom';
 import useUserNameModel from '../../models/user-name';
+import cookie from 'react-cookies';
 function Login(){
     const [userName,setuserName] = useState();
     const [password,setpassword] = useState();
@@ -25,12 +26,35 @@ function Login(){
   
     useEffect(()=>{
         async function Login(userName,password){
-          const res = await YottaAPI.Login(userName,password); 
-          console.log('res.code',res.status);
-          setUserName(userName);
-          if(res.status === 200){
-            history.push({pathname:'/nav',state:{login:true,userName:userName}});
-          }
+          try
+            {
+              const res = await YottaAPI.Login(userName,password); 
+              setUserName(userName);
+              let intenMinutes = new Date(new Date().getTime() +  600* 1000);
+              cookie.save('userInfo',userName,{expires: intenMinutes});
+
+              cookie.save('userType',res.data,{expires: intenMinutes});//safe?
+
+
+              history.push({pathname:'/nav',state:{login:true,userName:userName}});
+              console.log("cookie",cookie.loadAll())
+              
+            }
+          catch(err)
+            {
+              console.log("error",err);
+              setlogin(false);
+            }
+          // finally
+          //   {console.log('res.code',res.status);
+          //   setUserName(userName);
+          //   if(res.status === 200){
+          //     let intenMinutes = new Date(new Date().getTime() +  600* 1000);
+          //     cookie.save('userInfo',userName,{expires: intenMinutes})
+          //     history.push({pathname:'/nav',state:{login:true,userName:userName}});
+            
+          //     console.log("cookie",cookie.loadAll())
+          //   }}
         }
         if(login&&userName&&password){
           Login(userName,password);

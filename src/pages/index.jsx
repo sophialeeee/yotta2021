@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Layout, Menu} from 'antd';
 import {useHistory, Switch, Route, useLocation} from 'react-router-dom';
-
+import cookie from 'react-cookies';
 import {Cascader, Modal, Input} from "antd";
 import {ExclamationCircleOutlined} from '@ant-design/icons'
 
@@ -23,23 +23,42 @@ function App() {
     const {setAutoConstructType} = useConstructModel();
     const {confirm} = Modal;
     // data
-    const menuList = [
-        {
-        key: '/nav',
-        title: '导航',
-        component: HomePage
-        },
-         {
-        key: '/display-page',
-        title: '浏览',
-        component: DisplayPage
-    },
-    {
-        key: '/construct-page',
-        title: '构建',
-        component: ConstructPage
-    }
-    ];
+    const userT = cookie.load('userType')
+    
+    if(userT&&userT === "admin user")
+        { 
+            var menuList = [
+                {
+                key: '/nav',
+                title: '导航',
+                component: HomePage
+                },
+                {
+                key: '/display-page',
+                title: '浏览',
+                component: DisplayPage
+            },
+            {
+                key: '/construct-page',
+                title: '构建',
+                component: ConstructPage
+            }
+            ];
+        }else{
+            var menuList = [
+                {
+                key: '/nav',
+                title: '导航',
+                component: HomePage
+                },
+                {
+                key: '/display-page',
+                title: '浏览',
+                component: DisplayPage
+            },
+            ];
+        }
+        
 
     // hooks
     const history = useHistory();
@@ -138,6 +157,10 @@ function App() {
                     <Route exact path ={'/nav'} component={HomePage}></Route>
                     <Route exact path ={'/display-page'} component={DisplayPage}></Route>
                     <Route exact path ={'/construct-page'} component={ConstructPage}></Route>
+                    {/* {
+                        (userT&&userT === "admin user")&&(<Route exact path ={'/construct-page'} component={ConstructPage}></Route>)
+                        
+                    } */}
                 </Switch>
             </Content>
             <Footer className={classes.footer}>

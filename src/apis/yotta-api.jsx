@@ -33,7 +33,9 @@ const YottaAPI = {
     // 根据用户名和密码登录系统
     Login(userName,password){
        
-        let result =  axios.post(`http://47.95.145.72:8084/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
+        
+        // let result =  axios.post(`http://47.95.145.72:8084/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
+        let result = axios.post(`http://zscl.xjtudlc.com:8083/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
         return result;
     },
     // 根据用户名获取学科和课程
