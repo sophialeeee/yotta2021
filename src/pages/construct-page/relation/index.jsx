@@ -7,13 +7,18 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import {drawMap} from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined} from '@ant-design/icons';
+import Gephi from '../../../components/Gephi';
+import classes from './index.module.css';
 
 function Relation() {
 
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     var [data,setdata] =  useState([]);
+    var [dataTemp,setdataTemp] =  useState([]);
     // var [dataTemp,setdataTemp] =  useState([]);
     const [data1,setdata1] = useState();
+    const [firstTime,setfirstTime] = useState();
+    // setfirstTime(1);
     var [deleteTopicStart,setDeleteTopic1] = useState();
     var [deleteTopicEnd,setDeleteTopic2] = useState();
     const [mapdata,setmapdata] = useState();
@@ -67,6 +72,8 @@ function Relation() {
         top:'5px'
     }
     var [relationData,setrelationData] = useState();
+    const [gephi, setGephi] = useState(undefined);
+    // var firstTime = 1;
     // var [relationPart,setrelationPart] = useState();
     // var [maxShow,setmaxShow] = useState();
     // 设置依赖列表的格式
@@ -101,18 +108,41 @@ function Relation() {
             // setrelationPart(relationData.slice(0, maxShow));
             setrelationData(relationData);
             relationData.map((relation,index)=>{
-                data.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
+                dataTemp.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
 
             })
             // console.log('dataTemp', dataTemp)
             // for (var maxShow = 0; maxShow <= relationData.length; 1){
-                setdata(data.slice(-relationData.length));
-                setdata1(data[0]);
-                console.log('data', data);
+            // setdata(data.slice(-relationData.length));
+            // console.log("SubjectName:", currentSubjectDomain.subject);
+            setdata1(dataTemp.slice(-relationData.length));
+            // console.log('data', data);
             // }
         }
     },[relationData])
 
+    useEffect(()=>{
+        if(data1) {
+            // console.log("firstTime", firstTime);
+            if (firstTime){
+                setdata(data1);
+                console.log("This is not the first time!")
+            }else{
+                var num = 1;
+                var maxlength = data1.length;
+                // setdata(data1.slice(-relationData.length));
+                const timer = setInterval(() => {
+                    setdata(data1.slice(0, num));
+                    num = num + 1;
+                    if (num === maxlength + 1) {
+                        clearInterval(timer);
+                        setfirstTime(data);
+                        console.log("This is the first time!");
+                    }
+                }, 500);
+            }
+        }
+    },[data1])
 
     const onDeleteRelation = (relationOne, relationTwo, e) => {
         confirm({
@@ -159,19 +189,27 @@ function Relation() {
         })
     }; 
 
+    // const onCascaderSADChange = async (e) => {
+    //     setCurrentSubjectDomain(...e);
+    //     const result = await YottaAPI.getSubjectGraph(currentSubjectDomain);
+    //     setGephi(result);
+    // };
+
     useEffect(()=>{
         async function insertRelation(){
             await YottaAPI.insertRelation(currentSubjectDomain.domain, insertTopic1, insertTopic2);
             const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
             setrelationData(res);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    setmapdata(res.data);
-                    if(res.data&&mapRef){
-                    // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
-                }
-            ) 
+            // await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            //     (res) => {
+            //         setmapdata(res.data);
+            //         if(res.data&&mapRef){
+            //         // console.log('res.data',res.data);
+            //         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+            //     }
+            // ) 
+            const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
+            setGephi(result);
         }
         if(insertTopic1){
             insertRelation(insertTopic1, insertTopic2);
@@ -180,17 +218,19 @@ function Relation() {
 
     useEffect(()=>{
         async function deleteRelation(){
-            await YottaAPI.deleteRelation(currentSubjectDomain.domain,deleteTopicStart, deleteTopicEnd);
+            await YottaAPI.deleteRelation(currentSubjectDomain.domain, deleteTopicStart, deleteTopicEnd);
             const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
             setrelationData(res);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    setmapdata(res.data);
-                    if(res.data&&mapRef){
-                    // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
-                }
-            ) 
+            // await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            //     (res) => {
+            //         setmapdata(res.data);
+            //         if(res.data&&mapRef){
+            //         // console.log('res.data',res.data);
+            //         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+            //     }
+            // ) 
+            const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
+            setGephi(result);
         }
         if(deleteTopicStart){
             console.log('useEffect:', deleteTopicStart, deleteTopicEnd)
@@ -205,17 +245,19 @@ function Relation() {
     // 画认知关系图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    setmapdata(res.data);
-                    if(JSON.stringify(res.data.topics)=='{}'){
-                        alert("该课程下无依赖关系！");
-                    }
-                    else if(res.data&&mapRef){
-                    console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
-                }
-            )
+            // await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            //     (res) => {
+            //         setmapdata(res.data);
+            //         if(JSON.stringify(res.data.topics)=='{}'){
+            //             alert("该课程下无依赖关系！");
+            //         }
+            //         else if(res.data&&mapRef){
+            //         console.log('res.data',res.data);
+            //         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+            //     }
+            // )
+            const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
+            setGephi(result);
         }
         fetchDependencesMap();
         
@@ -252,9 +294,11 @@ function Relation() {
             </Card> */}
         <Card title="知识森林概览" style={mapStyle}>
                 <div style={{ width: '100%', height: '680px' }} >
-                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-                         <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0',marginLeft: 0,marginTop: 56}}></svg>
-                    
+                    {/* <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg> */}
+                         {/* <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0',marginLeft: 0,marginTop: 56}}></svg> */}
+                    <div className={classes.chart}>
+                        {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
+                    </div>
                 </div>
             </Card>
         </>

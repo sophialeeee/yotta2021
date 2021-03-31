@@ -104,7 +104,7 @@ function Gephi(props) {
 
     return (
         <ReactEchartsCore echarts={echarts} option={option}
-                          style={{height: '90%', width: '100%', margin: 'auto'}}/>
+                          style={{height: 600, width: 550, margin: 'auto'}}/>
     );
 
 

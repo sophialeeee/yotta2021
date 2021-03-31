@@ -58,7 +58,7 @@ const YottaAPI = {
     },
     // 获取图
     async getSubjectGraph(subject){
-        return await gets_8084(`subject/getSubjectGraphByName?subjectName=${encodeURI(subject)}`);
+        return await axios.get(`http://47.95.145.72:8083/subject/getSubjectGraphByName?subjectName=${encodeURI(subject)}`);
     },
     // 获取画课程间认知关系的图
     async getDomainGraph(domain){
@@ -208,6 +208,16 @@ const YottaAPI = {
     },
     async getFacetByDomainName(domainName){
         return await gets((`facet/getByDomainName?domainName=${encodeURI(domainName)}`));
+    },
+
+    // 主题关系删除
+    async deleteRelation(domainName, startTopicName, endTopicName){
+        return await axios.post((`http://47.95.145.72:8084/dependency/deleteDependencyByTopicName?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+    },
+
+    // 主题关系插入
+    async insertRelation(domainName, startTopicName, endTopicName){
+        return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
     },
 };
 
