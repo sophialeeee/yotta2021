@@ -38,7 +38,7 @@ const YottaAPI = {
     },
     // 根据用户名获取学科和课程
     getDomainsBySubject(userName) {
-        let result =  axios.get(`http://47.95.145.72:8083/domain/getDomainsAndSubjectsByUseId?userName=${encodeURI(userName)}`);
+        let result =  axios.get(`http://47.95.145.72:8084/domain/getDomainsAndSubjectsByUseId?userName=${encodeURI(userName)}`);
         return result;
     },
     // 获取学科和课程
@@ -85,7 +85,7 @@ const YottaAPI = {
     async getDynamicTreeData(domainName,topicName,flag){
         let result = undefined;
         try{
-            result = await axios.post(`http://10.181.204.48:8083/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}&incremental=${encodeURI(flag)}`)
+            result = await axios.post(`http://10.181.204.48:8084/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}&incremental=${encodeURI(flag)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -127,9 +127,9 @@ const YottaAPI = {
     async getDynamicMulti(domainName,topicName,flag){
         let result = undefined;
         try{
-            // result = await axios.post(`http://10.181.204.48:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            // result = await axios.post(`http://10.181.204.48:8084/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             result = await axios.post(`http://47.95.145.72:8084/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
-            //  result = await axios.post(`http://10.181.58.80:8083/newSpiderFor2021/spiderTopicAndFragmentByDomainName?domainName=${encodeURI(domainName)}`)
+            //  result = await axios.post(`http://10.181.58.80:8084/newSpiderFor2021/spiderTopicAndFragmentByDomainName?domainName=${encodeURI(domainName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }

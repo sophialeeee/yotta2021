@@ -41,8 +41,14 @@ function KnowledgeForest() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if(res.data&&mapRef){
+                    // console.log("shuchu",treeRef.current);
+                    // console.log("shuchu",currentSubjectDomain);
+                    
+                    if(res.data&&mapRef&&(learningPath.length !== 0)){
                         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                    else{
+                        alert("该课程下无知识森林数据！")
+                    }
                 }
             )
         }
