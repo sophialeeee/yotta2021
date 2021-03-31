@@ -24,8 +24,10 @@ function App() {
     const {confirm} = Modal;
     // data
     const userT = cookie.load('userType')
-    
-    if(userT&&userT === "admin user")
+    if(userT){
+        var type = userT.data;
+    }
+    if(type === "admin user")
         { 
             var menuList = [
                 {
