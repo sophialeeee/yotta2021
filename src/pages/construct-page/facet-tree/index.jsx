@@ -5,7 +5,7 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import { useState } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
-import { Card,Input,Modal } from 'antd';
+import { Card,Input,Modal,message } from 'antd';
 
 const topicsStyle = {
     width: '35%',
@@ -43,11 +43,24 @@ function FacetTree() {
     const [insertFacet1,setinsertFacet1] = useState();
     const [topicName2,settopicName2] = useState();
     
- 
+    const [firstTime,setfirstTime] = useState();
+    const [data1,setdata1] = useState();
+    var [data,setdata] = useState();
+    var [dataTemp,setdataTemp] = useState();
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
     }
    
+    const infoFinish = () => {
+        message.success('关系构建成功，已全部展示！')
+    };
+    const infoDelete = () => {
+        message.success('关系删除成功！')
+    };
+    const infoInsert = () => {
+        message.success('关系插入成功！')
+    };
+
     const onClickTopic = (topicName,e) => {
         emptyChildren(treeRef.current);
         console.log('topicName',topicName);
@@ -214,40 +227,69 @@ function FacetTree() {
             //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
             settopicsData(topicsData);
             if(topicsData){
-                settopics(topicsData.map((topic) =>topic.topicName
-));
+                dataTemp = (topicsData.map((topic) =>topic.topicName
+               ));
             }
+            console.log('dataTemp',dataTemp);
+            setdata1(dataTemp.slice(-topics.length));
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
         }
     }, [insertTopic1,deleteTopic2,topiclength])
   
-    
+    useEffect(()=>{
+        if(data1) {
+            // console.log("firstTime", firstTime);
+            if (firstTime){
+                setdata(data1);
+                console.log("This is not the first time!")
+            }else{
+                var num = 1;
+                var maxlength = data1.length;
+                // setdata(data1.slice(-relationData.length));
+                const timer = setInterval(() => {
+                    setdata(data1.slice(0, num));
+                    num = num + 1;
+                    if (num === maxlength + 1) {
+                        infoFinish();
+                        clearInterval(timer);
+                        setfirstTime(data);
+                        console.log("This is the first time!");
+                    }
+                }, 100);
+            }
+        }
+    },[data1])
     return (
         <>
             
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
                 {
-                    topics.map(
-                        (topicName, index) =>
-                            (
-                              
-                                
-                                <Card.Grid style={{width: '100%', height: '80%',opacity:1}}  key={index}>
-                                    {topicName}
+                    data?(
+                        data.map(
+                            (topicName, index) =>
+                                (
+                                  
                                     
-                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" style={{ position:"absolute", right:'11%'}}>
-                                        <a  onClick={onClickTopic.bind(null, topicName)}>构建</a>
-                                    </button>
-                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null,topicName)} style={{ position:"absolute", right:'5%'}}>
-                                        <DeleteOutlined />
-                                    </button>
+                                    <Card.Grid style={{width: '100%', height: '80%',opacity:1}}  key={index}>
+                                        {topicName}
+                                        
+                                        <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" style={{ position:"absolute", right:'11%'}}>
+                                            <a  onClick={onClickTopic.bind(null, topicName)}>构建</a>
+                                        </button>
+                                        <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null,topicName)} style={{ position:"absolute", right:'5%'}}>
+                                            <DeleteOutlined />
+                                        </button>
+                                        
+                                    </Card.Grid>
                                     
-                                </Card.Grid>
-                                
-                            )
+                                )
+                        )
+                    ):(
+                        null
                     )
+                    
                 }
             </Card>
             <Card title="主题分面树" style={treeStyle}>

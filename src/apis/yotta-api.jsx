@@ -58,7 +58,7 @@ const YottaAPI = {
     },
     // 获取图
     async getSubjectGraph(subject){
-        return await axios.get(`http://47.95.145.72:8084/subject/getSubjectGraphByName?subjectName=${encodeURI(subject)}`);
+        return await axios.get(`http://47.95.145.72:8083/subject/getSubjectGraphByName?subjectName=${encodeURI(subject)}`);
     },
     // 获取画课程间认知关系的图
     async getDomainGraph(domain){

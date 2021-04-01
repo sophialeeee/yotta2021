@@ -5,7 +5,8 @@ import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/graph';
 import 'echarts/lib/component/title'
 import 'echarts/lib/component/legend';
-
+import {useHistory} from 'react-router-dom';
+import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
 
 function Gephi(props) {
     const {gephi, subjectName} = props;
@@ -13,6 +14,18 @@ function Gephi(props) {
     console.log('graph',graph)
     let categories = [];
     let communityCount = 0;
+    const history = useHistory();
+    const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
+    const onEvents = {
+        'click':(data)=>{
+           
+        if (data.dataType === 'node'){
+            let currentDomainName = data.data.name;
+            setCurrentSubjectDomain(currentSubjectDomain.subject, currentDomainName);
+            history.push('/display-page');
+        }
+        }
+    }
 
     graph.nodes.forEach(function (node) {
         communityCount = Math.max(communityCount, node.attributes.modularity_class);
@@ -103,7 +116,7 @@ function Gephi(props) {
     };
 
     return (
-        <ReactEchartsCore echarts={echarts} option={option}
+        <ReactEchartsCore echarts={echarts} option={option} onEvents={onEvents}
                           style={{height: 600, width: 550, margin: 'auto'}}/>
     );
 
