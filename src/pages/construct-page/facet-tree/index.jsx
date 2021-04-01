@@ -5,7 +5,7 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import { useState } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
-import { Card,Input,Modal } from 'antd';
+import { Card,Input,Modal,message } from 'antd';
 
 const topicsStyle = {
     width: '35%',
@@ -42,7 +42,10 @@ function FacetTree() {
 
     const [insertFacet1,setinsertFacet1] = useState();
     const [topicName2,settopicName2] = useState();
-    
+    const [firstTime,setfirstTime] = useState();
+    const [data1,setdata1] = useState();
+    var [data,setdata] = useState();
+    var [dataTemp,setdataTemp] = useState();
     var flag;
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
@@ -306,29 +309,33 @@ function FacetTree() {
     },[data1])
     return (
         <>
-            
+
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
                 {
-                    topics.map(
-                        (topicName, index) =>
-                            (
-                              
-                                
-                                <Card.Grid style={{width: '100%', height: '80%',opacity:1}}  key={index}>
-                                    {topicName}
-                                    
-                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" style={{ position:"absolute", right:'11%'}}>
-                                        <a  onClick={onClickTopic.bind(null, topicName)}>构建</a>
-                                    </button>
-                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null,topicName)} style={{ position:"absolute", right:'5%'}}>
-                                        <DeleteOutlined />
-                                    </button>
-                                    
-                                </Card.Grid>
-                                
-                            )
+                    data?(
+                        data.map(
+                            (topicName, index) =>
+                                (
+
+
+                                    <Card.Grid style={{width: '100%', height: '80%',opacity:1}}  key={index}>
+                                        {topicName}
+
+                                        <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" style={{ position:"absolute", right:'11%'}}>
+                                            <a  onClick={onClickTopic.bind(null, topicName)}>构建</a>
+                                        </button>
+                                        <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null,topicName)} style={{ position:"absolute", right:'5%'}}>
+                                            <DeleteOutlined />
+                                        </button>
+
+                                    </Card.Grid>
+
+                                )
+                        )
+                    ):(
+                        null
                     )
-                    
+
                 }
             </Card>
             <Card title="主题分面树" style={treeStyle}>
