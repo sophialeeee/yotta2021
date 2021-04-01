@@ -7,26 +7,23 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTree,drawTreeNumber} from '../../../modules/facetTree';
-import {Card, Alert, Input} from 'antd';
+import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
 
 const {confirm} = Modal;
 
 
 
-
-
 function Assemble() {
 
-   
-    
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     const [currentTopic,setcurrentTopic] = useState();
     const [topics,settopics] = useState([]);
     const [assembles,setassembles] = useState();
     const [treeData,settreeData] = useState();
     const [assnum,setassnum] = useState(0);
-    
+    const [renderFinish,setrenderFinish] = useState(0);
+
     const [newassnum, setnewassnum] = useState(0);
     const [facet, setfacet] = useState();
     const [currentFacetId, setcurrentFacetId] = useState();
@@ -215,6 +212,7 @@ function Assemble() {
         async function append(){
             console.log("新增碎片",appendAssembleContent);
             await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
+            infoInsert();
         }
         if(appendAssembleContent){
             append();
@@ -226,6 +224,7 @@ function Assemble() {
         async function deleteAss(){
             console.log(deleteAssemble);
             await YottaAPI.deleteAssemble(deleteAssemble);
+            infoDelete();
         }
         if(deleteAssemble){
             deleteAss();
@@ -291,19 +290,55 @@ function Assemble() {
         }
     }, [currentSubjectDomain.domain])
 
-   
 
+   
+    //获取碎片
     useEffect(()=>{
-       
-        async function fetchAssembleData(){
-            await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic).then(res=>{
+
+        async function fetchAssembleData(){         
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+            if(res){
                 setassembles(res);
-                console.log("fetchass data")
-            })
+                console.log("以HTML形式渲染");
+                infoFinish();
+            }
+            
         }
         fetchAssembleData();
-        
-    },[appendAssembleContent, deleteAssemble, updateAssembleContent, currentTopic])
+    },[appendAssembleContent, deleteAssemble, updateAssembleContent, renderFinish])
+
+
+    //动态渲染碎片
+    var arr=new Array();
+    useEffect(() => {   
+        async function fetchAssembleData2() {
+            console.log("开始动态渲染");
+            setrenderFinish(0);
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+            if(res){
+                var i=0;
+                var myvar = setInterval(()=>{
+                if(i==res.length){
+                    setassembles(res);
+                    setrenderFinish(1);
+                    clearInterval(myvar);
+
+                }else        
+                { 
+                    arr.push(res[i]);
+                    setassembles(arr);
+                    setassnum(arr.length);
+                    i++;
+                }
+                
+            },300);
+                
+            }
+        }
+        fetchAssembleData2();
+                
+    }, [currentTopic]);
+
 
     useEffect(() => {
         if (assembles) {
@@ -313,9 +348,17 @@ function Assemble() {
     }, [appendAssembleContent, deleteAssemble, assembles, currentTopic])
     
   
-
-    
-
+    const infoFinish = () => {
+        message.success('碎片构建成功，已全部展示！')
+    };
+    const infoDelete = () => {
+        message.config({duration: 1,  maxCount: 3})
+        message.info('碎片删除成功，正在重新构建，请稍后！')
+    };
+    const infoInsert = () => {
+        message.config({duration: 1,  maxCount: 3})
+        message.info('碎片插入成功，正在重新构建，请稍后！')
+    };
 
     return (
         <>
@@ -346,7 +389,6 @@ function Assemble() {
 
              <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onAppendAssemble}/>} title="碎片" style={assembleStyle}>
                 {
-                    
                     assembles && currentTopic? (
                          assembles.map(
                                 (assemble)=>
@@ -355,10 +397,17 @@ function Assemble() {
                                             <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute", right:'3%'}}>
                                                 <DeleteOutlined />
                                             </button>
-                                            <Leaf style={{overflow: 'auto'}} assemble={assemble} key={assemble.assembleId}>
-                                                
-                                            </Leaf>
-                                            
+                                            {
+                                                !renderFinish ?
+                                                (
+                                                    <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
+                                                ) :
+                                                (
+                                                    <Leaf style={{overflow: 'auto'}} assemble={assemble} key={assemble.assembleId}>
+
+                                                    </Leaf>
+                                                )
+                                            }
                                         </Card.Grid>
                                    )
                             ) 
