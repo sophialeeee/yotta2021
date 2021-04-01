@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Input, Modal} from 'antd';
+import {Card, Input, Modal, message} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -29,6 +29,15 @@ function Relation() {
     var [insertTopic1,setinsertTopic1] = useState();
     var [insertTopic2,setinsertTopic2] = useState();
     // const {TextArea} = Input;
+    const infoFinish = () => {
+        message.success('关系构建成功，已全部展示！')
+    };
+    const infoDelete = () => {
+        message.success('关系删除成功！')
+    };
+    const infoInsert = () => {
+        message.success('关系插入成功！')
+    };
     const columns = [
         {
             title:'主题一',
@@ -135,6 +144,7 @@ function Relation() {
                     setdata(data1.slice(0, num));
                     num = num + 1;
                     if (num === maxlength + 1) {
+                        infoFinish();
                         clearInterval(timer);
                         setfirstTime(data);
                         console.log("This is the first time!");
@@ -198,6 +208,7 @@ function Relation() {
     useEffect(()=>{
         async function insertRelation(){
             await YottaAPI.insertRelation(currentSubjectDomain.domain, insertTopic1, insertTopic2);
+            infoInsert();
             const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
             setrelationData(res);
             // await YottaAPI.getMap(currentSubjectDomain.domain).then(
@@ -219,6 +230,7 @@ function Relation() {
     useEffect(()=>{
         async function deleteRelation(){
             await YottaAPI.deleteRelation(currentSubjectDomain.domain, deleteTopicStart, deleteTopicEnd);
+            infoDelete();
             const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
             setrelationData(res);
             // await YottaAPI.getMap(currentSubjectDomain.domain).then(
