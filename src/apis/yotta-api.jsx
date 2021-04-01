@@ -219,6 +219,10 @@ const YottaAPI = {
     async insertRelation(domainName, startTopicName, endTopicName){
         return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
     },
+    //根据分面id删除该分面下子分面以及该分面下碎片
+    async deleteAssembleByFacetId(facetId){
+        return await gets((`facet/deleteFacetCompleteByFacetId?facetId=${encodeURI(facetId)}`))
+    },
 };
 
 export default YottaAPI;
