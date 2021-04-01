@@ -272,7 +272,7 @@ function Assemble() {
 
     useEffect(() => {
         if (treeRef && treeData) {
-            drawTree(treeRef.current, treeData, d => { });
+            drawTreeNumber(treeRef.current, treeData, d => { });
             console.log("树",treeRef.current)
         }
     }, [treeData])
