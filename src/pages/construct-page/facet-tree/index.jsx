@@ -48,6 +48,16 @@ function FacetTree() {
         textareaValueRef.current = e.target.value;
     }
    
+    const infoFinish = () => {
+        message.success('关系构建成功，已全部展示！')
+    };
+    const infoDelete = () => {
+        message.success('关系删除成功！')
+    };
+    const infoInsert = () => {
+        message.success('关系插入成功！')
+    };
+
     const onClickTopic = (topicName,e) => {
         window.flag = true;
         emptyChildren(treeRef.current);
@@ -260,16 +270,40 @@ function FacetTree() {
             //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
             settopicsData(topicsData);
             if(topicsData){
-                settopics(topicsData.map((topic) =>topic.topicName
-));
+                dataTemp = (topicsData.map((topic) =>topic.topicName
+               ));
             }
+            console.log('dataTemp',dataTemp);
+            setdata1(dataTemp.slice(-topics.length));
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
         }
     }, [insertTopic1,deleteTopic2,topiclength])
   
-    
+    useEffect(()=>{
+        if(data1) {
+            // console.log("firstTime", firstTime);
+            if (firstTime){
+                setdata(data1);
+                console.log("This is not the first time!")
+            }else{
+                var num = 1;
+                var maxlength = data1.length;
+                // setdata(data1.slice(-relationData.length));
+                const timer = setInterval(() => {
+                    setdata(data1.slice(0, num));
+                    num = num + 1;
+                    if (num === maxlength + 1) {
+                        infoFinish();
+                        clearInterval(timer);
+                        setfirstTime(data);
+                        console.log("This is the first time!");
+                    }
+                }, 100);
+            }
+        }
+    },[data1])
     return (
         <>
             
@@ -294,6 +328,7 @@ function FacetTree() {
                                 
                             )
                     )
+                    
                 }
             </Card>
             <Card title="主题分面树" style={treeStyle}>

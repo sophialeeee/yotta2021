@@ -7,18 +7,15 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTreeNumber} from '../../../modules/facetTree';
-import {Card,Alert} from 'antd';
-
+import {Card,Alert,Input} from 'antd';
+import {PlusOutlined, MinusOutlined, EditOutlined, CloseOutlined} from '@ant-design/icons';
 
 const {confirm} = Modal;
 
 
 
-
-
 function Assemble() {
 
-   
     
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     const [currentTopic,setcurrentTopic] = useState();
@@ -26,9 +23,20 @@ function Assemble() {
     const [assembles,setassembles] = useState();
     const [treeData,settreeData] = useState();
     const [assnum,setassnum] = useState(0);
+    const [newassnum, setnewassnum] = useState(0);
+    const [facet, setfacet] = useState();
+    const [currentFacetId, setcurrentFacetId] = useState();
+    const textareaValueRef = useRef('');
+    const [appendAssembleContent,setappendAssembleContent] = useState();
+    const [deleteAssemble,setdeleteAssemble] = useState();
+    const [updateAssembleId,setupdateAssembleId] = useState();
+    const [updateAssembleContent,setupdateAssembleContent] = useState();
+    const {TextArea} = Input;
    
  
-      
+    const handleTextareaChange= (e)=>{
+        textareaValueRef.current = e.target.value;
+    }
     
     const treeStyle = {
         width:'40%',
@@ -99,16 +107,166 @@ function Assemble() {
         })
     };
 
+
+    
+    const onAppendAssemble = () => {
+        let facetId = '';
+        const onSelectChange = (id) => { 
+            facetId =  id;
+        }
+        confirm({
+            title: '请输入要添加的碎片内容',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                <span>
+                    分面名：
+                </span>
+                    <Select onSelect={onSelectChange}>
+                        {
+                            facet.map((facet1)=>(
+                            <option value={facet1.facetId} >{facet1.facetName}</option> 
+                            ))
+                        }
+                    </Select> 
+                </div>
+                <div>
+                    <span>
+                        碎片内容：
+                    </span>
+                    <TextArea showCount maxLength={150} onChange={handleTextareaChange}/>
+                </div>
+            </>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                const newAssemble = textareaValueRef.current;     // 新增碎片的内容
+                textareaValueRef.current = '';
+                setappendAssembleContent(newAssemble);
+                setcurrentFacetId(facetId);
+                console.log(currentFacetId); 
+                console.log('newAssemble',newAssemble);
+                
+            },
+            onCancel() {
+                
+            }
+        })
+    }; 
+
+    const onDeleteAssemble = (assembleId1, e) => {
+        confirm({
+            title: '是否想要删除此碎片？',
+            icon: <ExclamationCircleOutlined/>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                setdeleteAssemble(assembleId1); 
+            },
+            onCancel() {
+                
+            }
+        })
+    };
+
+    const onUpdateAssemble = (assembleId1, assembleContent1,e) => {
+        console.log("碎片内容",assembleContent1);
+        confirm({
+            title: '请编辑碎片内容',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <TextArea showCount maxLength={120} onChange={handleTextareaChange} defaultValue={assembleContent1}/>
+            </>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                const assembleContent = textareaValueRef.current;     // 新增碎片的内容
+                textareaValueRef.current = '';
+                setupdateAssembleId(assembleId1);
+                setupdateAssembleContent(assembleContent); 
+                console.log(assembleContent1);
+                console.log('updateAssemble',assembleId1);
+                
+            },
+            onCancel() {
+                
+            }
+        })
+    }; 
+
+
     const treeRef = useRef();
+
+    //根据domainName获取分面信息
+    useEffect(()=>{
+        async function fetchFacetData(){
+            await YottaAPI.getFacetByDomainName(currentSubjectDomain.domain).then(res=>{
+                setfacet(res)
+            })
+        }
+        fetchFacetData();
+    },[appendAssembleContent, deleteAssemble, currentTopic])
+
+    //新增碎片
+    useEffect(() => {                  
+        async function append(){
+            console.log("新增碎片",appendAssembleContent);
+            await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
+        }
+        if(appendAssembleContent){
+            append();
+        }
+    }, [appendAssembleContent])
+
+    //删除碎片
+    useEffect(() => {                  
+        async function deleteAss(){
+            console.log(deleteAssemble);
+            await YottaAPI.deleteAssemble(deleteAssemble);
+        }
+        if(deleteAssemble){
+            deleteAss();
+        }
+    }, [deleteAssemble])
+
+    //编辑碎片
+    useEffect(() => {                  
+        async function updateAss(){
+            console.log(updateAssembleId);
+            console.log(updateAssembleContent);
+            await YottaAPI.updateAssemble(updateAssembleId,updateAssembleContent,"人工",null);
+        }
+        if(updateAssembleId){
+            updateAss();
+        }
+    }, [updateAssembleId])
+
+    //统计近一个月的新增碎片数
+    useEffect(() => {                  
+        async function countUpdateAss(){
+            const res = await YottaAPI.countUpdateAssemble(currentSubjectDomain.domain);
+            console.log("res:",res)
+            if(res){
+                const newassnum = res;
+                console.log("近一个月新增：",newassnum);
+                setnewassnum(newassnum);
+            }
+  
+        }
+        countUpdateAss();
+    }, [assembles, currentTopic])
+
+
+
 
     useEffect(() => {
         async function fetchTreeData() {
             const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
             settreeData(treeData);
-            
+            console.log(treeData);
         }
         fetchTreeData();
-    }, [currentTopic]);
+    }, [currentTopic,appendAssembleContent, deleteAssemble, updateAssembleContent]);
 
    
     useEffect(() => {
@@ -128,7 +286,6 @@ function Assemble() {
         }
     }, [currentSubjectDomain.domain])
 
-   
 
     useEffect(()=>{
        
@@ -139,15 +296,15 @@ function Assemble() {
         }
         fetchAssembleData();
         
-    },[currentTopic])
-   
+    },[appendAssembleContent, deleteAssemble, updateAssembleContent, currentTopic])
+
+
     useEffect(() => {
         if (assembles ) {
             setassnum(assembles.length);
         }
-    }, [assembles,currentTopic])
+    }, [appendAssembleContent, deleteAssemble, assembles, currentTopic])
     
-  
 
     return (
         <>
@@ -165,18 +322,18 @@ function Assemble() {
                      类型：   碎片
                 </Card.Grid> 
                 <Card.Grid style={{width:'100%',height:'50px'}} >
-                     碎片个数：   {assnum}
+                     碎片个数：   <span style={{color:'red',fontWeight:'bolder'}}>{assnum}</span>
                 </Card.Grid> 
                 
              </Card>
              <Card title="增量统计" style={increaseStyle}>
                 <Card.Grid style={{width:'100%',height:'100px'}} >
-                    近一个月新增碎片数量：0
+                    近一个月新增碎片数量：<span style={{color:'red',fontWeight:'bolder'}}>{newassnum}</span>
                 </Card.Grid>  
              </Card>
-       
+        
 
-             <Card  title="碎片" style={assembleStyle}>
+             <Card extra={<PlusOutlined style={{top:'50px'}} onClick={onAppendAssemble}/>} title="碎片" style={assembleStyle}>
                 {
                     
                     assembles ? (
@@ -185,14 +342,16 @@ function Assemble() {
                             
                                (assemble)=>
                                    (
-                                   
-                                       <div style={{ borderRadius: 4, border: '1px solid #bfbfbf', marginBottom: 16}} dangerouslySetInnerHTML={{__html:assemble.assembleContent}}>
-
-                                       </div>
-
+                                       <>
+                                        <div style={{width:'100%', textAlign:"right"}}>
+                                        <MinusOutlined style={{top:'50px'}} onClick={onDeleteAssemble.bind(null,assemble.assembleId)}/>
+                                        <EditOutlined style={{top:'50px'}} onClick={onUpdateAssemble.bind(null,assemble.assembleId,assemble.assembleContent)}/>
+                                        </div>
+                                        <div style={{ borderRadius: 4, border: '1px solid #bfbfbf', marginBottom: 16}} dangerouslySetInnerHTML={{__html:assemble.assembleContent}}>
+                                        </div>
+                                        </>
                                
                                    )
-                           
                             
                             ) 
                   

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 import {Cascader, Modal, Input} from "antd";
 import {ExclamationCircleOutlined} from '@ant-design/icons'
@@ -24,6 +24,16 @@ function Charts(props) {
     const [gephi, setGephi] = useState(undefined);
     const history = useHistory();
 
+    useEffect(() => {
+        async function fetchGephi() {
+            const gephi = await YottaAPI.getSubjectGraph('计算机科学');
+            console.log('gephi',gephi);
+            setGephi(gephi.data.data);
+        }
+        fetchGephi();
+    }, []);
+
+  
 
     const subjectOptions = options.map(op => {
         return {
@@ -37,8 +47,13 @@ function Charts(props) {
     const onCascaderSADChange = async (e) => {
         setCurrentSubjectDomain(...e);
         const result = await YottaAPI.getSubjectGraph(e[0]);
-        setGephi(result);
+        setGephi(result.data.data);
     };
+
+    if(currentSubjectDomain.subject && currentSubjectDomain.domain){
+        history.push('./display-page');
+    }
+
 
     return (
         <div className={classes.wrapper}>
