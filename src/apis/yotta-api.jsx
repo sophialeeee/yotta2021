@@ -217,7 +217,7 @@ const YottaAPI = {
 
     // 主题关系插入
     async insertRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+        return await posts((`dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
     },
 };
 
