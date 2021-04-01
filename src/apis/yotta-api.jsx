@@ -58,7 +58,7 @@ const YottaAPI = {
     },
     // 获取图
     async getSubjectGraph(subject){
-        return await axios.get(`http://47.95.145.72:8084/subject/getSubjectGraphByName?subjectName=${encodeURI(subject)}`);
+        return await axios.get(`http://47.95.145.72:8083/subject/getSubjectGraphByName?subjectName=${encodeURI(subject)}`);
     },
     // 获取画课程间认知关系的图
     async getDomainGraph(domain){
@@ -218,6 +218,10 @@ const YottaAPI = {
     // 主题关系插入
     async insertRelation(domainName, startTopicName, endTopicName){
         return await posts((`dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+    },
+    //根据分面id删除该分面下子分面以及该分面下碎片
+    async deleteAssembleByFacetId(facetId){
+        return await gets((`facet/deleteFacetCompleteByFacetId?facetId=${encodeURI(facetId)}`))
     },
 };
 

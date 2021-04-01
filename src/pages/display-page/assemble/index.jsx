@@ -322,13 +322,13 @@ function Assemble() {
                      类型：   碎片
                 </Card.Grid> 
                 <Card.Grid style={{width:'100%',height:'50px'}} >
-                     碎片个数：   {assnum}
+                     碎片个数：   <span style={{color:'red',fontWeight:'bolder'}}>{assnum}</span>
                 </Card.Grid> 
                 
              </Card>
              <Card title="增量统计" style={increaseStyle}>
                 <Card.Grid style={{width:'100%',height:'100px'}} >
-                    近一个月新增碎片数量：{newassnum}
+                    近一个月新增碎片数量：<span style={{color:'red',fontWeight:'bolder'}}>{newassnum}</span>
                 </Card.Grid>  
              </Card>
         

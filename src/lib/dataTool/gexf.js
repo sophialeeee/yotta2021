@@ -42,7 +42,7 @@ var zrUtil = require("zrender/lib/core/util");
 // http://gexf.net/1.2draft/gexf-12draft-primer.pdf
 function parse(xml) {
   var doc;
-
+  console.log('xml',xml);
   if (typeof xml === 'string') {
     var parser = new DOMParser();
     doc = parser.parseFromString(xml, 'text/xml');
@@ -140,7 +140,7 @@ function parseNodes(parent, attributesMap) {
               break;
 
             case 'boolean':
-              attValue = attValue.toLowerCase() === 'true';
+              attValue = attValue.toLowerCase() == 'true';
               break;
 
             default:
@@ -197,7 +197,7 @@ function getChildByTagName(parent, tagName) {
   var node = parent.firstChild;
 
   while (node) {
-    if (node.nodeType !== 1 || node.nodeName.toLowerCase() !== tagName.toLowerCase()) {
+    if (node.nodeType != 1 || node.nodeName.toLowerCase() != tagName.toLowerCase()) {
       node = node.nextSibling;
     } else {
       return node;
@@ -212,7 +212,7 @@ function getChildrenByTagName(parent, tagName) {
   var children = [];
 
   while (node) {
-    if (node.nodeName.toLowerCase() === tagName.toLowerCase()) {
+    if (node.nodeName.toLowerCase() == tagName.toLowerCase()) {
       children.push(node);
     }
 
