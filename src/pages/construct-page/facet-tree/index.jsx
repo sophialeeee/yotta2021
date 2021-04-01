@@ -43,15 +43,17 @@ function FacetTree() {
     const [insertFacet1,setinsertFacet1] = useState();
     const [topicName2,settopicName2] = useState();
     
- 
+    var flag;
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
     }
    
     const onClickTopic = (topicName,e) => {
+        window.flag = true;
         emptyChildren(treeRef.current);
         console.log('topicName',topicName);
         setcurrentTopic(topicName);
+        console.log("currentTopic",currentTopic);
         // 闪烁效果 
         // e.persist();
         // let my = setInterval(() => {
@@ -64,25 +66,38 @@ function FacetTree() {
     useEffect(() => {  
         async function fetchTreeData() {
             const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+            console.log("画树用",result);
             settreeData(result);          
         }
         if(currentTopic){
             fetchTreeData();
         }
     }, [currentTopic]);
+
+   
     // 画分面树
+    //window.flag = true;
     useEffect(() => {
+        console.log("chushi",window.flag);
         
         if (treeRef && treeData) {
             if(treeData.childrenNumber === 0){
-                
+                alert("当前页面无分面树！");
                 emptyChildren(treeRef.current); 
             }
             else{
-                if(treeRef.current.childNodes.length === 0 ){
-                    console.log('treeRef',treeRef.current.childNodes);
+                if(treeRef.current.childNodes.length === 0&&window.flag===true ){
+                    console.log('动态树treeRef',treeRef.current.childNodes);
                     drawTree(treeRef.current,treeData,clickFacet,ClickBranch);
+                    
+                    
                 }
+                if(treeRef.current.childNodes.length === 0&&window.flag===false ){
+                    console.log('静态树treeRef',treeRef.current.childNodes);
+                    drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch);
+                    
+                }
+                
             }
         }
     }, [treeData])
@@ -197,16 +212,35 @@ function FacetTree() {
     
 
     async function ClickBranch(facetId){
+        if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id",facetId);
         setassembles(res);
-        console.log("branch函数有调用");
-        const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-            if(treeData){
-                console.log("新的画树数据",treeData);
-                emptyChildren(treeRef.current);
-                settreeData(treeData)
-            }
+        }
+    
+        console.log("currentTopic clickbranch",currentTopic);
+        // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+        // window.flag = false;
+        // console.log("shanchuhou",window.flag);
+        //     if(treeData){
+        //         console.log("新的画树数据",treeData);
+        //         emptyChildren(treeRef.current);
+        //         settreeData(treeData);
+        //     }
+        setcurrentTopic(topic => {
+            (async () => {
+                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+                console.log('t-tt',topic);
+                window.flag = false;
+                console.log("shanchuhou", window.flag);
+                if (treeData) {
+                    console.log("新的画树数据", treeData);
+                    emptyChildren(treeRef.current);
+                    settreeData(treeData);
+                }
+            })();
+            return topic
+        })
            
         
         
