@@ -66,7 +66,7 @@ function FacetTree() {
         emptyChildren(treeRef.current);
         console.log('topicName',topicName);
         setcurrentTopic(topicName);
-        console.log("currentTopic",currentTopic);
+        
         // 闪烁效果 
         // e.persist();
         // let my = setInterval(() => {
