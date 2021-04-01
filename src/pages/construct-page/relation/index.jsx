@@ -149,7 +149,7 @@ function Relation() {
                         setfirstTime(data);
                         console.log("This is the first time!");
                     }
-                }, 500);
+                }, 200);
             }
         }
     },[data1])
@@ -277,7 +277,9 @@ function Relation() {
     
     return (
         <>
-        <Card extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertRelation}/>} title="认知关系挖掘" style={relationStyle}>
+        <Card extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
+        {/* <Card.Grid style={{height: "20%", width: "100%", textAlign: 'center', color: 'gray'}}></Card.Grid> */}
+        已构建关系数量：{data.length}
                 {
                     data.map(
                         (relation, index) =>
