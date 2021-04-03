@@ -67,6 +67,9 @@ function App() {
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const location = useLocation();
     const [menuKey, setMenuKey] = useState('/nav');
+    if (localStorage.getItem("visitedRelation")){
+        localStorage.removeItem("visitedRelation");
+    }
     function onAutoConstructClick(){
         let subject = '';
         let domain = '';

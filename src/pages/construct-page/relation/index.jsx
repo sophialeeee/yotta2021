@@ -28,6 +28,7 @@ function Relation() {
     var topicInsertRef2 = useRef('');
     var [insertTopic1,setinsertTopic1] = useState();
     var [insertTopic2,setinsertTopic2] = useState();
+    // var isEnglish = new Boolean(false);
     // const {TextArea} = Input;
     const infoFinish = () => {
         message.success('关系构建成功，已全部展示！')
@@ -39,7 +40,7 @@ function Relation() {
         message.success('关系插入成功！')
     };
     const infoAlert = () => {
-        message.error('该主题关系已存在！')
+        message.error('主题不存在或该主题关系已存在！')
     };
     const columns = [
         {
@@ -123,7 +124,7 @@ function Relation() {
 
     useEffect(()=>{
         async function fetchrelationData(){
-            await YottaAPI.getDependences(currentSubjectDomain.domain).then(
+            await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 res=>setrelationData(res)
             )
         }
@@ -165,10 +166,11 @@ function Relation() {
     useEffect(()=>{
         if(data1) {
             // console.log("firstTime", firstTime);
-            if (firstTime){
+            if (localStorage.getItem("visitedRelation")){
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
+                localStorage.setItem("visitedRelation", "yes")
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
@@ -178,14 +180,30 @@ function Relation() {
                     if (num === maxlength + 1) {
                         infoFinish();
                         clearInterval(timer);
-                        setfirstTime(data);
+                        // setfirstTime(data);
                         console.log("This is the first time!");
                     }
-                }, 200);
+                }, 150);
             }
         }
     },[data1])
 
+    function nameCheck(originName) {
+        var tempName = originName;
+        if (originName.search('\\+') != -1){
+            console.log("tempName", tempName);
+            tempName = originName.replace("+", "jiahao");
+            console.log("tempName", tempName);
+        };
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
     const onDeleteRelation = (relationOne, relationTwo, e) => {
         confirm({
             title: '确定删除关系吗？',
@@ -207,8 +225,8 @@ function Relation() {
             title: '请输入两个主题的名称',
             icon: <ExclamationCircleOutlined/>,
             content: <>
-                <Input placeholder="主题一" onChange={handleTextareaChange1 } style={{marginBottom: 5}}/>
-                <Input placeholder="主题二" onChange={handleTextareaChange2} />
+                <Input placeholder="主题一 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange1 } style={{marginBottom: 5}}/>
+                <Input placeholder="主题二 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange2} />
                 {/* <TextArea showCount maxLength={20} onChange={handleTextareaChange1}/>
                 <TextArea showCount maxLength={20} onChange={handleTextareaChange2}/> */}
             </>,
@@ -249,7 +267,8 @@ function Relation() {
 
     useEffect(()=>{
         async function insertRelation(){
-            const response = await YottaAPI.insertRelation(currentSubjectDomain.domain, insertTopic1, insertTopic2);
+
+            const response = await YottaAPI.insertRelation(currentSubjectDomain.domain, nameCheck(insertTopic1).checkedName, nameCheck(insertTopic2).checkedName);
             // console.log("Responsedata", response)
             if (response){
                 infoInsert();
@@ -259,7 +278,7 @@ function Relation() {
                     infoAlert();
                 };
             };
-            const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
+            const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
@@ -281,11 +300,12 @@ function Relation() {
 
     useEffect(()=>{
         async function deleteRelation(){
-            const response = await YottaAPI.deleteRelation(currentSubjectDomain.domain, deleteTopicStart, deleteTopicEnd);
+
+            const response = await YottaAPI.deleteRelation(currentSubjectDomain.domain, nameCheck(deleteTopicStart).checkedName, nameCheck(deleteTopicEnd).checkedName);
             if (response){
                 infoDelete();
             };
-            const res = await YottaAPI.getDependences(currentSubjectDomain.domain);
+            const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
