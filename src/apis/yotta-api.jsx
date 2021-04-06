@@ -228,6 +228,10 @@ const YottaAPI = {
     async deleteAssembleByFacetId(facetId){
         return await gets((`facet/deleteFacetCompleteByFacetId?facetId=${encodeURI(facetId)}`))
     },
+    // 获得特定知识主题的所有分面信息
+    async getFacetsInTopic(domainName, topicName){
+        return await gets((`facet/getFacetsInTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
+    },
 };
 
 export default YottaAPI;

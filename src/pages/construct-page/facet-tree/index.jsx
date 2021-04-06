@@ -81,6 +81,7 @@ function FacetTree () {
       const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
       console.log("画树用", result);
       settreeData(result);
+      console.log(currentTopic);
     }
     if (currentTopic) {
       fetchTreeData();
@@ -275,6 +276,8 @@ function FacetTree () {
       if (topicsData) {
         dataTemp = (topicsData.map((topic) => topic.topicName
         ));
+        setcurrentTopic(topicsData[0].topicName);  // 默认topic
+        window.flag = false;
       }
       console.log('dataTemp', dataTemp);
       setdata1(dataTemp.slice(-topics.length));
