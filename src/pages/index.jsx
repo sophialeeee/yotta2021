@@ -70,6 +70,9 @@ function App() {
     if (localStorage.getItem("visitedRelation")){
         localStorage.removeItem("visitedRelation");
     }
+    if (localStorage.getItem("visitedTopic")){
+        localStorage.removeItem("visitedTopic");
+    }
     function onAutoConstructClick(){
         let subject = '';
         let domain = '';
