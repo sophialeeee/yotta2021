@@ -232,6 +232,12 @@ const YottaAPI = {
     async getFacetsInTopic(domainName, topicName){
         return await gets((`facet/getFacetsInTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
     },
+
+    // 删除主题
+    async deleteTopic(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicCompleteByDomainNameAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
+    },
 };
 
 export default YottaAPI;
