@@ -166,6 +166,11 @@ const YottaAPI = {
         return await gets(`dependency/getDependenciesByDomainName?domainName=${encodeURI(domainName)}`);
     },
 
+    // 结合麻珂欣师姐的知识关系抽取算法获取关系依赖
+    async generateDependences(domainName, isEnglish){
+        return await posts(`dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
+    },
+
      async getMap(domainName){
         return await axios.get(`http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}`);
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
@@ -217,11 +222,15 @@ const YottaAPI = {
 
     // 主题关系插入
     async insertRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+        return await posts((`dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
     },
     //根据分面id删除该分面下子分面以及该分面下碎片
     async deleteAssembleByFacetId(facetId){
         return await gets((`facet/deleteFacetCompleteByFacetId?facetId=${encodeURI(facetId)}`))
+    },
+    // 获得特定知识主题的所有分面信息
+    async getFacetsInTopic(domainName, topicName){
+        return await gets((`facet/getFacetsInTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
     },
 };
 

@@ -56,10 +56,11 @@ function FacetTree() {
         async function fetchTopicsData() {
             const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
             settopics(topicsData.map((topic) => topic.topicName));
+            setcurrentTopic(topicsData[0].topicName);  // 默认topic
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
-            setcurrentTopic('树状数组');
+            //setcurrentTopic('树状数组');
         }
     }, [])
 

@@ -100,7 +100,6 @@ function Assemble() {
             cancelText: '取消',
             onOk() {
                 setcurrentTopic(currentTopic1);
-               
             },
             onCancel() {
                 
@@ -197,10 +196,10 @@ function Assemble() {
     const treeRef = useRef();
 
 
-    //根据domainName获取分面信息
+    //根据domainName,topicName获取分面信息
     useEffect(()=>{
         async function fetchFacetData(){
-            await YottaAPI.getFacetByDomainName(currentSubjectDomain.domain).then(res=>{
+            await YottaAPI.getFacetsInTopic(currentSubjectDomain.domain,currentTopic).then(res=>{
                 setfacet(res)
             })
         }
@@ -316,6 +315,7 @@ function Assemble() {
             setrenderFinish(0);
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
+                infoConstructing();
                 var i=0;
                 var myvar = setInterval(()=>{
                 if(i==res.length){
@@ -349,6 +349,7 @@ function Assemble() {
     
   
     const infoFinish = () => {
+        message.config({duration: 1,  maxCount: 3})
         message.success('碎片构建成功，已全部展示！')
     };
     const infoDelete = () => {
@@ -358,6 +359,10 @@ function Assemble() {
     const infoInsert = () => {
         message.config({duration: 1,  maxCount: 3})
         message.info('碎片插入成功，正在重新构建，请稍后！')
+    };
+    const infoConstructing = () => {
+        message.config({duration: 1,  maxCount: 3})
+        message.info('正在构建碎片，请稍后！')
     };
 
     return (
@@ -394,16 +399,16 @@ function Assemble() {
                                 (assemble)=>
                                    (
                                         <Card.Grid style={{width:"100%",height:"80%"}} >
-                                            {/* <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute", right:'3%'}}>
+                                            <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute",right:'3%'}}>
                                                 <DeleteOutlined />
-                                            </button> */}
+                                            </button>
                                             {
                                                 !renderFinish ?
                                                 (
                                                     <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
                                                 ) :
                                                 (
-                                                    <Leaf style={{overflow: 'auto'}} assemble={assemble} key={assemble.assembleId}>
+                                                    <Leaf assemble={assemble} key={assemble.assembleId}>
 
                                                     </Leaf>
                                                 )

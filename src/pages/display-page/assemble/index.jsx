@@ -9,6 +9,7 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import {drawTreeNumber} from '../../../modules/facetTree';
 import {Card,Alert,Input} from 'antd';
 import {PlusOutlined, MinusOutlined, EditOutlined, CloseOutlined} from '@ant-design/icons';
+import Leaf from '../../../components/Leaf'
 
 const {confirm} = Modal;
 
@@ -71,6 +72,7 @@ function Assemble() {
         height:'590px',
         overflow: 'auto',
     }
+
 
     const onAutoConstructClick = () => {
         let currentTopic1 = '';
@@ -278,11 +280,12 @@ function Assemble() {
     useEffect(() => {
         async function fetchTopicsData() {
             const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-            settopics(topicsData.map((topic) => topic.topicName));
+            settopics(topicsData.map((topic) => (topic.topicName)));
+            setcurrentTopic(topicsData[0].topicName);  // 默认topic
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
-            setcurrentTopic('树状数组');
+            //setcurrentTopic('树状数组');
         }
     }, [currentSubjectDomain.domain])
 
@@ -333,28 +336,26 @@ function Assemble() {
              </Card>
         
 
-             <Card extra={<PlusOutlined style={{top:'50px'}} onClick={onAppendAssemble}/>} title="碎片" style={assembleStyle}>
+             <Card title="碎片" style={assembleStyle}>
                 {
                     
                     assembles ? (
                         
-                         assembles.map(
+                        assembles.map(
                             
-                               (assemble)=>
-                                   (
-                                       <>
-                                        <div style={{width:'100%', textAlign:"right"}}>
-                                        <MinusOutlined style={{top:'50px'}} onClick={onDeleteAssemble.bind(null,assemble.assembleId)}/>
-                                        <EditOutlined style={{top:'50px'}} onClick={onUpdateAssemble.bind(null,assemble.assembleId,assemble.assembleContent)}/>
+                            (assemble)=>
+                                (
+                                    
+                                    <Card.Grid style={{width:"100%",height:"80%"}} >
+                                        <div style={{ borderRadius: 4, marginBottom: 16, }} dangerouslySetInnerHTML={{__html:assemble.assembleContent}}>
                                         </div>
-                                        <div style={{ borderRadius: 4, border: '1px solid #bfbfbf', marginBottom: 16}} dangerouslySetInnerHTML={{__html:assemble.assembleContent}}>
-                                        </div>
-                                        </>
-                               
-                                   )
+                                    </Card.Grid>
+                                    
+                            
+                                )
                             
                             ) 
-                  
+                
                     ) :
                     (
                         <Alert style={{fontSize:'20px'}}message="请先选择需要装配的主题" type="info" />

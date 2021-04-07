@@ -1,26 +1,27 @@
 import React from 'react';
-import { drawTree,drawTreeNumber,drawTreeDel } from '../../../module/facetTree';
+import { drawTree, drawTreeNumber, drawTreeDel } from '../../../module/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import { useState } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
-import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
-import { Card,Input,Modal,message } from 'antd';
+import { DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { Card, Input, Modal, message } from 'antd';
 
 const topicsStyle = {
-    width: '35%',
-    height: '800px',
-    overflow: 'auto',
-    textAlign: 'center',
+  width: '35%',
+  height: '800px',
+  overflow: 'auto',
+  textAlign: 'center',
 };
 const treeStyle = {
-    width: '50%',
-    position: 'absolute',
-    left: '40%',
-    textAlign: 'center',
-    top: '5px'
+  width: '50%',
+  position: 'absolute',
+  left: '40%',
+  textAlign: 'center',
+  top: '5px'
 };
 
+<<<<<<< HEAD
  
 
 function FacetTree() {
@@ -144,109 +145,174 @@ function FacetTree() {
         console.log('children',children);
         while (children.length > 0) {
             dom.removeChild(children[0]);
-        }
-    };
+=======
 
-    
-   
-    const onInsertTopic = () => {
-        confirm({
-            title: '请输入主题名称',
-            icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <TextArea showCount maxLength={100} onChange={handleTextareaChange}/>
-            </>,
-            okText: '确定',
-            cancelText: '取消',
-            onOk() {
-                const Topic1 = textareaValueRef.current;
-                textareaValueRef.current = '';
-                setinsertTopic1(Topic1); 
-                console.log('Topic1',Topic1);
-                
-            },
-            onCancel() {
-                
-            }
-        })
-    };
 
-    const onDeleteTopic = (deleteTopic1) => {
-        confirm({
-            title:"确认删除该主题吗？",
-            okText:'确定',
-            cancelText:'取消',
-            onOk(){
-                console.log("待删除的主题是",deleteTopic1);
-                setdeleteTopic1(deleteTopic1);
-            },
-            onCancel(){
+function FacetTree () {
 
-            }
-        })
-        // e.stopPropagation();
+  const { currentSubjectDomain } = useCurrentSubjectDomainModel();
+  const [topics, settopics] = useState([]);
+  const [topicsData, settopicsData] = useState();
+  const [currentTopic, setcurrentTopic] = useState();
+  const [treeData, settreeData] = useState();
+  const textareaValueRef = useRef('');
+  const [insertTopic1, setinsertTopic1] = useState();
+  const { confirm } = Modal;
+  const { TextArea } = Input;
+  const resultTree = useRef();
+  const [assembles, setassembles] = useState();
+  const [topiclength, settopiclength] = useState();  //判断topic列表长度
+  const [deleteTopic1, setdeleteTopic1] = useState();
+  const [deleteTopic2, setdeleteTopic2] = useState();
+
+  const [insertFacet1, setinsertFacet1] = useState();
+  const [topicName2, settopicName2] = useState();
+  const [firstTime, setfirstTime] = useState();
+  const [data1, setdata1] = useState();
+  var [data, setdata] = useState();
+  var [dataTemp, setdataTemp] = useState();
+  var flag;
+  const handleTextareaChange = (e) => {
+    textareaValueRef.current = e.target.value;
+  }
+
+  const infoFinish = () => {
+    message.success('主题构建成功，已全部展示！')
+  };
+  const infoDelete = () => {
+    message.success('主题删除成功！')
+  };
+  const infoInsert = () => {
+    message.success('主题插入成功！')
+  };
+
+  const onClickTopic = (topicName, e) => {
+    window.flag = true;
+    emptyChildren(treeRef.current);
+    console.log('topicName', topicName);
+    setcurrentTopic(topicName);
+
+    // 闪烁效果 
+    // e.persist();
+    // let my = setInterval(() => {
+    //     let opacity = e.target.style.opacity;
+    //     e.target.style.opacity = 1-(+opacity||0)
+    //     e.target.style.color = 'red';     
+    // }, 500);
+  };
+
+  useEffect(() => {
+    async function fetchTreeData () {
+      const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+      console.log("画树用", result);
+      settreeData(result);
+      console.log(currentTopic);
     }
+    if (currentTopic) {
+      fetchTreeData();
+    }
+  }, [currentTopic]);
 
-    const onInsertFacet = (topicName2) => {
-        confirm({
-            title: '请输入分面名称',
-            icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <TextArea showCount maxLength={100} onChange={handleTextareaChange}/>
-            </>,
-            okText: '确定',
-            cancelText: '取消',
-            onOk() {
-                settopicName2(topicName2);
-                const insertFacet1 = textareaValueRef.current;
-                textareaValueRef.current = '';
-                setinsertFacet1(insertFacet1);
-            },
-            onCancel() {
 
-            }
-        })
-    };
+  // 画分面树
+  //window.flag = true;
+  useEffect(() => {
+    console.log("chushi", window.flag);
 
-    // 删除主题
-    useEffect(()=>{
-        async function deleteTopic(){
-            await YottaAPI.deleteTopic(currentSubjectDomain.domain,deleteTopic1);
-            setdeleteTopic2(deleteTopic1);
-        }
-        if(deleteTopic1){
-            deleteTopic();
-        }
-    },[deleteTopic1])
+    if (treeRef && treeData) {
+      if (treeData.childrenNumber === 0) {
+        alert("当前页面无分面树！");
+        emptyChildren(treeRef.current);
+      }
+      else {
+        if (treeRef.current.childNodes.length === 0 && window.flag === true) {
+          console.log('动态树treeRef', treeRef.current.childNodes);
+          drawTree(treeRef.current, treeData, clickFacet, ClickBranch);
 
-    // 插入分面
-    useEffect(()=>{
-        async function insertFacet(){
-            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+
         }
-        if(topicName2 && insertFacet1){
-            insertFacet(topicName2, insertFacet1);
+        if (treeRef.current.childNodes.length === 0 && window.flag === false) {
+          console.log('静态树treeRef', treeRef.current.childNodes);
+          drawTreeNumber(treeRef.current, treeData, clickFacet, ClickBranch);
+
+>>>>>>> upstream/main
         }
+
+      }
+    }
+  }, [treeData])
+
+
+  function emptyChildren (dom) {
+    const children = dom.childNodes;
+    console.log('children', children);
+    while (children.length > 0) {
+      dom.removeChild(children[0]);
+    }
+  };
+
+
+
+  const onInsertTopic = () => {
+    confirm({
+      title: '请输入主题名称',
+      icon: <ExclamationCircleOutlined />,
+      content: <>
+        <TextArea showCount maxLength={100} onChange={handleTextareaChange} />
+      </>,
+      okText: '确定',
+      cancelText: '取消',
+      onOk () {
+        const Topic1 = textareaValueRef.current;
+        textareaValueRef.current = '';
+        setinsertTopic1(Topic1);
+        console.log('Topic1', Topic1);
+
+      },
+      onCancel () {
+
+      }
     })
+  };
 
-    // 插入主题
-    useEffect(()=>{
-        async function insert(){
-            await YottaAPI.insertTopic(currentSubjectDomain.domain,insertTopic1);
-        }
-        if(insertTopic1){
-            insert(insertTopic1);
-        }
-    },[insertTopic1]) 
+  const onDeleteTopic = (deleteTopic1) => {
+    confirm({
+      title: "确认删除该主题吗？",
+      okText: '确定',
+      cancelText: '取消',
+      onOk () {
+        console.log("待删除的主题是", deleteTopic1);
+        setdeleteTopic1(deleteTopic1);
+      },
+      onCancel () {
 
-    const treeRef = useRef();
+      }
+    })
+    // e.stopPropagation();
+  }
 
-    
-    
-    //删除分面调用接口
+  const onInsertFacet = (topicName2) => {
+    confirm({
+      title: '请输入分面名称',
+      icon: <ExclamationCircleOutlined />,
+      content: <>
+        <TextArea showCount maxLength={100} onChange={handleTextareaChange} />
+      </>,
+      okText: '确定',
+      cancelText: '取消',
+      onOk () {
+        settopicName2(topicName2);
+        const insertFacet1 = textareaValueRef.current;
+        textareaValueRef.current = '';
+        setinsertFacet1(insertFacet1);
+      },
+      onCancel () {
 
-    
+      }
+    })
+  };
 
+<<<<<<< HEAD
     async function ClickBranch(facetId){
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
@@ -272,97 +338,173 @@ function FacetTree() {
            
         
         
+=======
+  // 删除主题
+  useEffect(() => {
+    async function deleteTopic () {
+      await YottaAPI.deleteTopic(currentSubjectDomain.domain, deleteTopic1);
+      setdeleteTopic2(deleteTopic1);
+>>>>>>> upstream/main
+    }
+    if (deleteTopic1) {
+      deleteTopic();
+    }
+  }, [deleteTopic1])
+
+  // 插入分面
+  useEffect(() => {
+    async function insertFacet () {
+      await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+    }
+    if (topicName2 && insertFacet1) {
+      insertFacet(topicName2, insertFacet1);
+    }
+  })
+
+  // 插入主题
+  useEffect(() => {
+    async function insert () {
+      await YottaAPI.insertTopic(currentSubjectDomain.domain, insertTopic1);
+    }
+    if (insertTopic1) {
+      insert(insertTopic1);
+    }
+  }, [insertTopic1])
+
+  const treeRef = useRef();
+
+
+
+  //删除分面调用接口
+
+
+
+  async function ClickBranch (facetId) {
+    if (facetId > 0) {
+      const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+      console.log("传入删除id", facetId);
+      setassembles(res);
     }
 
-    //返回碎片调用接口
-    async function clickFacet(facetId){
-        const res = await YottaAPI.getASsembleByFacetId(facetId);
-        setassembles(res);
-        console.log("Facet函数有调用");
+    console.log("currentTopic clickbranch", currentTopic);
+    // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+    // window.flag = false;
+    // console.log("shanchuhou",window.flag);
+    //     if(treeData){
+    //         console.log("新的画树数据",treeData);
+    //         emptyChildren(treeRef.current);
+    //         settreeData(treeData);
+    //     }
+    setcurrentTopic(topic => {
+      (async () => {
+        const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+        console.log('t-tt', topic);
+        window.flag = false;
+        console.log("shanchuhou", window.flag);
+        if (treeData) {
+          console.log("新的画树数据", treeData);
+          emptyChildren(treeRef.current);
+          settreeData(treeData);
+        }
+      })();
+      return topic
+    })
+
+
+
+  }
+
+  //返回碎片调用接口
+  async function clickFacet (facetId) {
+    const res = await YottaAPI.getASsembleByFacetId(facetId);
+    setassembles(res);
+    console.log("Facet函数有调用");
+  }
+  // 获取一个课程下所有的主题数据
+  useEffect(() => {
+    async function fetchTopicsData () {
+      const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject, currentSubjectDomain.domain);
+      const topicsData = res.data.data;
+      //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+      settopicsData(topicsData);
+      if (topicsData) {
+        dataTemp = (topicsData.map((topic) => topic.topicName
+        ));
+        setcurrentTopic(topicsData[0].topicName);  // 默认topic
+        window.flag = false;
+      }
+      console.log('dataTemp', dataTemp);
+      setdata1(dataTemp.slice(-topics.length));
     }
-    // 获取一个课程下所有的主题数据
-    useEffect(() => {
-        async function fetchTopicsData() {
-            const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
-            const topicsData = res.data.data;
-            //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-            settopicsData(topicsData);
-            if(topicsData){
-                dataTemp = (topicsData.map((topic) =>topic.topicName
-               ));
-            }
-            console.log('dataTemp',dataTemp);
-            setdata1(dataTemp.slice(-topics.length));
-        }
-        if (currentSubjectDomain.domain) {
-            fetchTopicsData();
-        }
-    }, [insertTopic1,deleteTopic2,topiclength])
-  
-    useEffect(()=>{
-        if(data1) {
-            // console.log("firstTime", firstTime);
-            if (firstTime){
-                setdata(data1);
-                console.log("This is not the first time!")
-            }else{
-                var num = 1;
-                var maxlength = data1.length;
-                // setdata(data1.slice(-relationData.length));
-                const timer = setInterval(() => {
-                    setdata(data1.slice(0, num));
-                    num = num + 1;
-                    if (num === maxlength + 1) {
-                        infoFinish();
-                        clearInterval(timer);
-                        setfirstTime(data);
-                        console.log("This is the first time!");
-                    }
-                }, 100);
-            }
-        }
-    },[data1])
-    return (
-        <>
+    if (currentSubjectDomain.domain) {
+      fetchTopicsData();
+    }
+  }, [insertTopic1, deleteTopic2, topiclength])
 
-            <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
-                {
-                    data?(
-                        data.map(
-                            (topicName, index) =>
-                                (
+  useEffect(() => {
+    if (data1) {
+      // console.log("firstTime", firstTime);
+      if (firstTime) {
+        setdata(data1);
+        console.log("This is not the first time!")
+      } else {
+        var num = 1;
+        var maxlength = data1.length;
+        // setdata(data1.slice(-relationData.length));
+        const timer = setInterval(() => {
+          setdata(data1.slice(0, num));
+          num = num + 1;
+          if (num === maxlength + 1) {
+            infoFinish();
+            clearInterval(timer);
+            setfirstTime(data);
+            console.log("This is the first time!");
+          }
+        }, 100);
+      }
+    }
+  }, [data1])
+  return (
+    <>
+
+      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={onInsertTopic} />} title="主题列表" style={topicsStyle}>
+        {
+          data ? (
+            data.map(
+              (topicName, index) =>
+              (
 
 
-                                    <Card.Grid style={{width: '100%', height: '80%',opacity:1}}  key={index}>
-                                        {topicName}
+                <Card.Grid style={{ width: '100%', height: '80%', opacity: 1 }} key={index}>
+                  {topicName}
 
-                                        <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" style={{ position:"absolute", right:'11%'}}>
-                                            <a  onClick={onClickTopic.bind(null, topicName)}>构建</a>
-                                        </button>
-                                        <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null,topicName)} style={{ position:"absolute", right:'5%'}}>
-                                            <DeleteOutlined />
-                                        </button>
+                  <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" style={{ position: "absolute", right: '11%' }}>
+                    <a onClick={onClickTopic.bind(null, topicName)}>构建</a>
+                  </button>
+                  <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteTopic.bind(null, topicName)} style={{ position: "absolute", right: '5%' }}>
+                    <DeleteOutlined />
+                  </button>
 
-                                    </Card.Grid>
-
-                                )
-                        )
-                    ):(
-                        null
-                    )
-
-                }
-            </Card>
-            <Card title="主题分面树" style={treeStyle}>
-                <Card.Grid style={{ width: '100%', height: '730px' }} >
-                    <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
-                    </svg>
                 </Card.Grid>
-            </Card>
+
+              )
+            )
+          ) : (
+            null
+          )
+
+        }
+      </Card>
+      <Card title="主题分面树" style={treeStyle}>
+        <Card.Grid style={{ width: '100%', height: '730px' }} >
+          <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
+          </svg>
+        </Card.Grid>
+      </Card>
 
 
-        </>
-    );
+    </>
+  );
 }
 
 export default FacetTree;
