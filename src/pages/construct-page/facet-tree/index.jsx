@@ -10,6 +10,7 @@ import { Card, Input, Modal, message } from 'antd';
 const topicsStyle = {
   width: '35%',
   height: '800px',
+  top:'120px',
   overflow: 'auto',
   textAlign: 'center',
 };
@@ -20,7 +21,14 @@ const treeStyle = {
   textAlign: 'center',
   top: '5px'
 };
-
+const countStyle1 = {
+  width:'35%',
+  position:'absolute',
+  // left:'20%',
+  textAlign:'center',
+  top:'5px',
+  lineHeight:'10px',
+}
 
 
 function FacetTree () {
@@ -44,7 +52,7 @@ function FacetTree () {
   const [topicName2, settopicName2] = useState();
   const [firstTime, setfirstTime] = useState();
   const [data1, setdata1] = useState();
-  var [data, setdata] = useState();
+  var [data, setdata] = useState([]);
   var [dataTemp, setdataTemp] = useState();
   var flag;
   const handleTextareaChange = (e) => {
@@ -165,6 +173,7 @@ function FacetTree () {
     // e.stopPropagation();
   }
 
+  //插入分面
   const onInsertFacet = (topicName2) => {
     confirm({
       title: '请输入分面名称',
@@ -201,11 +210,19 @@ function FacetTree () {
   useEffect(() => {
     async function insertFacet () {
       await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+      window.flag = false;
+      console.log("shanchuhou", window.flag);
+      if (treeData) {
+        console.log("新的画树数据", treeData2);
+        emptyChildren(treeRef.current);
+        settreeData(treeData2);
+      }
     }
     if (topicName2 && insertFacet1) {
       insertFacet(topicName2, insertFacet1);
     }
-  })
+  },[topicName2])
 
   // 插入主题
   useEffect(() => {
@@ -276,8 +293,8 @@ function FacetTree () {
       if (topicsData) {
         dataTemp = (topicsData.map((topic) => topic.topicName
         ));
-        setcurrentTopic(topicsData[0].topicName);  // 默认topic
-        window.flag = false;
+        // setcurrentTopic(topicsData[0].topicName);  // 默认topic
+        // window.flag = false;
       }
       console.log('dataTemp', dataTemp);
       setdata1(dataTemp.slice(-topics.length));
@@ -285,15 +302,16 @@ function FacetTree () {
     if (currentSubjectDomain.domain) {
       fetchTopicsData();
     }
-  }, [insertTopic1, deleteTopic2, topiclength])
+  }, [insertTopic1, deleteTopic2])
 
   useEffect(() => {
     if (data1) {
       // console.log("firstTime", firstTime);
-      if (firstTime) {
+      if (localStorage.getItem("visitedTopic")) {
         setdata(data1);
         console.log("This is not the first time!")
       } else {
+        localStorage.setItem("visitedTopic", "yes")
         var num = 1;
         var maxlength = data1.length;
         // setdata(data1.slice(-relationData.length));
@@ -303,16 +321,22 @@ function FacetTree () {
           if (num === maxlength + 1) {
             infoFinish();
             clearInterval(timer);
-            setfirstTime(data);
+            setfirstTime(data1);
             console.log("This is the first time!");
+            // console.log("firstTime", firstTime);
           }
         }, 100);
       }
     }
   }, [data1])
+
   return (
     <>
-
+      <Card title='主题数量统计' style={countStyle1}>
+        <Card.Grid style={{ width: '100%', height: '50px' }}>
+          主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{data.length}</span>
+        </Card.Grid>
+      </Card>
       <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={onInsertTopic} />} title="主题列表" style={topicsStyle}>
         {
           data ? (
@@ -341,8 +365,9 @@ function FacetTree () {
 
         }
       </Card>
-      <Card title="主题分面树" style={treeStyle}>
-        <Card.Grid style={{ width: '100%', height: '730px' }} >
+      {/* <Card title="主题分面树" style={treeStyle}> */}
+      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={onInsertFacet.bind(null, currentTopic)}/>} title="主题分面树" style={treeStyle}>
+        <Card.Grid style={{ width: '100%', height: '850px' }} >
           <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
           </svg>
         </Card.Grid>
