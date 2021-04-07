@@ -41,13 +41,18 @@ function KnowledgeForest() {
         async function fetchDependencesMap() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
-
-                    if (res.data && mapRef && (learningPath.length !== 0)) {
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
-                    } else {
-                        alert("该课程下无知识森林数据！")
+                    
+                        if ( res.data && mapRef) {
+                            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
+                        } 
+                        else {
+                            alert("该课程下无知识森林数据！");
+                        }
                     }
-                }
+                    // else {
+                    //         alert("该课程下无知识森林数据！")
+                    // }
+                // }
             )
         }
 

@@ -44,9 +44,11 @@ function FacetTree() {
     const [topicName2,settopicName2] = useState();
     const [firstTime,setfirstTime] = useState();
     const [data1,setdata1] = useState();
+
     var [data,setdata] = useState();
     var [dataTemp,setdataTemp] = useState();
     var flag;
+    window.lock = false;
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
     }
@@ -62,10 +64,18 @@ function FacetTree() {
     };
 
     const onClickTopic = (topicName,e) => {
-        window.flag = true;
-        emptyChildren(treeRef.current);
-        console.log('topicName',topicName);
-        setcurrentTopic(topicName);
+        if(window.lock===false)
+        {
+            window.flag = true;
+            emptyChildren(treeRef.current);
+            console.log('topicName',topicName);
+            setcurrentTopic(topicName);
+        }
+        else {
+            alert("请等待当前主题树构建完成！");
+        }
+        
+        
         
         // 闪烁效果 
         // e.persist();
@@ -77,13 +87,20 @@ function FacetTree() {
     };
 
     useEffect(() => {  
-        async function fetchTreeData() {
-            const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-            console.log("画树用",result);
-            settreeData(result);          
+        if (window.lock === false){
+            window.lock = true;
+            console.log("lock",window.lock);
+            async function fetchTreeData() {
+                const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+                console.log("画树用",result);
+                settreeData(result);          
+            }
+            if(currentTopic){
+                fetchTreeData();
+            }
         }
-        if(currentTopic){
-            fetchTreeData();
+        else {
+            alert("请等待当前主题树构建完成！");
         }
     }, [currentTopic]);
 
@@ -91,28 +108,34 @@ function FacetTree() {
     // 画分面树
     //window.flag = true;
     useEffect(() => {
-        console.log("chushi",window.flag);
-        
-        if (treeRef && treeData) {
-            if(treeData.childrenNumber === 0){
-                alert("当前页面无分面树！");
-                emptyChildren(treeRef.current); 
-            }
-            else{
-                if(treeRef.current.childNodes.length === 0&&window.flag===true ){
-                    console.log('动态树treeRef',treeRef.current.childNodes);
-                    drawTree(treeRef.current,treeData,clickFacet,ClickBranch);
-                    
-                    
+        console.log("lockintree",window.lock);
+        if (window.lock === false){
+            if (treeRef && treeData) {
+                if(treeData.childrenNumber === 0){
+                    window.lock = false;
+                    alert("当前页面无分面树！");
+                    emptyChildren(treeRef.current); 
                 }
-                if(treeRef.current.childNodes.length === 0&&window.flag===false ){
-                    console.log('静态树treeRef',treeRef.current.childNodes);
-                    drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch);
-                    
-                }
+                else{
                 
+                    if(treeRef.current.childNodes.length === 0&&window.flag===true ){
+                        window.lock = true;
+                        console.log("lockindrawtree",window.lock);
+                        console.log('动态树treeRef',treeRef.current.childNodes);
+                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch);
+                    
+                    
+                        }
+                    if(treeRef.current.childNodes.length === 0&&window.flag===false ){
+                        console.log('静态树treeRef',treeRef.current.childNodes);
+                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch);
+                    
+                        }
+                    }
+                }
             }
-        }
+        //else {
+            //alert("请等待当前页面构建完成！");}
     }, [treeData])
 
     
@@ -227,27 +250,19 @@ function FacetTree() {
     async function ClickBranch(facetId){
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-        console.log("传入删除id",facetId);
+        // if (res.data.code === 200){
+        //     message.success("分面删除成功！");
+        // }
         setassembles(res);
         }
     
         console.log("currentTopic clickbranch",currentTopic);
-        // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-        // window.flag = false;
-        // console.log("shanchuhou",window.flag);
-        //     if(treeData){
-        //         console.log("新的画树数据",treeData);
-        //         emptyChildren(treeRef.current);
-        //         settreeData(treeData);
-        //     }
         setcurrentTopic(topic => {
             (async () => {
                 const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
-                console.log('t-tt',topic);
                 window.flag = false;
-                console.log("shanchuhou", window.flag);
                 if (treeData) {
-                    console.log("新的画树数据", treeData);
+                    
                     emptyChildren(treeRef.current);
                     settreeData(treeData);
                 }
