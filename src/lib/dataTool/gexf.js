@@ -42,7 +42,7 @@ var zrUtil = require("zrender/lib/core/util");
 // http://gexf.net/1.2draft/gexf-12draft-primer.pdf
 function parse(xml) {
   var doc;
-  console.log('xml',xml);
+  //console.log('xml',xml);
   if (typeof xml === 'string') {
     var parser = new DOMParser();
     doc = parser.parseFromString(xml, 'text/xml');

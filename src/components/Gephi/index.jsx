@@ -21,6 +21,7 @@ function Gephi(props) {
            
         if (data.dataType === 'node'){
             let currentDomainName = data.data.name;
+            console.log(currentSubjectDomain.subject,currentDomainName)
             setCurrentSubjectDomain(currentSubjectDomain.subject, currentDomainName);
             history.push('/display-page');
         }
