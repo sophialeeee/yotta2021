@@ -32,6 +32,10 @@ function Assemble() {
     const [deleteAssemble,setdeleteAssemble] = useState();
     const [updateAssembleId,setupdateAssembleId] = useState();
     const [updateAssembleContent,setupdateAssembleContent] = useState();
+    const [appendAssembleContentFlagToFetch,setappendAssembleContentFlagToFetch] = useState();  //新增碎片后前往获取碎片列表
+    const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
+    const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
+    const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
     const {TextArea} = Input;
       
     const handleTextareaChange= (e)=>{
@@ -212,9 +216,10 @@ function Assemble() {
             console.log("新增碎片",appendAssembleContent);
             await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
             infoInsert();
+            setappendAssembleContentFlagToFetch(appendAssembleContent);
         }
         if(appendAssembleContent){
-            append();
+            append(); 
         }
     }, [appendAssembleContent])
 
@@ -227,6 +232,7 @@ function Assemble() {
         }
         if(deleteAssemble){
             deleteAss();
+            setdeleteAssembleToFetch(deleteAssemble);
         }
     }, [deleteAssemble])
 
@@ -291,22 +297,34 @@ function Assemble() {
 
 
    
-    //获取碎片
+    //新增和渲染完成后获取碎片列表
     useEffect(()=>{
-
         async function fetchAssembleData(){         
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
                 setassembles(res);
-                console.log("以HTML形式渲染");
+                console.log("获取碎片");
                 infoFinish();
+                setappendAssembleContentFlagToSort(appendAssembleContentFlagToFetch);
             }
-            
         }
         fetchAssembleData();
-    },[appendAssembleContent, deleteAssemble, updateAssembleContent, renderFinish])
+    },[appendAssembleContentFlagToFetch, deleteAssembleToFetch,renderFinish])
 
-
+    //删除碎片后，获取碎片列表
+    useEffect(()=>{
+        async function fetchAssembleData(){         
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+            if(res){
+                setassembles(res);
+                console.log("获取碎片");
+                infoFinish(); 
+                setdeleteAssembleToSort(deleteAssembleToSort);
+            }
+        }
+        fetchAssembleData();
+    },[deleteAssembleToFetch])
+        
     //动态渲染碎片
     var arr=new Array();
     useEffect(() => {   
@@ -344,8 +362,21 @@ function Assemble() {
         if (assembles) {
             console.log("重新计算碎片个数");
             setassnum(assembles.length);
+
+            if (appendAssembleContentFlagToSort) {
+                for(var ass_index=0; ass_index<assembles.length; ass_index++){
+                    if(assembles[ass_index].assembleContent==appendAssembleContent){
+                        const assemble_temp = assembles[ass_index];
+                        assembles.splice(ass_index,1);
+                        assembles.unshift(assemble_temp);
+                        break;
+                    }
+                }
+            }
+
         }
-    }, [appendAssembleContent, deleteAssemble, assembles, currentTopic])
+    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, assembles, currentTopic])
+
     
   
     const infoFinish = () => {
@@ -396,20 +427,22 @@ function Assemble() {
                 {
                     assembles && currentTopic? (
                          assembles.map(
-                                (assemble)=>
+                                (assemble,index)=>
                                    (
-                                        <Card.Grid style={{width:"100%",height:"80%"}} >
+                                        <Card.Grid style={{width:"100%",height:"80%"}} key={index}>
                                             <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute",right:'3%'}}>
                                                 <DeleteOutlined />
                                             </button>
                                             {
                                                 !renderFinish ?
                                                 (
+                                                    <>
+                                                    <div>{assemble.assembleScratchTime}</div>
                                                     <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
+                                                    </>
                                                 ) :
                                                 (
-                                                    <Leaf assemble={assemble} key={assemble.assembleId}>
-
+                                                    <Leaf assemble={assemble} key={index}>
                                                     </Leaf>
                                                 )
                                             }
