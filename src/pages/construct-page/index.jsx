@@ -8,7 +8,7 @@ import FacetTree from './facet-tree';
 import Assemble from './assemble';
 import Relation from './relation';
 import KnowledgeForest from './knowledge-forest';
-
+import cookie from 'react-cookies';
 import useConstructTypeModel from '../../models/construct-type';
 import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
 
@@ -19,6 +19,7 @@ function ConstructPage() {
     const location = useLocation();
     console.log('loca',location.state);
     // consts
+    console.log(cookie.loadAll())
     const stepList = [
         {
             title: '主题分面树构建',
@@ -38,7 +39,26 @@ function ConstructPage() {
             component: <KnowledgeForest/>
         },
     ];
-
+    const stepList2 = [
+        {
+        title: '知识森林概览',
+        description: '实例化的主题分面树与认知关系共同构成知识森林。',
+        component: <KnowledgeForest/>
+    },
+    {
+        title: '主题分面树构建',
+        description: '抽取主题与分面，并组合成树状结构。',
+        component: <FacetTree/>
+    }, {
+        title: '碎片化知识装配',
+        description: '将文本及图像等碎片化知识装配到主题分面树上。',
+        component: <Assemble/>
+    }, {
+        title: '认知关系挖掘',
+        description: '挖掘知识主题之间的因果、参考、对比等认知关系。',
+        component: <Relation/>
+    }, 
+    ];
     let constructStep = 0; // 当前自动构建到了第几步
 
     // hooks
@@ -107,10 +127,16 @@ function ConstructPage() {
                     </div>
                     <Steps current={step} onChange={onStepChange} direction="vertical" className={classes.steps}>
                         {
-                            stepList.map((s, i) => (
+                            (cookie.load('c-type')&&cookie.load('c-type')==='1')?
+                            (
+                                stepList2.map((s, i) => (
                                 <Step key={`step_${s.title}`} title={s.title} description={s.description} status={stepStatus[i]}>
-                                </Step>
-                            ))
+                                </Step>))
+                            ):(
+                                stepList.map((s, i) => (
+                                    <Step key={`step_${s.title}`} title={s.title} description={s.description} status={stepStatus[i]}>
+                                    </Step>
+                            )))
                         }
                     </Steps>
                 </Col>
@@ -118,7 +144,12 @@ function ConstructPage() {
                 </Col>
                 <Col span={18}>
                     {
-                        stepList[step].component
+                        (cookie.load('c-type')&&cookie.load('c-type')==='1')?
+                        (
+                            stepList2[step].component
+                        ):(
+                            stepList[step].component
+                        )
                     }
                 </Col>
             </Row>

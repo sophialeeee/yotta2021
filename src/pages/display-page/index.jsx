@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {notification, Steps, Row, Col, Modal} from 'antd';
 import {useHistory} from 'react-router-dom';
+import {Cascader, Input,Button,Tooltip} from "antd";
+import {ExclamationCircleOutlined} from '@ant-design/icons'
 
 import classes from './index.module.css';
 
@@ -8,31 +10,36 @@ import FacetTree from './facet-tree';
 import Assemble from './assemble';
 import Relation from './relation';
 import KnowledgeForest from './knowledge-forest';
-
+import useConstructModel from '../../models/construct-type';
 import useConstructTypeModel from '../../models/construct-type';
 import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
-
+import cookie from 'react-cookies';
 import {useLocation} from 'react-router-dom';
+import { color } from 'echarts/lib/theme/light';
 const {Step} = Steps;
 
 function DisplayPage() {
+    const {setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const location = useLocation();
+    const {confirm} = Modal;
+    const {setAutoConstructType} = useConstructModel();
     console.log('loca',location.state);
     // consts
     const stepList = [
+        // {
+        //     title: '主题分面树构建',
+        //     description: '抽取主题与分面，并组合成树状结构。',
+        //     component: <FacetTree/>
+        // }, {
+        //     title: '碎片化知识装配',
+        //     description: '将文本及图像等碎片化知识装配到主题分面树上。',
+        //     component: <Assemble/>
+        // }, {
+        //     title: '认知关系挖掘',
+        //     description: '挖掘知识主题之间的因果、参考、对比等认知关系。',
+        //     component: <Relation/>
+        // }, 
         {
-            title: '主题分面树构建',
-            description: '抽取主题与分面，并组合成树状结构。',
-            component: <FacetTree/>
-        }, {
-            title: '碎片化知识装配',
-            description: '将文本及图像等碎片化知识装配到主题分面树上。',
-            component: <Assemble/>
-        }, {
-            title: '认知关系挖掘',
-            description: '挖掘知识主题之间的因果、参考、对比等认知关系。',
-            component: <Relation/>
-        }, {
             title: '知识森林概览',
             description: '实例化的主题分面树与认知关系共同构成知识森林。',
             component: <KnowledgeForest/>
@@ -87,7 +94,26 @@ function DisplayPage() {
         // }
         setStep(current);
     };
+    function onAutoConstructClick(){
+        let subject = currentSubjectDomain.subject;
+        let domain = currentSubjectDomain.domain;
+        
 
+
+        
+        if(subject&&domain)
+            {
+                
+                console.log("S&D",subject,domain)
+                setAutoConstructType();
+                setCurrentSubjectDomain(subject, domain);
+                cookie.save('c-type','1')
+                console.log(cookie.loadAll(),'======================================')
+            // ({pathname:'/construct-page',state:{login:true}});
+                history.push('/construct-page');
+        }
+           
+    };
 
     return (
         <>
@@ -113,6 +139,9 @@ function DisplayPage() {
                             ))
                         }
                     </Steps>
+                    <Button type="link" style={{float:'left',color:'black'}}>对现有构建不满意？</Button>
+                    <Button type="default" onClick={onAutoConstructClick} style={{}}>重新构建</Button>
+                    
                 </Col>
                 <Col span={1} className={classes.divider}>
                 </Col>

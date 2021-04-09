@@ -106,6 +106,7 @@ function App() {
             onOk() {
                 setAutoConstructType();
                 setCurrentSubjectDomain(subject, domain);
+                cookie.save('c-type','0')
                 // ({pathname:'/construct-page',state:{login:true}});
                 history.push('/construct-page');
             },
