@@ -275,8 +275,9 @@ function FacetTree() {
     useEffect(()=>{
         async function insert(){
             await YottaAPI.insertTopic(currentSubjectDomain.domain,insertTopic1);
-            const res = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);;
-            settopicData(res);
+            const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.domain);
+            const topicsData = res.data.data;
+            settopicData(topicsData);
         }
         if(insertTopic1){
             insert(insertTopic1);
