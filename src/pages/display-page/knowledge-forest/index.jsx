@@ -19,14 +19,14 @@ function KnowledgeForest () {
   // const [facetId,setfacetId] = useState();
   const [facetName, setfacetName] = useState('摘要');
   const mapStyle = {
-    width: '50%',
+    width: '62%',
     position: 'absolute',
     left: '0%',
     textAlign: 'center',
     top: '5px'
   }
   const assembleStyle = {
-    width: '47%',
+    width: '35%',
     position: 'absolute',
     right: '0%',
     textAlign: 'center',
@@ -87,13 +87,13 @@ function KnowledgeForest () {
   return (
     <>
       <Card title="知识森林概览" style={mapStyle}>
-        <div style={{ width: '100%', height: '700px' }}>
+        <div style={{ width: '700px', height: '700px' }}>
           <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%', height: '100%' }}></svg>
           <svg ref={ref => treeRef.current = ref} id='tree' style={{
-            position: 'absolute', left: '0', marginLeft: 30,
+            position: 'absolute', left: '0', marginLeft: 28,
             visibility: 'hidden',
             top: 10,
-            marginTop: 56
+            marginTop: 68
           }}></svg>
         </div>
       </Card>

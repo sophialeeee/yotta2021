@@ -295,7 +295,7 @@ function FacetTree() {
     async function ClickBranch(facetId){
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-      console.log("传入删除id", facetId);
+        console.log("传入删除id", facetId);
         setassembles(res);
         }
     
@@ -311,11 +311,11 @@ function FacetTree() {
         setcurrentTopic(topic => {
             (async () => {
                 const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
-        console.log('t-tt', topic);
+                console.log('t-tt', topic);
                 window.flag = false;
-        console.log("shanchuhou", window.flag);
+                console.log("shanchuhou", window.flag);
                 if (treeData) {
-          console.log("新的画树数据", treeData);
+                    console.log("新的画树数据", treeData);
                     emptyChildren(treeRef.current);
                     settreeData(treeData);
                 }
