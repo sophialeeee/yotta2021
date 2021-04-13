@@ -67,7 +67,7 @@ function Relation() {
     //     height: '800px'
     // };
     const countStyle1 = {
-        width:'35%',
+        width:'33%',
         position:'absolute',
         // left:'20%',
         textAlign:'center',
@@ -83,7 +83,7 @@ function Relation() {
         lineHeight:'10px',
     }
     const relationStyle = {
-        width: '35%',
+        width: '33%',
         top: '120px',
         height: '680px',
         overflow: 'auto',
@@ -95,7 +95,7 @@ function Relation() {
         opacity:1
     }
     const mapStyle = {
-        width:'55%',
+        width:'65%',
         position:'absolute',
         right:'0%',
         textAlign:'center',
@@ -393,7 +393,7 @@ function Relation() {
         <Card title="知识森林概览" style={mapStyle}>
             <div style={{ width: '100%', height: '680px' }} >
                 <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-                <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0',marginLeft: 0,marginTop: 56}}></svg>
+                <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0',marginLeft: 22,marginTop: 65}}></svg>
                 {/* <div className={classes.chart}>
                     {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
                 </div> */}
