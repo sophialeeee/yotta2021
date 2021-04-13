@@ -83,10 +83,10 @@ function KnowledgeForest() {
             <Card title="主题间认知路径图" style={mapStyle}>
                 <div style={{ width: '700px', height: '700px' }} >
                   <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-                           <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'0',marginLeft:30,
+                           <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'0',marginLeft:28,
             visibility: 'hidden',
             top: 10,
-            marginTop: 56}}></svg>
+            marginTop: 68}}></svg>
                 </div>
             </Card>
             
