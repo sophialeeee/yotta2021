@@ -43,36 +43,44 @@ function Assemble() {
     }
     
     const treeStyle = {
-        width:'40%',
+        width:'50%',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'50px',
+        top:'10px',
         
       };
+
+    const chartStyle = {
+        width:'50%',
+        position: 'absolute',
+        left: '0%',
+        textAlign: 'center',
+        top:'360px',
+    };
     const countStyle = {
-        width:'20%',
+        width:'25%',
         position:'absolute',
-        left:'42%',
+        left:'52%',
         textAlign:'center',
-        top:'50px',
+        top:'10px',
         lineHeight:'10px',
     }
     const increaseStyle = {
-        width:'35%',
+        width:'22%',
         position:'absolute',
-        left:'63%',
+        left:'79%',
         textAlign:'center',
-        top:'50px',
+        top:'10px',
         lineHeight:'10px',
     }
     const assembleStyle = {
-        width:'56%',
+        width:'49%',
         position:'absolute',
-        left:'42%',
+        left:'52%',
         textAlign:'center',
-        top:'220px',
-        height:'590px',
+        top:'190px',
+        height:'618px',
         overflow: 'auto',
     }
 
@@ -398,13 +406,20 @@ function Assemble() {
 
     return (
         <>
-             <a className={classes.hint} onClick={onAutoConstructClick}>
+            <a className={classes.hint} onClick={onAutoConstructClick}>
                     请选择要装配的主题
              </a>
              <Card title="主题分面树" style={treeStyle}>
-                 <Card.Grid style={{width:'100%',height:'700px'}} >
-                     <svg ref={ref => treeRef.current = ref} id='tree' style={{width:'100%',height:'620px'}}>    
+                 <Card.Grid style={{width:'100%',height:'280px'}} >
+                     <svg ref={ref => treeRef.current = ref} id='tree' style={{width:'100%',height:'260px'}}>    
                      </svg>
+                 </Card.Grid> 
+            </Card>
+            <Card title="圆形布局图" style={chartStyle}>
+                 <Card.Grid style={{width:'100%',height:'395px'}} >
+                     需等待圆形布局图可视化修改完成后，再进入下一步调整。目前在页面上方仍旧保留选择主题列表，便于测试。
+                     {/* <svg ref={ref => treeRef.current = ref} id='tree' style={{width:'100%',height:'620px'}}>    
+                     </svg> */}
                  </Card.Grid> 
             </Card>
              <Card title="主题碎片数量统计" style={countStyle}>
