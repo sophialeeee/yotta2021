@@ -52,7 +52,10 @@ function FacetTree() {
     const [topicName2,settopicName2] = useState();
     const [firstTime,setfirstTime] = useState();
     const [data1,setdata1] = useState();
-  var [data, setdata] = useState([]);
+    
+    var [topicData, settopicData] = useState();
+
+    var [data, setdata] = useState([]);
     var [dataTemp,setdataTemp] = useState();
     var flag;
     window.lock = false;
@@ -155,7 +158,29 @@ function FacetTree() {
         }
     };
 
-    
+    useEffect(()=>{
+        if(topicData){
+            console.log('topicData', topicData);
+            settopicData(topicData);
+            if(topicData){
+                dataTemp = (topicData.map((topic) =>topic.topicName
+               ));
+            }
+            dataTemp = dataTemp.slice(-topicData.length)
+            if(dataTemp[0] == insertTopic1){
+                console.log("Nothing");
+            }else{
+                for (var i=1; i < topicData.length; i++){
+                    if (dataTemp[i]=== insertTopic1 ){
+                        var dataChange = dataTemp[0];
+                        dataTemp[0] = dataTemp[i];
+                        dataTemp[i] = dataChange;
+                    }
+                };
+            }
+            setdata1(dataTemp);
+        }
+    },[topicData])
    
     const onInsertTopic = () => {
         confirm({
@@ -250,6 +275,9 @@ function FacetTree() {
     useEffect(()=>{
         async function insert(){
             await YottaAPI.insertTopic(currentSubjectDomain.domain,insertTopic1);
+            const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.domain);
+            const topicsData = res.data.data;
+            settopicData(topicsData);
         }
         if(insertTopic1){
             insert(insertTopic1);

@@ -55,13 +55,30 @@ function Relation() {
     const treeRef = useRef();
     useEffect(() => {
         async function fetchrelationData() {
-            await YottaAPI.getDependences(currentSubjectDomain.domain).then(
+            await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 res => setrelationData(res)
             )
         }
 
         fetchrelationData();
     }, [currentSubjectDomain.domain])
+
+    function nameCheck(originName) {
+        // var tempName = originName;
+        // if (originName.search('\\+') != -1){
+        //     console.log("tempName", tempName);
+        //     tempName = originName.replace("+", "jiahao");
+        //     console.log("tempName", tempName);
+        // };
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            // checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
 
     useEffect(() => {
         if (relationData) {
