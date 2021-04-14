@@ -26,9 +26,18 @@ function Charts(props) {
     const [subjects,setSubjects]=useState()
     useEffect(() => {
         async function fetchGephi() {
-            const gephi = await YottaAPI.getSubjectGraph('计算机科学');
+            if((currentSubjectDomain&&currentSubjectDomain.subject))
+            {
+                var gephi = await YottaAPI.getSubjectGraph(currentSubjectDomain.subject);
+            }else
+            {var gephi = await YottaAPI.getSubjectGraph('计算机科学');}
             console.log('gephi',gephi);
-            setCurrentSubjectDomain('计算机科学')
+            console.log('csd',currentSubjectDomain)
+            if(!(currentSubjectDomain&&currentSubjectDomain.subject&&currentSubjectDomain.domain&&currentSubjectDomain.domain!=''))
+                {
+                    setCurrentSubjectDomain('计算机科学',undefined);
+                    console.log('csd',currentSubjectDomain)
+                }
             setGephi(gephi.data.data);        
             var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
             domainsAndSubjects = domainsAndSubjects.data.data;
@@ -39,8 +48,7 @@ function Charts(props) {
         fetchGephi();
     }, []);
 
-  
-
+   
     const subjectOptions = options.map(op => {
         return {
             value: op.value,
@@ -51,14 +59,20 @@ function Charts(props) {
    
 
     const onCascaderSADChange = async (e) => {
-        setCurrentSubjectDomain(...e);
+
         const result = await YottaAPI.getSubjectGraph(e[0]);
         setGephi(result.data.data);
+        console.log("ooooooooooo",currentSubjectDomain.domain)
+        if(e&&e.length===2){
+                    setCurrentSubjectDomain(...e);
+                    history.push('./display-page');
+            }else{
+                if(e&&e.length===1){
+                    setCurrentSubjectDomain(...e,'');
+                }
+            }
     };
-
-    // if(currentSubjectDomain.subject && currentSubjectDomain.domain){
-    //     history.push('./display-page');
-    // }
+    
     function onAutoConstructClick(){
         let subject = '';
         let domain = '';
@@ -127,7 +141,16 @@ function Charts(props) {
     return (
         <div className={classes.wrapper}>
             <div>
-                <Cascader
+                {(currentSubjectDomain.subject)?(<Cascader
+                    options={options}
+                    expandTrigger={'hover'}
+                    changeOnSelect
+                    placeholder={'请选择学科和课程'}
+                    className={classes.cascader}
+                    onChange={onCascaderSADChange}
+                    defaultValue={[currentSubjectDomain.subject]}
+                    style={{float:'left'}}
+                />):(<Cascader
                     options={options}
                     expandTrigger={'hover'}
                     changeOnSelect
@@ -136,7 +159,7 @@ function Charts(props) {
                     onChange={onCascaderSADChange}
                     defaultValue={["计算机科学"]}
                     style={{float:'left'}}
-                />
+                />)}
                {/* <Button type="text" style={{float:'left'}}></Button> */}
                 {/* <Tooltip title=""> */}
                 <Button type="link" onClick={onAutoConstructClick} style={{float:'left'}}>未找到想要课程，自动构建</Button>
