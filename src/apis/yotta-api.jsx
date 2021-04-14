@@ -156,6 +156,10 @@ const YottaAPI = {
     async getDynamicTopics(subjectName,domainName){
         return await axios.post(`http://47.95.145.72:8084/spiderDynamicOutput/spiderTopicBySubjectAndDomainName?subjectName=${encodeURI(subjectName)}&domainName=${encodeURI(domainName)}`);
     },
+
+    async getFirstTopicByDomainName(domainName){
+        return await axios.post(`http://zscl.xjtudlc.com:8083/topic/getFirstTopicByDomainName?domainName=${encodeURI(domainName)}`);
+    },
     // 根据课程名获取画依赖关系的数据
     async getDependenceByDomainName(domainName){
         return await gets(`?domainName=${encodeURI(domainName)}`);

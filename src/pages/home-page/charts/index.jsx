@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Cascader, Modal, Input,Button,Tooltip} from "antd";
+import {Cascader, Modal, Input,Button,Tooltip,Select} from "antd";
 import {ExclamationCircleOutlined} from '@ant-design/icons'
 
 import Gephi from '../../../components/Gephi';
@@ -23,13 +23,18 @@ function Charts(props) {
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const [gephi, setGephi] = useState(undefined);
     const history = useHistory();
-
+    const [subjects,setSubjects]=useState()
     useEffect(() => {
         async function fetchGephi() {
             const gephi = await YottaAPI.getSubjectGraph('计算机科学');
             console.log('gephi',gephi);
             setCurrentSubjectDomain('计算机科学')
-            setGephi(gephi.data.data);
+            setGephi(gephi.data.data);        
+            var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
+            domainsAndSubjects = domainsAndSubjects.data.data;
+            console.log("+++++++",domainsAndSubjects)
+            if(domainsAndSubjects)
+                {setSubjects(domainsAndSubjects)}
         }
         fetchGephi();
     }, []);
@@ -51,9 +56,9 @@ function Charts(props) {
         setGephi(result.data.data);
     };
 
-    if(currentSubjectDomain.subject && currentSubjectDomain.domain){
-        history.push('./display-page');
-    }
+    // if(currentSubjectDomain.subject && currentSubjectDomain.domain){
+    //     history.push('./display-page');
+    // }
     function onAutoConstructClick(){
         let subject = '';
         let domain = '';
@@ -63,18 +68,40 @@ function Charts(props) {
         const onTextDomainChange = (e) => {
             domain = e.target.value;
         };
-        
 
+        const onSelectChange = (e) => { 
+            subject = e;  
+        }
         confirm({
+            
             title: '请选择构建学科，并输入要构建的课程',
             icon: <ExclamationCircleOutlined/>,
             content: <>
                 <div style={{display: 'flex', flexDirection: 'column'}}>
+                
                 <span>
-                    学科：   
+                    学科：
                 </span>
-                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange}/>
+                {(subjects)?(
+                    <Select onSelect={onSelectChange}>
+                        {
+                            subjects.map((SubjectsName)=>(
+                            <option value={SubjectsName.subjectName} >{SubjectsName.subjectName}</option> 
+                            ))
+                        }
+                    </Select>):                 
+                (
+                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange}/>)}
+
+
                 </div>
+                {/* <div>
+                    <span>
+                        碎片内容：
+                    </span>
+                    <TextArea showCount maxLength={150} onChange={handleTextareaChange}/>
+                </div> */}
+
                 <div>
                 <span>
                     课程：
@@ -111,9 +138,9 @@ function Charts(props) {
                     style={{float:'left'}}
                 />
                {/* <Button type="text" style={{float:'left'}}></Button> */}
-                <Tooltip title="未找到想要课程？">
-                <Button type="link" onClick={onAutoConstructClick} style={{float:'left'}}>自动构建</Button>
-                </Tooltip>
+                {/* <Tooltip title=""> */}
+                <Button type="link" onClick={onAutoConstructClick} style={{float:'left'}}>未找到想要课程，自动构建</Button>
+                {/* </Tooltip> */}
             </div>
             <div className={classes.chart}>
                 {gephi ? <Gephi subjectName={currentSubjectDomain.subject} gephi={gephi}/> : <div>该学科没有图谱</div>}

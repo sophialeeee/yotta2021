@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Badge, Divider} from 'antd';
+import {Card, Badge, Divider, Modal} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -16,15 +16,16 @@ function KnowledgeForest() {
     const [assnum,setassnum] = useState(0);
     // const [facetId,setfacetId] = useState();
     const [facetName,setfacetName] = useState('摘要');
+    const {confirm} = Modal;
     const mapStyle = {
-        width:'62%',
+        width:'50%',
         position:'absolute',
         left:'0%',
         textAlign:'center',
         top:'5px'
     }
     const assembleStyle = {
-        width:'35%',
+        width:'47%',
         position:'absolute',
         right:'0%',
         textAlign:'center',
@@ -50,7 +51,27 @@ function KnowledgeForest() {
     },[currentSubjectDomain.domain]);
     
 
-   
+    async function deleteTopic(domainName, topicName) {
+        confirm({
+            title: "确认删除该主题吗？",
+            okText: '确定',
+            cancelText: '取消',
+            async onOk() {
+                const res =  YottaAPI.deleteTopic(domainName, topicName)
+                const status = res.data.data;
+                if (status==200){
+                    const new_domain = YottaAPI.getTopicsByDomainName(domainName)
+                    //...
+                }
+
+            },
+            onCancel() {
+
+            }
+        })
+
+    }
+
     async function clickFacet(facetId){
             const res = await YottaAPI.getASsembleByFacetId(facetId);
             setassembles(res);
@@ -76,17 +97,17 @@ function KnowledgeForest() {
                 setassembles(res);
             }
         );
-       
+
     }
     return (
         <>
             <Card title="主题间认知路径图" style={mapStyle}>
-                <div style={{ width: '700px', height: '700px' }} >
+                <div style={{ width: '100%', height: '700px' }} >
                   <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-                           <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'0',marginLeft:28,
+                           <svg ref={ref=>treeRef.current = ref} id='tree' style={{position:'absolute',left:'0',marginLeft:30,
             visibility: 'hidden',
             top: 10,
-            marginTop: 68}}></svg>
+            marginTop: 56}}></svg>
                 </div>
             </Card>
             
