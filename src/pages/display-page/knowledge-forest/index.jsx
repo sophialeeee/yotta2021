@@ -7,11 +7,12 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import { drawMap } from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
-
+import {useHistory} from 'react-router-dom';
 function KnowledgeForest () {
   const { currentSubjectDomain } = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
+  const history = useHistory();
   const [learningPath, setlearningPath] = useState([]);
   const [currentTopic, setcurrentTopic] = useState('字符串');
   const [assembles, setassembles] = useState(initialAssemble.current);
@@ -46,6 +47,7 @@ function KnowledgeForest () {
             drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
           } else {
             alert("该课程下无知识森林数据！")
+            history.push({pathname:'/nav',state:{login:true}})
           }
         }
       )
