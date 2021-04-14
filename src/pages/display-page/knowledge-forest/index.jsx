@@ -62,6 +62,7 @@ function KnowledgeForest () {
     const res = await YottaAPI.getASsembleByFacetId(facetId);
     setassembles(res);
     const res1 = await YottaAPI.getFacetName1(facetId);
+    //if (res1.facetName){
     setfacetName(res1.facetName);
   }
 
@@ -116,7 +117,7 @@ function KnowledgeForest () {
   return (
     <>
       <Card title="知识森林概览" style={mapStyle}>
-        <div style={{ width: '700px', height: '700px' }}>
+        <div style={{ width: '100%', height: '700px' }}>
           <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%', height: '100%' }}></svg>
           <svg ref={ref => treeRef.current = ref} id='tree' style={{
             position: 'absolute', left: '0', marginLeft: 28,
