@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Badge, Divider} from 'antd';
+import {Card, Badge, Divider, Modal} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -16,6 +16,7 @@ function KnowledgeForest() {
     const [assnum,setassnum] = useState(0);
     // const [facetId,setfacetId] = useState();
     const [facetName,setfacetName] = useState('摘要');
+    const {confirm} = Modal;
     const mapStyle = {
         width:'50%',
         position:'absolute',
