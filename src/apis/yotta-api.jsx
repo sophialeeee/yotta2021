@@ -195,6 +195,11 @@ const YottaAPI = {
         return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
     },
 
+    async insertTopic_zyl(domainName,topicName){
+        // return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
+        return await axios.get(`http://47.95.145.72:8084/topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+
     async countUpdateAssemble(domainName){
         return await gets((`assemble/countUpdateAssemble?domainName=${encodeURI(domainName)}`));
     },
@@ -239,7 +244,8 @@ const YottaAPI = {
 
     // 删除主题
     async deleteTopic(domainName,topicName){
-        return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicCompleteByDomainNameAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+           return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
 };

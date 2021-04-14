@@ -7,8 +7,9 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import {drawMap} from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
+import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
 function KnowledgeForest() {
-    const {currentSubjectDomain} = useCurrentSubjectDomainModel();
+    const {currentSubjectDomain ,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     // const [mapdata,setmapdata] = useState();
     const [learningPath,setlearningPath] = useState([]);
     const [currentTopic,setcurrentTopic] = useState('树状数组');
@@ -45,31 +46,67 @@ function KnowledgeForest() {
                         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
                 }
             )
+
         }
         fetchDependencesMap();
-
     },[currentSubjectDomain.domain]);
-    
 
-    async function deleteTopic(domainName, topicName) {
+
+    async  function  insertTopic(domainName, topicName){
+        const res = await YottaAPI.insertTopic_zyl(domainName, topicName)
+        const res_data  = res.data
+        if (!res_data){
+            alert('插入主题失败')
+            return
+        }
+        if (res_data.code==200){
+
+            setCurrentSubjectDomain()
+            // //重新获取重绘
+            // await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            //     (res) => {
+            //         if(res.data&&mapRef){
+            //             drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+            //     }
+            // )
+        }else {
+            alert(res.data.msg)
+        }
+
+
+
+    }
+
+    async function  deleteTopic_t  (domainName_p, topicName_p) {
         confirm({
             title: "确认删除该主题吗？",
             okText: '确定',
             cancelText: '取消',
             async onOk() {
-                const res =  YottaAPI.deleteTopic(domainName, topicName)
-                const status = res.data.data;
-                if (status==200){
-                    const new_domain = YottaAPI.getTopicsByDomainName(domainName)
-                    //...
+                const res = await YottaAPI.deleteTopic(domainName_p, topicName_p)
+                const res_data  = res.data
+                if (!res_data){
+                    alert('删除失败')
+                    return
                 }
-
+                if (res_data.code==200){
+                    //重新获取重绘
+                    setCurrentSubjectDomain()
+                    // await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                    //     (res) => {
+                    //         // setmapdata(res.data);
+                    //         if(res.data&&mapRef){
+                    //             drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                    //     }
+                    // )
+                }else {
+                    alert(res_data.msg)
+                }
             },
             onCancel() {
-
+                console.log('cancel')
             }
         })
-
     }
 
     async function clickFacet(facetId){
@@ -90,6 +127,7 @@ function KnowledgeForest() {
     },[assembles])
     
     if(!assembles){
+
         YottaAPI.getASsembleByFacetId(2).then(
             res=>
             {
@@ -112,7 +150,7 @@ function KnowledgeForest() {
             </Card>
             
             <Card  title="碎片" style={assembleStyle}>
-                
+
                 <Badge color="purple" text={'主题:'+currentTopic}/> &nbsp;&nbsp;&nbsp;  
                 <Badge color="purple" text={'分面:'+facetName}/> &nbsp;&nbsp;&nbsp;  
                 <Badge color="purple" text={'碎片数量:'+assnum}/> &nbsp;&nbsp; &nbsp; 
@@ -134,7 +172,7 @@ function KnowledgeForest() {
             </Card>
         </>
     );
-}
+};
 
 export default KnowledgeForest;
 

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTree,drawTreeNumber} from '../../../modules/facetTree';
+import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
 
@@ -15,7 +16,7 @@ const {confirm} = Modal;
 
 
 function Assemble() {
-
+    const [learningPath,setlearningPath] = useState([]);  //学习路径
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     const [currentTopic,setcurrentTopic] = useState();
     const [topics,settopics] = useState([]);
@@ -37,26 +38,33 @@ function Assemble() {
     const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
     const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
     const {TextArea} = Input;
-      
+    
+
+    const mapRef = useRef();
+    const treeRef = useRef();
+    const treeRef1 = useRef();
+
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
     }
     
     const treeStyle = {
         width:'50%',
+        height:'340px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'10px',
+        top:'0px',
         
       };
 
     const chartStyle = {
         width:'50%',
+        height:'455px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'360px',
+        top:'350px',
     };
     const countStyle = {
         width:'25%',
@@ -205,8 +213,6 @@ function Assemble() {
         })
     }; 
 
-    const treeRef = useRef();
-
 
     //根据domainName,topicName获取分面信息
     useEffect(()=>{
@@ -303,8 +309,37 @@ function Assemble() {
         }
     }, [currentSubjectDomain.domain])
 
+    //画圆形图
+    useEffect(()=>{
+        async function fetchDependencesMap(){
+            const result = await YottaAPI.getMap(currentSubjectDomain.domain);
+            console.log("结果是：",result);
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                (res) => {
+                    // setmapdata(res.data);
+                    if(res.data&&mapRef){
+                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                }
+            )
+        }
+        console.log("当前主题为",currentSubjectDomain.domain);
+        fetchDependencesMap();
 
+    },[currentSubjectDomain.domain]);
    
+
+
+    async function clickFacet(facetId){
+        const res = await YottaAPI.getASsembleByFacetId(facetId);
+        setassembles(res);
+        //const res1 = await YottaAPI.getFacetName1(facetId);
+        //setfacet(res1.facetName);
+    }
+
+    async function clickTopic(topicId,topicName){
+        setcurrentTopic(topicName);
+    }
+
     //新增和渲染完成后获取碎片列表
     useEffect(()=>{
         async function fetchAssembleData(){         
@@ -406,21 +441,14 @@ function Assemble() {
 
     return (
         <>
-            <a className={classes.hint} onClick={onAutoConstructClick}>
-                    请选择要装配的主题
-             </a>
              <Card title="主题分面树" style={treeStyle}>
-                 <Card.Grid style={{width:'100%',height:'280px'}} >
-                     <svg ref={ref => treeRef.current = ref} id='tree' style={{width:'100%',height:'260px'}}>    
-                     </svg>
-                 </Card.Grid> 
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'260px'}}></svg> 
             </Card>
             <Card title="圆形布局图" style={chartStyle}>
-                 <Card.Grid style={{width:'100%',height:'395px'}} >
-                     需等待圆形布局图可视化修改完成后，再进入下一步调整。目前在页面上方仍旧保留选择主题列表，便于测试。
-                     {/* <svg ref={ref => treeRef.current = ref} id='tree' style={{width:'100%',height:'620px'}}>    
-                     </svg> */}
-                 </Card.Grid> 
+                 <div style={{ width: '100%', height: '650px' }} >
+                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%',marginLeft:'80px' }}></svg>
+                    <svg ref={ref => treeRef1.current = ref} style={{position:'absolute',left:'0',marginLeft:"150px",visibility: 'hidden',top:"20px", marginTop:"80px"}}></svg>
+                </div>
             </Card>
              <Card title="主题碎片数量统计" style={countStyle}>
                 <Card.Grid style={{width:'100%',height:'50px'}} >
