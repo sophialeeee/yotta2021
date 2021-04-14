@@ -35,7 +35,7 @@ function Login(){
 
               cookie.save('userType',res.data,{expires: intenMinutes});//safe?
 
-
+              cookie.remove("c-type")
               history.push({pathname:'/nav',state:{login:true,userName:userName}});
               console.log("cookie",cookie.loadAll())
               
