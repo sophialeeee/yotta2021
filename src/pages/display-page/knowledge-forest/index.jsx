@@ -62,11 +62,16 @@ function KnowledgeForest () {
     const res = await YottaAPI.getASsembleByFacetId(facetId);
     setassembles(res);
     const res1 = await YottaAPI.getFacetName1(facetId);
-    setfacetName(res1.facetName);
+    if(res1)
+    {setfacetName(res1.facetName);}
   }
 
   async function clickTopic (topicId, topicName) {
     setcurrentTopic(topicName);
+    setfacetName("未选择")
+    await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicName).then(res=>{
+      setassembles(res)
+  })
   }
 
 
@@ -77,42 +82,31 @@ function KnowledgeForest () {
     }
   }, [assembles])
 
-     if(!assembles){
-        YottaAPI.getASsembleByFacetId(2).then(
-            res=>
-            {
-                console.log('res11111111111111111111111',res);
-                setassembles(res);
-            }
-        );
+    //  if(!assembles){
+    //     YottaAPI.getASsembleByFacetId(2).then(
+    //         res=>
+    //         {
+    //             console.log('res11111111111111111111111',res);
+    //             setassembles(res);
+    //         }
+    //     );
        
-    }
-  //   async function init(domain){
-  //     if((!assembles)&&domain){
+    // }
+    async function init(domain){
+      if((!assembles)&&domain){
 
-  //             const res= await YottaAPI.getFirstTopicByDomainName(domain)
-  //             console.log("resssssssss",res)
-  //             if(res.data.code===200)
-  //             {
-  //               console.log("resssssssss",res.data.topicName)
-                
-  //               if(res.data.data&&res.data.data.children)
-  //                 {
-  //                   setcurrentTopic(res.data.data.topicName);
-  //                   setfacetName(res.data.data.children[0].facetName)
-                  
-  //                   const res1 = await YottaAPI.getASsembleByFacetId(res.data.data.children[0].facetId);
-  //                   setassembles(res1);
-  //             }else{;}  
-  //             }else{
-  //               ;
-  //             }
-  //         }
-  // }
-  // useEffect(()=>{
-  //     console.log("starttttt")
-  //     init(currentSubjectDomain.domain)
-  // },[])
+        const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+        setcurrentTopic(topicsData[0].topicName); 
+        console.log("cTopic",currentTopic)
+        await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicsData[0].topicName).then(res=>{
+          setassembles(res)
+      })
+          }
+  }
+  useEffect(()=>{
+      console.log("starttttt")
+      init(currentSubjectDomain.domain)
+  },[])
   return (
     <>
       <Card title="知识森林概览" style={mapStyle}>

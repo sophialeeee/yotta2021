@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Badge, Divider, Modal} from 'antd';
+import {Card, Badge, Divider, Modal,Alert} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -44,7 +44,10 @@ function KnowledgeForest() {
                     // setmapdata(res.data);
                     if(res.data&&mapRef){
                         drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
-                }
+                        else {
+                            alert("该课程下无知识森林数据！")
+                            //history.push({pathname:'/nav',state:{login:true}})
+                          }}
             )
 
         }
@@ -110,14 +113,19 @@ function KnowledgeForest() {
     }
 
     async function clickFacet(facetId){
-            const res = await YottaAPI.getASsembleByFacetId(facetId);
-            setassembles(res);
-            const res1 = await YottaAPI.getFacetName1(facetId);
-            setfacetName(res1.facetName);
+        const res = await YottaAPI.getASsembleByFacetId(facetId);
+        setassembles(res);
+        const res1 = await YottaAPI.getFacetName1(facetId);
+        if(res1)
+        {setfacetName(res1.facetName);}
     }
     
     async function clickTopic(topicId,topicName){
         setcurrentTopic(topicName);
+        setfacetName("未选择")
+        await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicName).then(res=>{
+          setassembles(res)
+        })
     }
         // clickFacet();
     useEffect(()=>{
@@ -125,18 +133,31 @@ function KnowledgeForest() {
             setassnum(assembles.length);   
     }
     },[assembles])
-    
-    if(!assembles){
-
-        YottaAPI.getASsembleByFacetId(2).then(
-            res=>
-            {
-                console.log('res11111111111111111111111',res);
-                setassembles(res);
+    //  if(!assembles){
+    //     YottaAPI.getASsembleByFacetId(2).then(
+    //         res=>
+    //         {
+    //             console.log('res11111111111111111111111',res);
+    //             setassembles(res);
+    //         }
+    //     );
+       
+    // }
+    async function init(domain){
+        if((!assembles)&&domain){
+  
+          const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+          setcurrentTopic(topicsData[0].topicName); 
+          console.log("cTopic",currentTopic)
+          await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicsData[0].topicName).then(res=>{
+            setassembles(res)
+        })
             }
-        );
-
     }
+    useEffect(()=>{
+        console.log("starttttt")
+        init(currentSubjectDomain.domain)
+    },[])
     return (
         <>
             <Card title="主题间认知路径图" style={mapStyle}>
@@ -165,7 +186,7 @@ function KnowledgeForest() {
                             )
                         ) :
                         (
-                            null
+                            <Alert style={{fontSize:'20px'}}message="点击左侧圆形布局图以查看碎片" type="info" />
                         )
                 }
                
