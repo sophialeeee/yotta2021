@@ -27,7 +27,7 @@ function HomePage() {
 
     const [options, setOptions] = useState([]);
     const {setDisplayConstructType} = useConstructTypeModel();
-    const {setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
+    const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const {UserName} = useUserNameModel();
     const location = useLocation();
     const history = useHistory();
@@ -40,6 +40,7 @@ function HomePage() {
     useEffect(() => {
         // 获取数据
         async function fetchData() {
+            console.log("----------------------home--------------------")
             console.log('userName',UserName)
             console.log(cookie.loadAll())
             var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
@@ -70,7 +71,11 @@ function HomePage() {
         setDisplayConstructType();
       
         // 重置学科和课程
-        setCurrentSubjectDomain();
+        if(!(currentSubjectDomain.subject && currentSubjectDomain.domain))
+        {
+            console.log("222222",currentSubjectDomain.subject,currentSubjectDomain.domain)
+            setCurrentSubjectDomain();
+        }
 
     }, []);
     

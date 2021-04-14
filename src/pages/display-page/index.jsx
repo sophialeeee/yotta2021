@@ -16,6 +16,13 @@ import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
 import cookie from 'react-cookies';
 import {useLocation} from 'react-router-dom';
 import { color } from 'echarts/lib/theme/light';
+import { createFromIconfontCN } from '@ant-design/icons';
+
+const IconFont = createFromIconfontCN({
+  scriptUrl: [
+    "//at.alicdn.com/t/font_2482370_44lwu6rmrqx.js",//tree
+  ],
+});
 const {Step} = Steps;
 
 function DisplayPage() {
@@ -60,6 +67,7 @@ function DisplayPage() {
     useEffect(() => {
         // 如果学科和课程没有选全
         if (!(currentSubjectDomain.subject && currentSubjectDomain.domain)) {
+            console.log('history----------------------',history.location)
             Modal.error({
                 title: '学科和课程选择有误',
                 content: '请重新选择学科和课程！',
@@ -107,6 +115,7 @@ function DisplayPage() {
                 console.log("S&D",subject,domain)
                 setAutoConstructType();
                 setCurrentSubjectDomain(subject, domain);
+                cookie.remove("c-type")
                 cookie.save('c-type','1')
                 console.log(cookie.loadAll(),'======================================')
             // ({pathname:'/construct-page',state:{login:true}});
@@ -134,7 +143,7 @@ function DisplayPage() {
                     <Steps current={step} onChange={onStepChange} direction="vertical" className={classes.steps}>
                         {
                             stepList.map((s, i) => (
-                                <Step key={`step_${s.title}`} title={s.title} description={s.description} status={stepStatus[i]}>
+                                <Step key={`step_${s.title}`} title={s.title} description={s.description} status={stepStatus[i]} icon={<IconFont type="icon-tree" />}>
                                 </Step>
                             ))
                         }

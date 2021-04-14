@@ -73,6 +73,7 @@ function ConstructPage() {
     useEffect(() => {
         // 如果学科和课程没有选全
         if (!(currentSubjectDomain.subject && currentSubjectDomain.domain)) {
+            console.log('history----------------------',history.location)
             Modal.error({
                 title: '学科和课程选择有误',
                 content: '请重新选择学科和课程！',

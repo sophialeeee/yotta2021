@@ -68,16 +68,26 @@ function KnowledgeForest() {
     }
     },[assembles])
     
-    if(!assembles){
-        YottaAPI.getASsembleByFacetId(2).then(
-            res=>
-            {
-                console.log('res11111111111111111111111',res);
-                setassembles(res);
-            }
-        );
+    // if(!assembles){
+    //     YottaAPI.getASsembleByFacetId(2).then(
+    //         res=>
+    //         {
+    //             console.log('res11111111111111111111111',res);
+    //             setassembles(res);
+    //         }
+    //     );
        
+    // }
+    async function init(domain){
+        if((!assembles)&&domain){
+                const res= await YottaAPI.getFirstTopicByDomainName(domain)
+                console.log("[[]]][[]]",res.data)
+            }
     }
+    useEffect(()=>{
+        console.log("starttttt")
+        init(currentSubjectDomain.domain)
+    },[])
     return (
         <>
             <Card title="主题间认知路径图" style={mapStyle}>
