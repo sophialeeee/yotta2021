@@ -131,16 +131,16 @@ function FacetTree() {
                 
                     if(treeRef.current.childNodes.length === 0&&window.flag===true ){
                         window.lock = true;
-                        console.log("lockindrawtree",window.lock);
+                        //console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
+                        //drawTree(treeRef.current,treeData,clickFacet,DeleteFacet,onInsertFacet);
                         drawTree(treeRef.current,treeData,clickFacet,ClickBranch);
-                    
                     
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
+                        //drawTreeNumber(treeRef.current,treeData,clickFacet,DeleteFacet,onInsertFacet);
                         drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch);
-                    
                         }
                     }
                 }
@@ -288,44 +288,52 @@ function FacetTree() {
 
     
     
-    //删除分面调用接口
+    //删除分面函数
 
-    
+    const DeleteFacet = (facetId) => {
+        confirm({
+            title:"确认删除该分面吗？",
+            okText:'确定',
+            cancelText:'取消',
+            onOk(){
+                //console.log("待删除的主题是",deleteTopic1);
+                ClickBranch(facetId);
+            },
+            onCancel(){
 
-    async function ClickBranch(facetId){
-        if (facetId > 0){
-        const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-        console.log("传入删除id", facetId);
-        setassembles(res);
-        }
-    
-        console.log("currentTopic clickbranch",currentTopic);
-    // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-    // window.flag = false;
-    // console.log("shanchuhou",window.flag);
-    //     if(treeData){
-    //         console.log("新的画树数据",treeData);
-    //         emptyChildren(treeRef.current);
-    //         settreeData(treeData);
-    //     }
-        setcurrentTopic(topic => {
-            (async () => {
-                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
-                console.log('t-tt', topic);
-                window.flag = false;
-                console.log("shanchuhou", window.flag);
-                if (treeData) {
-                    console.log("新的画树数据", treeData);
-                    emptyChildren(treeRef.current);
-                    settreeData(treeData);
-                }
-            })();
-            return topic
+            }
         })
-           
-        
         
     }
+
+    async function ClickBranch(facetId){
+
+ 
+        if (facetId > 0){
+            const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+            console.log("传入删除id", facetId);
+            setassembles(res);
+            }
+            
+            setcurrentTopic(topic => {
+                (async () => {
+                    const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+                    console.log('t-tt', topic);
+                    window.flag = false;
+                    console.log("shanchuhou", window.flag);
+                    if (treeData) {
+                        console.log("新的画树数据", treeData);
+                        emptyChildren(treeRef.current);
+                        settreeData(treeData);
+                        }
+                })();
+                return topic
+            })
+
+         
+        }
+    
+
 
     //返回碎片调用接口
     async function clickFacet(facetId){
