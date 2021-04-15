@@ -67,7 +67,7 @@ function Relation() {
     //     height: '800px'
     // };
     const countStyle1 = {
-        width:'33%',
+        width:'42%',
         position:'absolute',
         // left:'20%',
         textAlign:'center',
@@ -83,7 +83,7 @@ function Relation() {
         lineHeight:'10px',
     }
     const relationStyle = {
-        width: '33%',
+        width: '42%',
         top: '120px',
         height: '680px',
         overflow: 'auto',
@@ -95,7 +95,7 @@ function Relation() {
         opacity:1
     }
     const mapStyle = {
-        width:'65%',
+        width:'56%',
         position:'absolute',
         right:'0%',
         textAlign:'center',
