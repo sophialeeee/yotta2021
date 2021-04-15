@@ -183,11 +183,11 @@ function BatchConstruct() {
         console.log('currentTopic',currentTopic);
     },[topics])
 
-    useEffect(()=>{
-        var stopCommand = 'True'
-        setstopCommand(stopCommand);
-        console.log(stopCommand);
-    },[topics])
+    // useEffect(()=>{
+    //     var stopCommand = 'True'
+    //     setstopCommand(stopCommand);
+    //     console.log(stopCommand);
+    // },[topics])
 
     // useEffect(()=>{
     //     emptyChildren(treeRef.current) 
@@ -237,7 +237,7 @@ function BatchConstruct() {
                         //  const result = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain,currentTopic); 
                         // resultTree.current = result;
                         // console.log(resultTree.current)
-                        console.log('stopCommand',stopCommand);
+                        // console.log('stopCommand');
                          const result = resultTree.current;
                          if(result){
                             const treeData = result.data;
@@ -264,7 +264,7 @@ function BatchConstruct() {
                          clearInterval(myvar);  
                      }  
         },1000)
-    }, [currentTopic,stopCommand]);
+    }, [currentTopic]);
 
     // 画分面树
     useEffect(() => {
@@ -379,10 +379,10 @@ function BatchConstruct() {
     return (
         <>
         <Card style={stopStyle}>
-                <Button shape='round' style={{ position:"absolute", left:'5%',top:'20%' }}>
+                <Button shape='circle' style={{ position:"absolute", left:'5%',top:'20%' }}>
                     <a onClick={onBatchStop}>暂停</a>
                 </Button>
-                <Button shape='round' style={{ position:"absolute", right:'5%',top:'20%' }}>
+                <Button shape='circle' style={{ position:"absolute", right:'5%',top:'20%' }}>
                     <a onClick={onBatchContinue}>继续</a>
                 </Button>
         </Card>
