@@ -50,7 +50,7 @@ function Assemble() {
     
     const treeStyle = {
         width:'50%',
-        height:'340px',
+        height:'300px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
@@ -60,11 +60,11 @@ function Assemble() {
 
     const chartStyle = {
         width:'50%',
-        height:'455px',
+        height:'495px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'350px',
+        top:'310px',
     };
     const countStyle = {
         width:'25%',
@@ -442,12 +442,12 @@ function Assemble() {
     return (
         <>
              <Card title="主题分面树" style={treeStyle}>
-                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'260px'}}></svg> 
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'200px'}}></svg> 
             </Card>
             <Card title="圆形布局图" style={chartStyle}>
-                 <div style={{ width: '100%', height: '650px' }} >
-                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%',marginLeft:'80px' }}></svg>
-                    <svg ref={ref => treeRef1.current = ref} style={{position:'absolute',left:'0',marginLeft:"150px",visibility: 'hidden',top:"20px", marginTop:"80px"}}></svg>
+                 <div style={{ width: '100%', height: '670px' }} >
+                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%' }}></svg>
+                    <svg ref={ref => treeRef1.current = ref} style={{position:'absolute',left:'0',marginLeft:"125px",visibility: 'hidden',top:"20px", marginTop:"80px"}}></svg>
                 </div>
             </Card>
              <Card title="主题碎片数量统计" style={countStyle}>

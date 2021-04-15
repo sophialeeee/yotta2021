@@ -23,14 +23,14 @@ function KnowledgeForest() {
     const [facetName, setfacetName] = useState('摘要');
     const {confirm} = Modal;
     const mapStyle = {
-        width: '50%',
+        width: '56%',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
         top: '5px'
     }
     const assembleStyle = {
-        width: '47%',
+        width: '42%',
         position: 'absolute',
         right: '0%',
         textAlign: 'center',
@@ -202,10 +202,11 @@ function KnowledgeForest() {
                 <div style={{width: '100%', height: '700px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{
-                        position: 'absolute', left: '0', marginLeft: 30,
+                        position: 'absolute', left: '0', 
+                        marginLeft: 26,
                         visibility: 'hidden',
                         top: 10,
-                        marginTop: 56
+                        marginTop: 30
                     }}></svg>
                 </div>
             </Card>
