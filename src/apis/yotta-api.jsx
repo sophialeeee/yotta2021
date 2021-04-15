@@ -248,6 +248,11 @@ const YottaAPI = {
         // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
+    async deleteTopic_zyl(topicId){
+        return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
+        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
+    },
 };
 
 export default YottaAPI;
