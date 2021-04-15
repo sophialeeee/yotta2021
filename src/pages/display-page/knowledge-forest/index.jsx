@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import { drawMap } from '../../../modules/topicDependenceVisualization';
+import { drawMap } from '../../../module/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
