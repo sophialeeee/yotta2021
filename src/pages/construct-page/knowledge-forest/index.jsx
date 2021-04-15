@@ -47,7 +47,9 @@ function KnowledgeForest() {
                 (res) => {
                     // setmapdata(res.data);
                     if (res.data && mapRef) {
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onInsertTopic, onInsertTopic);
+
+                        console.log(res.data)
+                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onInsertTopic, OnDeleteTopic);
                     } else {
                         alert("该课程下无知识森林数据！")
                         //history.push({pathname:'/nav',state:{login:true}})
@@ -60,8 +62,7 @@ function KnowledgeForest() {
         fetchDependencesMap();
     }, [currentSubjectDomain.domain]);
 
-
-    /***===============================================================================================================**/
+    /***  insert  ===============================================================================================================**/
     const textareaValueRef = useRef('');
     const {TextArea} = Input;
     const [insertTopic, setInsertTopic] = useState();
@@ -92,9 +93,8 @@ function KnowledgeForest() {
     useEffect(() => {
         async function insert() {
             await YottaAPI.insertTopic(currentSubjectDomain.domain, insertTopic);
-
-            const res = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-            console.log(res)
+            setCurrentSubjectDomain()
+            // const res = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
 
             // settopicData(topicsData);
         }
@@ -104,29 +104,20 @@ function KnowledgeForest() {
         }
     }, [insertTopic])
 
-    /***===============================================================================================================**/
-    async function insertTopic__(domainName, topicName) {
-        const res = await YottaAPI.insertTopic_zyl(domainName, topicName)
-        const res_data = res.data
-        if (!res_data) {
-            alert('插入主题失败')
-            return
-        }
-        if (res_data.code == 200) {
+    /***  insert   ===============================================================================================================**/
 
-            setCurrentSubjectDomain()
 
-        } else {
-            alert(res.data.msg)
-        }
-    }
 
-    async function deleteTopic(id) {
+
+    /***  delete  ===============================================================================================================**/
+
+    async function OnDeleteTopic(id) {
         confirm({
             title: "确认删除该主题吗？",
             okText: '确定',
             cancelText: '取消',
             async onOk() {
+
                 const res = id
                 const res_data = res.data
                 if (!res_data) {
@@ -146,6 +137,10 @@ function KnowledgeForest() {
             }
         })
     }
+
+
+    /***  delete  ===============================================================================================================**/
+
 
     async function clickFacet(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);

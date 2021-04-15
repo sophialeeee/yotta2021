@@ -406,10 +406,10 @@ function SingleConstruct() {
     return (
         <>
         <Card style={stopStyle}>
-                <Button shape='round' style={{ position:"absolute", left:'5%',top:'20%' }}>
+                <Button shape='circle' style={{ position:"absolute", left:'5%',top:'20%' }}>
                     <a onClick={onBatchInfo}>暂停</a>
                 </Button>
-                <Button shape='round' style={{ position:"absolute", right:'5%',top:'20%' }}>
+                <Button shape='circle' style={{ position:"absolute", right:'5%',top:'20%' }}>
                     <a onClick={onBatchInfo}>继续</a>
                 </Button>
         </Card>
