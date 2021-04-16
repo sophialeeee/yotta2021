@@ -100,7 +100,7 @@ function Relation() {
     // 画认知关系图
     useEffect(() => {
         async function fetchDependencesMap() {
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
                     if (JSON.stringify(res.data.topics) == '{}') {
@@ -112,8 +112,6 @@ function Relation() {
                             }, () => {
                             });
                         }
-
-
                     }
                 }
             )
