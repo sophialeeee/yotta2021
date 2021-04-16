@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {Layout, Menu} from 'antd';
 import {useHistory, Switch, Route, useLocation} from 'react-router-dom';
 import cookie from 'react-cookies';
-import {Cascader, Modal, Input} from "antd";
+import {Cascader, Modal, Input,Select} from "antd";
 import {ExclamationCircleOutlined} from '@ant-design/icons'
 
 import classes from './index.module.css'
-
+import YottaAPI from '../apis/yotta-api';
 import HomePage from './home-page';
 import ConstructPage from './construct-page';
 import CONSTS from "../constants";
@@ -18,11 +18,11 @@ import useCurrentSubjectDomainModel from '../models/current-subject-domain';
 const {Header, Content, Footer} = Layout;
 
 function App() {
-
-   
+    const [subjects,setSubjects]=useState()
     const {setAutoConstructType} = useConstructModel();
     const {confirm} = Modal;
     // data
+   
     const userT = cookie.load('userType')
     if(userT){
         var type = userT.data;
@@ -65,6 +65,7 @@ function App() {
     // hooks
     const history = useHistory();
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
+    
     const location = useLocation();
     const [menuKey, setMenuKey] = useState('/nav');
     if (localStorage.getItem("visitedRelation")){
@@ -73,7 +74,9 @@ function App() {
     if (localStorage.getItem("visitedTopic")){
         localStorage.removeItem("visitedTopic");
     }
+    
     function onAutoConstructClick(){
+        
         let subject = '';
         let domain = '';
         const onTextSubjectChange = (e) => {
@@ -82,18 +85,40 @@ function App() {
         const onTextDomainChange = (e) => {
             domain = e.target.value;
         };
-        
 
+        const onSelectChange = (e) => { 
+            subject = e;  
+        }
         confirm({
+            
             title: '请选择构建学科，并输入要构建的课程',
             icon: <ExclamationCircleOutlined/>,
             content: <>
                 <div style={{display: 'flex', flexDirection: 'column'}}>
+                
                 <span>
-                    学科：   
+                    学科：
                 </span>
-                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange}/>
+                {(subjects)?(
+                    <Select onSelect={onSelectChange}>
+                        {
+                            subjects.map((SubjectsName)=>(
+                            <option value={SubjectsName.subjectName} >{SubjectsName.subjectName}</option> 
+                            ))
+                        }
+                    </Select>):                 
+                (
+                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange}/>)}
+
+
                 </div>
+                {/* <div>
+                    <span>
+                        碎片内容：
+                    </span>
+                    <TextArea showCount maxLength={150} onChange={handleTextareaChange}/>
+                </div> */}
+
                 <div>
                 <span>
                     课程：
@@ -106,6 +131,7 @@ function App() {
             onOk() {
                 setAutoConstructType();
                 setCurrentSubjectDomain(subject, domain);
+                cookie.save('c-type','0')
                 // ({pathname:'/construct-page',state:{login:true}});
                 history.push('/construct-page');
             },
@@ -119,19 +145,29 @@ function App() {
     const onMenuItemClick = (e) => {
         console.log('e.key',e.key);
         if(e.key!='/construct-page'){
-            if(e.key=='./display-page'){
+            if(e.key=='/display-page'){
                 history.push({pathname:e.key,state:{login:true}});
             }
             else{
-                history.push({pathname:e.key,state:{login:true}});
+                history.push({pathname:'/nav',state:{login:true}});
             }
         }
         else{
             onAutoConstructClick();
         }
     };
-
+    useEffect(()=>{
+        async function fetch() {
+            
+            var domainsAndSubjects = await YottaAPI.getDomainsBySubject("zscl");
+            domainsAndSubjects = domainsAndSubjects.data.data;
+            if(domainsAndSubjects)
+                {setSubjects(domainsAndSubjects)}
+        }
+        fetch();
+    },[])
     useEffect(() => {
+        
         console.log('location.pathname',location.pathname);
         setMenuKey(location.pathname);
     }, [location]);

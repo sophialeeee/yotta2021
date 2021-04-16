@@ -24,7 +24,7 @@ function StatisticsCard(props) {
                 hoverable={false}
                 bodyStyle={{display: 'none'}}
                 headStyle={{paddingLeft: '0px'}}>
-                >
+                
 
             </Card>
         </div>

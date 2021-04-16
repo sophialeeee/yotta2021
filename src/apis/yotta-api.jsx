@@ -40,7 +40,7 @@ const YottaAPI = {
     },
     // 根据用户名获取学科和课程
     getDomainsBySubject(userName) {
-        let result =  axios.get(`http://47.95.145.72:8084/domain/getDomainsAndSubjectsByUseId?userName=${encodeURI(userName)}`);
+        let result =  axios.get(`http://47.95.145.72:8083/domain/getDomainsAndSubjectsByUseId?userName=${encodeURI(userName)}`);
         return result;
     },
     // 获取学科和课程
@@ -87,7 +87,7 @@ const YottaAPI = {
     async getDynamicTreeData(domainName,topicName,flag){
         let result = undefined;
         try{
-            result = await axios.post(`http://10.181.204.48:8084/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}&incremental=${encodeURI(flag)}`)
+            result = await axios.post(`http://10.181.204.48:8083/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}&incremental=${encodeURI(flag)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -108,7 +108,7 @@ const YottaAPI = {
     async getDynamicSingle(domainName,topicName,flag){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8084/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -154,7 +154,11 @@ const YottaAPI = {
     },
     // 根据课程名动态获取主题名
     async getDynamicTopics(subjectName,domainName){
-        return await axios.post(`http://47.95.145.72:8084/spiderDynamicOutput/spiderTopicBySubjectAndDomainName?subjectName=${encodeURI(subjectName)}&domainName=${encodeURI(domainName)}`);
+        return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/spiderTopicBySubjectAndDomainName?subjectName=${encodeURI(subjectName)}&domainName=${encodeURI(domainName)}`);
+    },
+
+    async getFirstTopicByDomainName(domainName){
+        return await axios.post(`http://zscl.xjtudlc.com:8083/topic/getFirstTopicByDomainName?domainName=${encodeURI(domainName)}`);
     },
     // 根据课程名获取画依赖关系的数据
     async getDependenceByDomainName(domainName){
@@ -194,6 +198,11 @@ const YottaAPI = {
     // 分面页添加API,添加主题
     async insertTopic(domainName,topicName){
         return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
+    },
+
+    async insertTopic_zyl(domainName,topicName){
+        // return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
+        return await axios.get(`http://47.95.145.72:8084/topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
 
     async countUpdateAssemble(domainName){
@@ -240,7 +249,13 @@ const YottaAPI = {
 
     // 删除主题
     async deleteTopic(domainName,topicName){
-        return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicCompleteByDomainNameAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+           return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
+    },
+    async deleteTopic_zyl(topicId){
+        return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
+        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
 };

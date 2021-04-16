@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Col, Row} from "antd";
 
-
+import {Cascader, Modal, Input,Button} from "antd";
+import {ExclamationCircleOutlined} from '@ant-design/icons'
 import Statistic from "./statistic";
 import Charts from "./charts";
 import cookie from 'react-cookies';
@@ -9,7 +10,7 @@ import useConstructTypeModel from '../../models/construct-type';
 import useCurrentSubjectDomainModel from "../../models/current-subject-domain";
 import useUserNameModel from '../../models/user-name';
 import YottaAPI from '../../apis/yotta-api';
-
+import useConstructModel from '../../models/construct-type';
 import {useLocation} from 'react-router-dom';
 import Login from '../Login';
 import {useHistory} from 'react-router-dom';
@@ -26,7 +27,7 @@ function HomePage() {
 
     const [options, setOptions] = useState([]);
     const {setDisplayConstructType} = useConstructTypeModel();
-    const {setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
+    const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const {UserName} = useUserNameModel();
     const location = useLocation();
     const history = useHistory();
@@ -39,17 +40,21 @@ function HomePage() {
     useEffect(() => {
         // 获取数据
         async function fetchData() {
+            console.log("----------------------home--------------------")
             console.log('userName',UserName)
             console.log(cookie.loadAll())
             var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
             domainsAndSubjects = domainsAndSubjects.data.data;
+            console.log(domainsAndSubjects)
             // 统计数据
             const subject = domainsAndSubjects.length;
             const domain = domainsAndSubjects.reduce((count, curr) => {
                 return count + curr.domains.length
             }, 0);
             const topic = await YottaAPI.getCountTopic();
+            console.log("topic:",topic)
             const assemble = await YottaAPI.getCountAssemble();
+            console.log("assemble:",assemble)
             // 修改状态
             setStatistics({
                 subject,
@@ -58,6 +63,7 @@ function HomePage() {
                 assemble
             });
             // 复选框
+            console.log(domainsAndSubjects)
             setOptions(handleSubjectAndDomainToOptions(domainsAndSubjects));
         }
         fetchData();
@@ -65,7 +71,11 @@ function HomePage() {
         setDisplayConstructType();
       
         // 重置学科和课程
-        setCurrentSubjectDomain();
+        if(!(currentSubjectDomain.subject && currentSubjectDomain.domain))
+        {
+            console.log("222222",currentSubjectDomain.subject,currentSubjectDomain.domain)
+            setCurrentSubjectDomain();
+        }
 
     }, []);
     
@@ -96,7 +106,7 @@ function HomePage() {
     }
 
 
-
+    
 
     return (
         <>
@@ -108,7 +118,9 @@ function HomePage() {
                 </Col>
                 <Col span={17} offset={1}>
                     <Charts options={options}/>
+                    
                 </Col>
+                
             </Row>
                 
             

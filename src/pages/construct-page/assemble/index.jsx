@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTree,drawTreeNumber} from '../../../modules/facetTree';
+import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
 
@@ -15,7 +16,7 @@ const {confirm} = Modal;
 
 
 function Assemble() {
-
+    const [learningPath,setlearningPath] = useState([]);  //学习路径
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     const [currentTopic,setcurrentTopic] = useState();
     const [topics,settopics] = useState([]);
@@ -32,43 +33,62 @@ function Assemble() {
     const [deleteAssemble,setdeleteAssemble] = useState();
     const [updateAssembleId,setupdateAssembleId] = useState();
     const [updateAssembleContent,setupdateAssembleContent] = useState();
+    const [appendAssembleContentFlagToFetch,setappendAssembleContentFlagToFetch] = useState();  //新增碎片后前往获取碎片列表
+    const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
+    const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
+    const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
     const {TextArea} = Input;
-      
+    
+
+    const mapRef = useRef();
+    const treeRef = useRef();
+    const treeRef1 = useRef();
+
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
     }
     
     const treeStyle = {
-        width:'40%',
+        width:'50%',
+        height:'300px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'50px',
+        top:'0px',
         
       };
+
+    const chartStyle = {
+        width:'50%',
+        height:'495px',
+        position: 'absolute',
+        left: '0%',
+        textAlign: 'center',
+        top:'310px',
+    };
     const countStyle = {
-        width:'20%',
+        width:'25%',
         position:'absolute',
-        left:'42%',
+        left:'52%',
         textAlign:'center',
-        top:'50px',
+        top:'10px',
         lineHeight:'10px',
     }
     const increaseStyle = {
-        width:'35%',
+        width:'22%',
         position:'absolute',
-        left:'63%',
+        left:'79%',
         textAlign:'center',
-        top:'50px',
+        top:'10px',
         lineHeight:'10px',
     }
     const assembleStyle = {
-        width:'56%',
+        width:'49%',
         position:'absolute',
-        left:'42%',
+        left:'52%',
         textAlign:'center',
-        top:'220px',
-        height:'590px',
+        top:'190px',
+        height:'618px',
         overflow: 'auto',
     }
 
@@ -193,8 +213,6 @@ function Assemble() {
         })
     }; 
 
-    const treeRef = useRef();
-
 
     //根据domainName,topicName获取分面信息
     useEffect(()=>{
@@ -212,9 +230,10 @@ function Assemble() {
             console.log("新增碎片",appendAssembleContent);
             await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
             infoInsert();
+            setappendAssembleContentFlagToFetch(appendAssembleContent);
         }
         if(appendAssembleContent){
-            append();
+            append(); 
         }
     }, [appendAssembleContent])
 
@@ -227,6 +246,7 @@ function Assemble() {
         }
         if(deleteAssemble){
             deleteAss();
+            setdeleteAssembleToFetch(deleteAssemble);
         }
     }, [deleteAssemble])
 
@@ -289,24 +309,65 @@ function Assemble() {
         }
     }, [currentSubjectDomain.domain])
 
-
-   
-    //获取碎片
+    //画圆形图
     useEffect(()=>{
+        async function fetchDependencesMap(){
+            const result = await YottaAPI.getMap(currentSubjectDomain.domain);
+            console.log("结果是：",result);
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                (res) => {
+                    // setmapdata(res.data);
+                    if(res.data&&mapRef){
+                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                }
+            )
+        }
+        console.log("当前主题为",currentSubjectDomain.domain);
+        fetchDependencesMap();
 
+    },[currentSubjectDomain.domain]);
+   
+
+
+    async function clickFacet(facetId){
+        const res = await YottaAPI.getASsembleByFacetId(facetId);
+        setassembles(res);
+        //const res1 = await YottaAPI.getFacetName1(facetId);
+        //setfacet(res1.facetName);
+    }
+
+    async function clickTopic(topicId,topicName){
+        setcurrentTopic(topicName);
+    }
+
+    //新增和渲染完成后获取碎片列表
+    useEffect(()=>{
         async function fetchAssembleData(){         
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
                 setassembles(res);
-                console.log("以HTML形式渲染");
+                console.log("获取碎片");
                 infoFinish();
+                setappendAssembleContentFlagToSort(appendAssembleContentFlagToFetch);
             }
-            
         }
         fetchAssembleData();
-    },[appendAssembleContent, deleteAssemble, updateAssembleContent, renderFinish])
+    },[appendAssembleContentFlagToFetch, deleteAssembleToFetch,renderFinish])
 
-
+    //删除碎片后，获取碎片列表
+    useEffect(()=>{
+        async function fetchAssembleData(){         
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+            if(res){
+                setassembles(res);
+                console.log("获取碎片");
+                infoFinish(); 
+                setdeleteAssembleToSort(deleteAssembleToSort);
+            }
+        }
+        fetchAssembleData();
+    },[deleteAssembleToFetch])
+        
     //动态渲染碎片
     var arr=new Array();
     useEffect(() => {   
@@ -344,8 +405,21 @@ function Assemble() {
         if (assembles) {
             console.log("重新计算碎片个数");
             setassnum(assembles.length);
+
+            if (appendAssembleContentFlagToSort) {
+                for(var ass_index=0; ass_index<assembles.length; ass_index++){
+                    if(assembles[ass_index].assembleContent==appendAssembleContent){
+                        const assemble_temp = assembles[ass_index];
+                        assembles.splice(ass_index,1);
+                        assembles.unshift(assemble_temp);
+                        break;
+                    }
+                }
+            }
+
         }
-    }, [appendAssembleContent, deleteAssemble, assembles, currentTopic])
+    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, assembles, currentTopic])
+
     
   
     const infoFinish = () => {
@@ -367,14 +441,14 @@ function Assemble() {
 
     return (
         <>
-             <a className={classes.hint} onClick={onAutoConstructClick}>
-                    请选择要装配的主题
-             </a>
              <Card title="主题分面树" style={treeStyle}>
-                 <Card.Grid style={{width:'100%',height:'700px'}} >
-                     <svg ref={ref => treeRef.current = ref} id='tree' style={{width:'100%',height:'620px'}}>    
-                     </svg>
-                 </Card.Grid> 
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'200px'}}></svg> 
+            </Card>
+            <Card title="圆形布局图" style={chartStyle}>
+                 <div style={{ width: '100%', height: '670px' }} >
+                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%' }}></svg>
+                    <svg ref={ref => treeRef1.current = ref} style={{position:'absolute',left:'0',marginLeft:"125px",visibility: 'hidden',top:"20px", marginTop:"80px"}}></svg>
+                </div>
             </Card>
              <Card title="主题碎片数量统计" style={countStyle}>
                 <Card.Grid style={{width:'100%',height:'50px'}} >
@@ -396,20 +470,22 @@ function Assemble() {
                 {
                     assembles && currentTopic? (
                          assembles.map(
-                                (assemble)=>
+                                (assemble,index)=>
                                    (
-                                        <Card.Grid style={{width:"100%",height:"80%"}} >
+                                        <Card.Grid style={{width:"100%",height:"80%"}} key={index}>
                                             <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute",right:'3%'}}>
                                                 <DeleteOutlined />
                                             </button>
                                             {
                                                 !renderFinish ?
                                                 (
+                                                    <>
+                                                    <div>{assemble.assembleScratchTime}</div>
                                                     <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
+                                                    </>
                                                 ) :
                                                 (
-                                                    <Leaf assemble={assemble} key={assemble.assembleId}>
-
+                                                    <Leaf assemble={assemble} key={index}>
                                                     </Leaf>
                                                 )
                                             }
