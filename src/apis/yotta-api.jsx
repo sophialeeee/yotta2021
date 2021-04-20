@@ -228,7 +228,19 @@ const YottaAPI = {
     },
 
     async insertRelation_zyl(domainName, startTopicName, endTopicName){
-        return await posts((`dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+        let result = undefined;
+        try{
+            result = await axios.post(`http://47.95.145.72:8083/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`);
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
     },
 
 

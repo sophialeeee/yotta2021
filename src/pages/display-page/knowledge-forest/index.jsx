@@ -47,7 +47,9 @@ function KnowledgeForest () {
         (res) => {
           if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
           // if (res.data && mapRef && (learningPath.length !== 0)) {
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onInsertTopic,onDeleteTopic,selectFirst,selectNext);
+            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onInsertTopic,onDeleteTopic,()=>{
+
+            },selectFirst);
           } else {
             alert("该课程下无知识森林数据！")
             history.push({pathname:'/nav',state:{login:true}})
@@ -68,6 +70,8 @@ function KnowledgeForest () {
     textareaValueRef.current = e.target.value;
   }
   const onInsertTopic = () => {
+    setTimeout(hide, 0);
+    reSet()
 
     confirm({
       title: '请输入主题名称',
@@ -106,6 +110,8 @@ function KnowledgeForest () {
 
   const onDeleteTopic = (par) => {
       console.log(par)
+    setTimeout(hide, 0);
+    reSet()
 
         confirm({
           title: "确认删除"+par+"吗？",
@@ -130,17 +136,52 @@ function KnowledgeForest () {
 
   /***  delete   ===============================================================================================================**/
 
-  /***  Assemble   ===============================================================================================================**/
+  /***  addRelation   start ===============================================================================================================**/
+  let statu = 0
+  let  firstSelect_Name = ''
+  let  secSelect_Name = ''
+  let hide=null
+  const selecting = function (content) {
+    hide = message.loading(content,0);
+  };
+  const reSet = function () {
+    statu = 0
+    firstSelect_Name = ''
+    secSelect_Name = ''
+  };
 
+  const selectFirst = async (par1, par2) => {
+    console.log(par1, par2)
+    if (par1 == -1) {
+      message.info("该主题不可选")
+    }
 
-  const selectFirst = (par) => {
+    if (statu == 0) {
+      firstSelect_Name = par2
+      selecting("已经选定主题: " + par2 + ", 请选择另一主题")
+      statu = 1
+    } else {
+      secSelect_Name = par2
+      if (statu == 1) {
+        if (firstSelect_Name == secSelect_Name) {
+          message.info("不可选相同主题相同主题")
+          secSelect_Name = ''
+          return
+        }
+        setTimeout(hide, 0);
 
+        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+        if (res.code == 185) {
+          message.warn(res.msg)
+        } else {
+          message.info(res.data)
+          init(currentSubjectDomain.domain)
+        }
+        reSet()
+      }
+    }
   }
-  const selectNext = (par) => {
-
-  }
-  /***  Assemble   ===============================================================================================================**/
-
+  /***  addRelation end ===============================================================================================================**/
 
 
   async function clickFacet (facetId) {

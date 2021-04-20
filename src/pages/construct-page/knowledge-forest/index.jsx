@@ -49,8 +49,11 @@ function KnowledgeForest() {
                     if (res.data && mapRef) {
 
                         console.log(res.data)
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,  ()=>{
+                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, (x)=>{
                             console.log('insert construct ====');
+                        },()=>{
+                            console.log('delete construct ====');
+
                         });
                     } else {
                         alert("该课程下无知识森林数据！")
