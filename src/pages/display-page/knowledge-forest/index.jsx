@@ -1,17 +1,20 @@
 import React from 'react';
-import { Card, Badge, Divider,Alert } from 'antd';
+import {Card, Badge, Divider, Modal, Alert, Input, message} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import { drawMap } from '../../../module/topicDependenceVisualization';
+import { drawMap } from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
+import {ExclamationCircleOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
-  const { currentSubjectDomain } = useCurrentSubjectDomainModel();
+  const { currentSubjectDomain,setCurrentSubjectDomain } = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
+  const {confirm} = Modal;
+
   const history = useHistory();
   const [learningPath, setlearningPath] = useState([]);
   const [currentTopic, setcurrentTopic] = useState('字符串');
@@ -44,7 +47,7 @@ function KnowledgeForest () {
         (res) => {
           if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
           // if (res.data && mapRef && (learningPath.length !== 0)) {
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
+            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onInsertTopic,onDeleteTopic,selectFirst,selectNext);
           } else {
             alert("该课程下无知识森林数据！")
             history.push({pathname:'/nav',state:{login:true}})
@@ -56,6 +59,88 @@ function KnowledgeForest () {
     fetchDependencesMap();
 
   }, [currentSubjectDomain.domain]);
+
+  /***  insert  ===============================================================================================================**/
+  const textareaValueRef = useRef('');
+  const {TextArea} = Input;
+  const [insertTopic, setInsertTopic] = useState();
+  const handleTextareaChange = (e) => {
+    textareaValueRef.current = e.target.value;
+  }
+  const onInsertTopic = () => {
+
+    confirm({
+      title: '请输入主题名称',
+      icon: <ExclamationCircleOutlined/>,
+      content: <>
+        <TextArea maxLength={100} onChange={handleTextareaChange}/>
+      </>,
+      okText: '确定',
+      cancelText: '取消',
+      async onOk() {
+        const Topic1 = textareaValueRef.current;
+        textareaValueRef.current = '';
+
+        console.log(currentSubjectDomain.domain,Topic1)
+        const res = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, Topic1);
+        if (res.code == 200) {
+          //重新获取重绘
+          message.info(res.msg)
+          setCurrentSubjectDomain()
+        } else {
+          message.warn(+res.msg)
+        }
+      },
+      onCancel() {
+      }
+    })
+
+
+  };
+
+
+  /***  insert   ===============================================================================================================**/
+
+
+  /***  delete  ===============================================================================================================**/
+
+  const onDeleteTopic = (par) => {
+      console.log(par)
+
+        confirm({
+          title: "确认删除"+par+"吗？",
+          okText: '确定',
+          cancelText: '取消',
+          async onOk() {
+            const res = await YottaAPI.deleteTopic_zyl(currentSubjectDomain.domain, par);
+
+            if (res.code == 200) {
+              message.info(res.msg)
+              setCurrentSubjectDomain(currentSubjectDomain.domain)
+            } else {
+              message.warn(res.msg)
+            }
+          },
+          onCancel() {
+            console.log('cancel')
+          }
+        })
+
+  };
+
+  /***  delete   ===============================================================================================================**/
+
+  /***  Assemble   ===============================================================================================================**/
+
+
+  const selectFirst = (par) => {
+
+  }
+  const selectNext = (par) => {
+
+  }
+  /***  Assemble   ===============================================================================================================**/
+
 
 
   async function clickFacet (facetId) {

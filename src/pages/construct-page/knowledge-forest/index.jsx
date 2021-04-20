@@ -4,7 +4,7 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import {drawMap,} from '../../../modules/topicDependenceVisualization';
+import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {useRef} from 'react';
 import Leaf from '../../../components/Leaf'
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
@@ -49,7 +49,9 @@ function KnowledgeForest() {
                     if (res.data && mapRef) {
 
                         console.log(res.data)
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onInsertTopic, OnDeleteTopic);
+                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,  ()=>{
+                            console.log('insert construct ====');
+                        });
                     } else {
                         alert("该课程下无知识森林数据！")
                         //history.push({pathname:'/nav',state:{login:true}})
@@ -62,81 +64,13 @@ function KnowledgeForest() {
         fetchDependencesMap();
     }, [currentSubjectDomain.domain]);
 
-    /***  insert  ===============================================================================================================**/
-    const textareaValueRef = useRef('');
-    const {TextArea} = Input;
-    const [insertTopic, setInsertTopic] = useState();
-    const handleTextareaChange = (e) => {
-        textareaValueRef.current = e.target.value;
-    }
-    const onInsertTopic = () => {
-        confirm({
-            title: '请输入主题名称',
-            icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <TextArea maxLength={100} onChange={handleTextareaChange}/>
-            </>,
-            okText: '确定',
-            cancelText: '取消',
-            onOk() {
-                const Topic1 = textareaValueRef.current;
-                textareaValueRef.current = '';
-                setInsertTopic(Topic1);
-                console.log('Topic1', Topic1);
-
-            },
-            onCancel() {
-
-            }
-        })
-    };
-    useEffect(() => {
-        async function insert() {
-            await YottaAPI.insertTopic(currentSubjectDomain.domain, insertTopic);
-            setCurrentSubjectDomain()
-            // const res = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-
-            // settopicData(topicsData);
-        }
-
-        if (insertTopic) {
-            insert(insertTopic);
-        }
-    }, [insertTopic])
-
-    /***  insert   ===============================================================================================================**/
 
 
 
 
     /***  delete  ===============================================================================================================**/
 
-    async function OnDeleteTopic(id) {
-        confirm({
-            title: "确认删除该主题吗？",
-            okText: '确定',
-            cancelText: '取消',
-            async onOk() {
 
-                const res = id
-                const res_data = res.data
-                if (!res_data) {
-                    alert('删除失败')
-                    return
-                }
-                if (res_data.code == 200) {
-                    //重新获取重绘
-                    setCurrentSubjectDomain()
-
-                } else {
-                    alert(res_data.msg)
-                }
-            },
-            onCancel() {
-                console.log('cancel')
-            }
-        })
-    }
 
 
     /***  delete  ===============================================================================================================**/
