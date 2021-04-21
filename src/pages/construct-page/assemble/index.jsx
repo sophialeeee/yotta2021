@@ -30,6 +30,7 @@ function Assemble() {
     const [autoCons, setautoCons] = useState(0);
     const [autocurrentTopic, setautocurrentTopic] = useState();
     const [autotreeData, setautotreeData] = useState();
+
     const [newassnum, setnewassnum] = useState(0);
     const [facet, setfacet] = useState();
     const [currentFacetId, setcurrentFacetId] = useState();
@@ -101,7 +102,7 @@ function Assemble() {
         overflow: 'auto',
     }
 
-
+    // 自动构建，临时
     const onAutoConstruct = () => {
         confirm({
             title: '是否要自动构建？',
@@ -116,6 +117,40 @@ function Assemble() {
             }
         })
     }
+
+    // const onAutoConstructClick = () => {
+    //     let currentTopic1 = '';
+    //     const onSelectChange = (e) => { 
+    //         currentTopic1 = e;  
+    //     }
+    //     confirm({
+    //         title: '请选择要装配的主题',
+    //         icon: <ExclamationCircleOutlined/>,
+    //         content: <>
+    //             <div style={{display: 'flex', flexDirection: 'column'}}>
+    //             <span>
+    //                 主题：
+    //             </span>
+    //                 <Select onSelect={onSelectChange}>
+    //                     {
+    //                         topics.map((topicName)=>(
+    //                         <option value={topicName} >{topicName}</option> 
+    //                         ))
+    //                     }
+    //                 </Select> 
+    //             </div>   
+                
+    //         </>,
+    //         okText: '开始装配',
+    //         cancelText: '取消',
+    //         onOk() {
+    //             setcurrentTopic(currentTopic1);
+    //         },
+    //         onCancel() {
+                
+    //         }
+    //     })
+    // };
 
 
     const onAppendAssemble = () => {
@@ -307,8 +342,8 @@ function Assemble() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if(res.data&&mapRef&&treeRef1&&learningPath){
-                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                    if(res.data&&mapRef){
+                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             )
         }
@@ -327,7 +362,7 @@ function Assemble() {
     }
 
     async function clickTopic(topicId,topicName){
-               // setcurrentTopic(topicName);
+       // setcurrentTopic(topicName);
     }
 
     async function insertTopic(){
@@ -369,14 +404,34 @@ function Assemble() {
         }
         fetchAssembleData();
     },[deleteAssembleToFetch])
-        
+
     //动态渲染碎片
     var arr=new Array();
     useEffect(() => {   
         async function fetchAssembleData2() {
             console.log("开始动态渲染");
             setrenderFinish(0);
+            //const res = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain, currentTopic);
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+
+            // var myvar1 = setInterval(
+            //     async function GDM() {
+            //      if(currentSubjectDomain.domain && currentTopic) {
+                   
+            //         const result = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain,currentTopic);
+            //          if(result){
+            //             console.log('result.code',result.code);
+            //             if(result.code == 200 ){
+            //                  clearInterval(myvar1);
+            //                  setres(result);
+            //             }  
+            //          }
+            //      }
+            //      else{
+            //          clearInterval(myvar1);
+            //      }
+            //    },10000);
+
             if(res){
                 infoConstructing();
                 var i=0;
@@ -431,6 +486,16 @@ function Assemble() {
         autofetchTreeData();
     }, [autocurrentTopic]);
 
+    // 自动构建时的fetch tree data
+    useEffect(() => {
+        console.log(autocurrentTopic);
+        async function autofetchTreeData() {
+            const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
+            setautotreeData(autotreeData);
+        }
+        autofetchTreeData();
+    }, [autocurrentTopic]);
+
     // 自动构建时的draw tree data
     useEffect(() => {
         if (treeRef && autotreeData) {
@@ -438,6 +503,9 @@ function Assemble() {
             console.log("树",treeRef.current)
         }
     }, [autotreeData])
+
+
+    // 自动构建时计算碎片个数
     useEffect(() => {
         async function autofetchAssembleData(){         
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,autocurrentTopic);
@@ -555,7 +623,6 @@ function Assemble() {
                                                 !renderFinish ?
                                                 (
                                                     <>
-                                                    <div>{assemble.assembleScratchTime}</div>
                                                     <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
                                                     </>
                                                 ) :
