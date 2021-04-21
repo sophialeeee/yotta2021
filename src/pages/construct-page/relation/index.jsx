@@ -17,10 +17,11 @@ function Relation() {
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     var [data,setdata] =  useState([]);
     var [dataTemp,setdataTemp] =  useState([]);
+    const [data0,setdata0]=useState(0);
     const {constructType} = useConstructTypeModel();
     // var [dataTemp,setdataTemp] =  useState([]);
     const [data1,setdata1] = useState();
-    const [firstTime,setfirstTime] = useState();
+    const [firstTime,setfirstTime] = useState(0);
     // setfirstTime(1);
     var [deleteTopicStart,setDeleteTopic1] = useState();
     var [deleteTopicEnd,setDeleteTopic2] = useState();
@@ -31,6 +32,7 @@ function Relation() {
     var topicInsertRef2 = useRef('');
     var [insertTopic1,setinsertTopic1] = useState();
     var [insertTopic2,setinsertTopic2] = useState();
+
     // var isEnglish = new Boolean(false);
     // const {TextArea} = Input;
     const infoFinish = () => {
@@ -184,19 +186,28 @@ function Relation() {
                         localStorage.setItem("visitedRelation", "yes")
                         infoFinish();
                         clearInterval(timer);
-                        // setfirstTime(data);
-                        if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
-                            setStep(3)
-                        }else{
-                            setStep(2)
-                        }
+                        setfirstTime(1);
+                        setdata0(1)
+                        // if(constructType=='cool')
+                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                        //     setStep(3)
+                        // }else{
+                        //     setStep(2)
+                        // }}
                         console.log("This is the first time!");
                     }
                 }, 150);
             }
         }
     },[data1])
-
+    useEffect(()=>{
+        if(constructType=='cool'&&firstTime===1)
+        {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+            setStep(3)
+        }else{
+            setStep(2)
+        }}
+    },[data0])
     function nameCheck(originName) {
         var tempName = originName;
         if (originName.search('\\+') != -1){

@@ -114,10 +114,18 @@ function ConstructPage() {
             infoFinish();
             if (localStorage.getItem("visitedTopic")){
                if (localStorage.getItem("visitedRelation")){
-                    if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
-                        setStep(3)
-                    }else{
-                        setStep(2)
+                   if(localStorage.getItem('visitedAssemble')){
+                        if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                            setStep(0)
+                        }else{
+                            setStep(3)
+                        }
+                     }else{
+                        if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                            setStep(3)
+                        }else{
+                            setStep(2)
+                        }
                     }
                 }else{
                     if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
@@ -128,11 +136,15 @@ function ConstructPage() {
                 }
             }else{
                 if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
-                    if(step!==2)
-                    {setStep(1)}
-                }else{
                     if(step!==1)
-                    {setStep(0)}
+                    {
+                        console.log("在这呢！！！")
+                        setStep(1)
+                    }
+                }else{
+                    if(step!==0)
+                    {console.log("在这呢！！！")
+                        setStep(0)}
                 }
             }            
             

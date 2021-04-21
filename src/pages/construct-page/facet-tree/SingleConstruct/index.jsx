@@ -2,12 +2,13 @@ import React from 'react';
 import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../module/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
+import useStepModel from '../../../../models/construct-step';
 import { useState } from 'react';
 import YottaAPI from '../../../../apis/yotta-api';
 import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
 import { Card,Input,Modal,message,Button,Select } from 'antd';
-
-
+import cookie from 'react-cookies';
+import useConstructTypeModel from '../../../../models/construct-type';
 const topicsStyle = {
     width: '35%',
     height: '800px',
@@ -42,7 +43,8 @@ const stopStyle={
 const {Option} = Select;
 
 function SingleConstruct() {
-    
+    const {step,setStep} = useStepModel(); 
+    const [data0,setdata0]=useState(0);
     const { currentSubjectDomain } = useCurrentSubjectDomainModel();
     const [topics, settopics] = useState([]);
     const [topicsData,settopicsData] = useState();
@@ -57,10 +59,10 @@ function SingleConstruct() {
     const [topiclength, settopiclength] = useState();  //判断topic列表长度
     const [deleteTopic1,setdeleteTopic1] = useState();
     const [deleteTopic2,setdeleteTopic2] = useState();
-
+    const {constructType} = useConstructTypeModel();
     const [insertFacet1,setinsertFacet1] = useState();
     const [topicName2,settopicName2] = useState();
-    const [firstTime,setfirstTime] = useState();
+    const [firstTime,setfirstTime] = useState(0);
     const [data1,setdata1] = useState();
     
     var [topicData, settopicData] = useState();
@@ -384,7 +386,7 @@ function SingleConstruct() {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
-        
+                
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
@@ -393,22 +395,32 @@ function SingleConstruct() {
                     num = num + 1;
                     if (num === maxlength + 1) {
                         infoFinish();
-                        clearInterval(timer);
-                        setfirstTime(data1);
-                        console.log("This is the first time!");
                         localStorage.setItem("visitedTopic", "yes")
-                        if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
-                            setStep(2)
-                         }else{
-                             setStep(1)
-                         }
+                        clearInterval(timer);
+                        setfirstTime(1);
+                        console.log("This is the first time!");
+                        setdata0(1)
+                        // if(constructType==='cool')
+                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                        //     setStep(2)
+                        //     }else{
+                        //         setStep(1)
+                        //     }}
+                       
             // console.log("firstTime", firstTime);
                     }
                 }, 100);
             }
         }
     },[data1])
-
+    useEffect(()=>{
+        if(constructType==='cool'&&firstTime===1)
+            {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                setStep(2)
+                }else{
+                    setStep(1)
+                }}
+    },[data0])
     return (
         <>
         <Card style={stopStyle}>
