@@ -49,9 +49,9 @@ function KnowledgeForest() {
                     if (res.data && mapRef) {
 
                         console.log(res.data)
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onInsertTopic,onDeleteTopic,()=>{
-
-                        },selectFirst);
+                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
+                            alert("+")
+                        },select,clickInsertTopics);
                     } else {
                         alert("该课程下无知识森林数据！")
                         //history.push({pathname:'/nav',state:{login:true}})
@@ -67,11 +67,10 @@ function KnowledgeForest() {
     /***  insert  ===============================================================================================================**/
     const textareaValueRef = useRef('');
     const {TextArea} = Input;
-    const [insertTopic, setInsertTopic] = useState();
     const handleTextareaChange = (e) => {
         textareaValueRef.current = e.target.value;
     }
-    const onInsertTopic = () => {
+    const clickInsertTopics = () => {
         setTimeout(hide, 0);
         reSet()
 
@@ -100,27 +99,22 @@ function KnowledgeForest() {
             onCancel() {
             }
         })
-
-
     };
-
-
     /***  insert   ===============================================================================================================**/
 
 
     /***  delete  ===============================================================================================================**/
 
-    const onDeleteTopic = (par) => {
-        console.log(par)
+    const onDeleteTopic = (name,id) => {
+        console.log(name)
         setTimeout(hide, 0);
         reSet()
-
         confirm({
-            title: "确认删除"+par+"吗？",
+            title: "确认删除主题："+name+" 吗？",
             okText: '确定',
             cancelText: '取消',
             async onOk() {
-                const res = await YottaAPI.deleteTopic_zyl(currentSubjectDomain.domain, par);
+                const res = await YottaAPI.deleteTopic_zyl(currentSubjectDomain.domain, name);
 
                 if (res.code == 200) {
                     message.info(res.msg)
@@ -136,8 +130,7 @@ function KnowledgeForest() {
 
     };
 
-    /***  delete   ===============================================================================================================**/
-
+    /***  delete  end  ===============================================================================================================**/
     /***  addRelation   start ===============================================================================================================**/
     let statu = 0
     let  firstSelect_Name = ''
@@ -152,7 +145,7 @@ function KnowledgeForest() {
         secSelect_Name = ''
     };
 
-    const selectFirst = async (par1, par2) => {
+    const select = async (par1, par2) => {
         console.log(par1, par2)
         if (par1 == -1) {
             message.info("该主题不可选")
