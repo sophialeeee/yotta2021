@@ -47,9 +47,7 @@ function KnowledgeForest () {
         (res) => {
           if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
           // if (res.data && mapRef && (learningPath.length !== 0)) {
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onInsertTopic,onDeleteTopic,()=>{
-
-            },selectFirst);
+            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
           } else {
             alert("该课程下无知识森林数据！")
             history.push({pathname:'/nav',state:{login:true}})
