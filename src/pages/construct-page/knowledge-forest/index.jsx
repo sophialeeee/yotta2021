@@ -47,11 +47,9 @@ function KnowledgeForest() {
                 (res) => {
                     // setmapdata(res.data);
                     if (res.data && mapRef) {
-
-                        console.log(res.data)
                         drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
                             alert("+")
-                        },select,clickInsertTopics);
+                        },select,onInsertTopic);
                     } else {
                         alert("该课程下无知识森林数据！")
                         //history.push({pathname:'/nav',state:{login:true}})
@@ -70,7 +68,9 @@ function KnowledgeForest() {
     const handleTextareaChange = (e) => {
         textareaValueRef.current = e.target.value;
     }
-    const clickInsertTopics = () => {
+    // const [insertTopic, setInsertTopic] = useState();
+
+    const onInsertTopic = () => {
         setTimeout(hide, 0);
         reSet()
 
@@ -137,7 +137,7 @@ function KnowledgeForest() {
     let  secSelect_Name = ''
     let hide=null
     const selecting = function (content) {
-        hide = message.loading(content,0);
+        hide = message.loading(content,20000);
     };
     const reSet = function () {
         statu = 0
@@ -227,6 +227,8 @@ function KnowledgeForest() {
 
     useEffect(() => {
         console.log("starttttt")
+        setTimeout(hide, 0);
+        reSet()
         init(currentSubjectDomain.domain)
     }, [])
     return (
