@@ -44,6 +44,7 @@ function KnowledgeForest () {
   useEffect(() => {
     async function fetchDependencesMap () {
       await YottaAPI.getMap(currentSubjectDomain.domain).then(
+        
         (res) => {
           if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
           // if (res.data && mapRef && (learningPath.length !== 0)) {
@@ -222,11 +223,12 @@ function KnowledgeForest () {
       if((!assembles)&&domain){
 
         const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-        setcurrentTopic(topicsData[0].topicName);
+        if(topicsData)
+        {setcurrentTopic(topicsData[0].topicName); 
         console.log("cTopic",currentTopic)
         await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicsData[0].topicName).then(res=>{
           setassembles(res)
-      })
+      })}
           }
   }
   useEffect(()=>{

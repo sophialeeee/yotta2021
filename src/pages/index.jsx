@@ -74,6 +74,9 @@ function App() {
     if (localStorage.getItem("visitedTopic")){
         localStorage.removeItem("visitedTopic");
     }
+    if (localStorage.getItem("visitedStep1")){
+        localStorage.removeItem("visitedStep1");
+    }
     
     function onAutoConstructClick(){
         

@@ -384,7 +384,7 @@ function SingleConstruct() {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
-        localStorage.setItem("visitedTopic", "yes")
+        
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
@@ -394,8 +394,14 @@ function SingleConstruct() {
                     if (num === maxlength + 1) {
                         infoFinish();
                         clearInterval(timer);
-            setfirstTime(data1);
+                        setfirstTime(data1);
                         console.log("This is the first time!");
+                        localStorage.setItem("visitedTopic", "yes")
+                        if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                            setStep(2)
+                         }else{
+                             setStep(1)
+                         }
             // console.log("firstTime", firstTime);
                     }
                 }, 100);
