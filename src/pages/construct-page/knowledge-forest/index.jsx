@@ -49,24 +49,6 @@ function KnowledgeForest() {
         }
     };
     useEffect(() => {
-
-        async function fetchMap() {
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    // setmapdata(res.data);
-                    if (res.data && mapRef&&mapRef.current) {
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
-                            alert("+")
-                        },select,onInsertTopic);
-                    } else {
-                        alert("该课程下无知识森林数据！")
-                        // history({pathname:'/nav',state:{login:true}})
-                    }
-                }
-            )
-
-        }
-        emptyChildren(treeRef.current)
         fetchMap();
     }, [currentSubjectDomain.domain]);
 
@@ -97,24 +79,7 @@ function KnowledgeForest() {
                 if (res.code == 200) {
                     //重新获取重绘
                     message.info(res.msg)
-                    async function fetchMap() {
-                        await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                            (res) => {
-                                // setmapdata(res.data);
-                                if (res.data && mapRef) {
-                                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
-                                        alert("+")
-                                    },select,onInsertTopic);
-                                    console.log('重新调用获取MapData和画图函数')
-                                } else {
-                                    alert("该课程下无知识森林数据！")
-                                    // history({pathname:'/nav',state:{login:true}})
-                                }
-                            }
-                        )
 
-                    }
-                    emptyChildren(treeRef.current)
                     fetchMap();
                 } else {
                     message.warn(res.msg)
@@ -142,7 +107,8 @@ function KnowledgeForest() {
 
                 if (res.code == 200) {
                     message.info(res.msg)
-                    setCurrentSubjectDomain(currentSubjectDomain.domain)
+                    fetchMap();
+
                 } else {
                     message.warn(res.msg)
                 }
@@ -196,25 +162,7 @@ function KnowledgeForest() {
                 } else {
                     message.info(res.msg)
                     console.log(currentSubjectDomain.domain)
-                    async function fetchMap() {
-                        await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                            (res) => {
-                                // setmapdata(res.data);
-                                if (res.data && mapRef) {
-                                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
-                                        alert("+")
-                                    },select,onInsertTopic);
-                                    console.log('重新调用获取MapData和画图函数')
-                                } else {
-                                    alert("该课程下无知识森林数据！")
-                                    // history({pathname:'/nav',state:{login:true}})
-                                }
-                            }
-                        )
 
-                    }
-                    emptyChildren(mapRef.current)
-                    emptyChildren(treeRef.current)
                     fetchMap();
                     console.log(currentSubjectDomain.domain)
                     // ser
@@ -226,6 +174,22 @@ function KnowledgeForest() {
     /***  addRelation end ===============================================================================================================**/
 
 
+    async function fetchMap() {
+        emptyChildren(mapRef.current)
+        emptyChildren(treeRef.current)
+        await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            (res) => {
+                // setmapdata(res.data);
+                if (res.data && mapRef) {
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+                } else {
+                    alert("该课程下无知识森林数据！")
+                    // history({pathname:'/nav',state:{login:true}})
+                }
+            }
+        )
+
+    }
 
     async function clickFacet(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);

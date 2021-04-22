@@ -343,7 +343,12 @@ function Assemble() {
                 (res) => {
                     // setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
-                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
+                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{
+
+                        },insertTopic,()=>{
+
+                        });
+                    }
                 }
             )
         }
