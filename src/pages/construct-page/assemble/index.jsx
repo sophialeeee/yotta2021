@@ -342,7 +342,7 @@ function Assemble() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if(res.data&&mapRef){
+                    if(res.data&&mapRef&&mapRef.current){
                         drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             )
