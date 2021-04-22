@@ -222,7 +222,19 @@ function BatchConstruct() {
                 },6000)
                 async function fetchTreeData(){
                     const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-                    settreeData(result);
+                    if(result){
+                        setTimeout(()=>{
+                            drawTree(treeRef.current,result,d => { },d => { },d => { },300);
+                            emptyChildren(treeRef.current);
+                            setTimeout(()=>{
+                                const index = topics.indexOf(currentTopic);
+                                console.log('index',index)
+                                setbatchData(topics.slice(index+1));
+                                (index < topics.length) && (setcurrentTopic(topics[index+1])); 
+                            },3000)
+                            
+                        },3000)
+                    }
                     console.log('result',result)
                 }
                 fetchTreeData();
@@ -231,24 +243,7 @@ function BatchConstruct() {
         }
     }, [currentTopic,stopCommand]);
   
-    useEffect(()=>{
-        console.log('treeData',treeData);
-        if(stopCommand){
-            if(treeData){
-                setTimeout(()=>{
-                    drawTree(treeRef.current,treeData,d => { },d => { },d => { },300);
-                    emptyChildren(treeRef.current);
-                    setTimeout(()=>{
-                        const index = topics.indexOf(currentTopic);
-                        console.log('index',index)
-                        setbatchData(topics.slice(index+1));
-                        (index < topics.length) && (setcurrentTopic(topics[index+1])); 
-                    },3000)
-                    
-            },3000)
-        }
-    }
-    },[treeData,stopCommand])
+    
    
     return (
         <>
@@ -262,7 +257,7 @@ function BatchConstruct() {
         </Card>
       <Card title='已构建主题数量统计' style={countStyle1}>
         <Card.Grid style={{ width: '100%', height: '50px' }}>
-          已经主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{topics.length-batchData.length}</span>
+          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{topics.length-batchData.length}</span>
         </Card.Grid>
       </Card>
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
