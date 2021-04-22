@@ -48,9 +48,10 @@ function KnowledgeForest () {
         (res) => {
           if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
           // if (res.data && mapRef && (learningPath.length !== 0)) {
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
-              alert("装载主题")
-            },select,onInsertTopic);
+          //   drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
+          //     alert("装载主题")
+          //   },select,onInsertTopic);
+            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
           } else {
             alert("该课程下无知识森林数据！")
             history.push({pathname:'/nav',state:{login:true}})
@@ -169,8 +170,9 @@ function KnowledgeForest () {
         if (res.code == 185) {
           message.warn(res.msg)
         } else {
-          message.info(res.data)
-          init(currentSubjectDomain.domain)
+          message.info(res.msg)
+          setCurrentSubjectDomain(currentSubjectDomain.domain)
+          // init(currentSubjectDomain.domain)
         }
         reSet()
       }

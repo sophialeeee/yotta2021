@@ -307,7 +307,7 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},(a,b) => {
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting");
                     });}
@@ -337,7 +337,7 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},(a,b) => {
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting2");
                     });}
@@ -367,7 +367,7 @@ function Relation() {
                     }
                     else if(res.data&&mapRef){
                     console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},(a,b) => {
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation(a, b);
                         console.log("deleting3")
                     });}
