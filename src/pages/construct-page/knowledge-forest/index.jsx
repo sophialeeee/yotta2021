@@ -4,7 +4,7 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import {drawMap,} from '../../../modules/topicDependenceVisualization';
+import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {useRef} from 'react';
 import Leaf from '../../../components/Leaf'
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
@@ -26,8 +26,10 @@ function KnowledgeForest() {
         width: '56%',
         position: 'absolute',
         left: '0%',
+        height: '810px',
         textAlign: 'center',
-        top: '5px'
+        top: '5px',
+        //overflow:'scroll'
     }
     const assembleStyle = {
         width: '42%',
@@ -46,10 +48,12 @@ function KnowledgeForest() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if (res.data && mapRef) {
+                    if (res.data && mapRef&&mapRef.current.clientHeight) {
 
                         console.log(res.data)
+                    
                         drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onInsertTopic, OnDeleteTopic);
+                        
                     } else {
                         alert("该课程下无知识森林数据！")
                         //history.push({pathname:'/nav',state:{login:true}})
@@ -201,7 +205,8 @@ function KnowledgeForest() {
                         marginLeft: 26,
                         visibility: 'hidden',
                         top: 10,
-                        marginTop: 30
+                        marginTop: 30,
+                        //overflow:'scroll'
                     }}></svg>
                 </div>
             </Card>
