@@ -24,6 +24,10 @@ function Assemble() {
     const [treeData,settreeData] = useState();
     const [assnum,setassnum] = useState(0);
     const [renderFinish,setrenderFinish] = useState(0);
+    const [res,setres] = useState();   //临时加的 存增量爬虫结果
+    const [autoCons, setautoCons] = useState(0);
+    const [autocurrentTopic, setautocurrentTopic] = useState();
+    const [autotreeData, setautotreeData] = useState();
 
     const [newassnum, setnewassnum] = useState(0);
     const [facet, setfacet] = useState();
@@ -92,40 +96,55 @@ function Assemble() {
         overflow: 'auto',
     }
 
-
-    const onAutoConstructClick = () => {
-        let currentTopic1 = '';
-        const onSelectChange = (e) => { 
-            currentTopic1 = e;  
-        }
+    // 自动构建，临时
+    const onAutoConstruct = () => {
         confirm({
-            title: '请选择要装配的主题',
+            title: '是否要自动构建？',
             icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                <span>
-                    主题：
-                </span>
-                    <Select onSelect={onSelectChange}>
-                        {
-                            topics.map((topicName)=>(
-                            <option value={topicName} >{topicName}</option> 
-                            ))
-                        }
-                    </Select> 
-                </div>   
-                
-            </>,
-            okText: '开始装配',
+            okText: '确定',
             cancelText: '取消',
             onOk() {
-                setcurrentTopic(currentTopic1);
+                setautoCons(1); 
             },
             onCancel() {
                 
             }
         })
-    };
+    }
+
+    // const onAutoConstructClick = () => {
+    //     let currentTopic1 = '';
+    //     const onSelectChange = (e) => { 
+    //         currentTopic1 = e;  
+    //     }
+    //     confirm({
+    //         title: '请选择要装配的主题',
+    //         icon: <ExclamationCircleOutlined/>,
+    //         content: <>
+    //             <div style={{display: 'flex', flexDirection: 'column'}}>
+    //             <span>
+    //                 主题：
+    //             </span>
+    //                 <Select onSelect={onSelectChange}>
+    //                     {
+    //                         topics.map((topicName)=>(
+    //                         <option value={topicName} >{topicName}</option> 
+    //                         ))
+    //                     }
+    //                 </Select> 
+    //             </div>   
+                
+    //         </>,
+    //         okText: '开始装配',
+    //         cancelText: '取消',
+    //         onOk() {
+    //             setcurrentTopic(currentTopic1);
+    //         },
+    //         onCancel() {
+                
+    //         }
+    //     })
+    // };
 
 
     const onAppendAssemble = () => {
@@ -318,7 +337,7 @@ function Assemble() {
                 (res) => {
                     // setmapdata(res.data);
                     if(res.data&&mapRef){
-                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             )
         }
@@ -337,6 +356,18 @@ function Assemble() {
     }
 
     async function clickTopic(topicId,topicName){
+       // setcurrentTopic(topicName);
+    }
+
+    async function insertTopic(){
+    }
+
+    async function deleteTopic(topicId){
+    }
+
+    async function assembleTopic(topicId,topicName){
+        console.log("成功啦成功啦");
+        console.log("此时的主题名为",topicName);
         setcurrentTopic(topicName);
     }
 
@@ -367,14 +398,34 @@ function Assemble() {
         }
         fetchAssembleData();
     },[deleteAssembleToFetch])
-        
+
     //动态渲染碎片
     var arr=new Array();
     useEffect(() => {   
         async function fetchAssembleData2() {
             console.log("开始动态渲染");
             setrenderFinish(0);
+            //const res = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain, currentTopic);
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+
+            // var myvar1 = setInterval(
+            //     async function GDM() {
+            //      if(currentSubjectDomain.domain && currentTopic) {
+                   
+            //         const result = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain,currentTopic);
+            //          if(result){
+            //             console.log('result.code',result.code);
+            //             if(result.code == 200 ){
+            //                  clearInterval(myvar1);
+            //                  setres(result);
+            //             }  
+            //          }
+            //      }
+            //      else{
+            //          clearInterval(myvar1);
+            //      }
+            //    },10000);
+
             if(res){
                 infoConstructing();
                 var i=0;
@@ -420,8 +471,62 @@ function Assemble() {
         }
     }, [appendAssembleContentFlagToSort, deleteAssembleToSort, assembles, currentTopic])
 
-    
-  
+    // 自动构建时的fetch tree data
+    useEffect(() => {
+        console.log(autocurrentTopic);
+        async function autofetchTreeData() {
+            const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
+            setautotreeData(autotreeData);
+        }
+        autofetchTreeData();
+    }, [autocurrentTopic]);
+
+    // 自动构建时的draw tree data
+    useEffect(() => {
+        if (treeRef && autotreeData) {
+            drawTreeNumber(treeRef.current, autotreeData, d => { });
+            console.log("树",treeRef.current)
+        }
+    }, [autotreeData])
+
+
+    // 自动构建时计算碎片个数
+    useEffect(() => {
+        async function autofetchAssembleData(){         
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,autocurrentTopic);
+            if(res){
+                setassnum(res.length);
+                setassembles(res);
+                console.log("res.length",res.length);
+            }
+        }
+        autofetchAssembleData();
+    },[autocurrentTopic])
+
+
+    useEffect(() => {
+        async function fetchAutoConstruct() {
+            const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+            if(topicsData){
+                    var i=0;
+                    var autoInterval = setInterval(()=>{
+                    if(i==topicsData.length){
+                        clearInterval(autoInterval);
+                        infoFinish();
+                    }else        
+                    { 
+                        setautocurrentTopic(topicsData[i].topicName);
+                        i++;
+                    }
+                },500);
+            }
+        }
+        if (currentSubjectDomain.domain&&autoCons==1){
+            fetchAutoConstruct();
+        }
+    }, [autoCons])
+
+
     const infoFinish = () => {
         message.config({duration: 1,  maxCount: 3})
         message.success('碎片构建成功，已全部展示！')
@@ -459,7 +564,7 @@ function Assemble() {
                 </Card.Grid> 
                 
              </Card>
-             <Card title="增量统计" style={increaseStyle}>
+             <Card extra={<PlusOutlined style={{top:'50px'}} onClick={onAutoConstruct}/>} title="增量统计" style={increaseStyle}>
                 <Card.Grid style={{width:'100%',height:'100px'}} >
                     近一个月新增碎片数量：<span style={{color:'red',fontWeight:'bolder'}}>{newassnum}</span>
                 </Card.Grid>  
@@ -480,7 +585,6 @@ function Assemble() {
                                                 !renderFinish ?
                                                 (
                                                     <>
-                                                    <div>{assemble.assembleScratchTime}</div>
                                                     <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
                                                     </>
                                                 ) :
