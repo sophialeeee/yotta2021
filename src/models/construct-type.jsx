@@ -9,11 +9,15 @@ function useConstructType() {
     const setDisplayConstructType = () => {
         setConstructType('display');
     };
+    const setCoolConstructType = () => {
+        setConstructType('cool');
+    };
 
     return {
         constructType,
         setAutoConstructType,
-        setDisplayConstructType
+        setDisplayConstructType,
+        setCoolConstructType
     };
 }
 

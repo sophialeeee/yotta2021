@@ -96,10 +96,11 @@ function BatchConstruct() {
     }, [topics])
     
     function emptyChildren(dom) {
-        const children = dom.childNodes;
+        if(dom)
+        {const children = dom.childNodes;
         while (children.length > 0) {
             dom.removeChild(children[0]);
-        }
+        }}
     };
 
     const onBatchStop = () =>{

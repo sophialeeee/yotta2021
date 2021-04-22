@@ -9,15 +9,19 @@ import { useRef } from 'react';
 import {ConsoleSqlOutlined, DeleteOutlined, ExclamationCircleOutlined,PlusOutlined} from '@ant-design/icons';
 import Gephi from '../../../components/Gephi';
 import classes from './index.module.css';
-
+import cookie from 'react-cookies';
+import useStepModel from '../../../models/construct-step';
+import useConstructTypeModel from '../../../models/construct-type';
 function Relation() {
-
+    const {step,setStep} = useStepModel();
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     var [data,setdata] =  useState([]);
     var [dataTemp,setdataTemp] =  useState([]);
+    const [data0,setdata0]=useState(0);
+    const {constructType} = useConstructTypeModel();
     // var [dataTemp,setdataTemp] =  useState([]);
     const [data1,setdata1] = useState();
-    const [firstTime,setfirstTime] = useState();
+    const [firstTime,setfirstTime] = useState(0);
     // setfirstTime(1);
     var [deleteTopicStart,setDeleteTopic1] = useState();
     var [deleteTopicEnd,setDeleteTopic2] = useState();
@@ -28,6 +32,7 @@ function Relation() {
     var topicInsertRef2 = useRef('');
     var [insertTopic1,setinsertTopic1] = useState();
     var [insertTopic2,setinsertTopic2] = useState();
+
     // var isEnglish = new Boolean(false);
     // const {TextArea} = Input;
     const infoFinish = () => {
@@ -170,7 +175,7 @@ function Relation() {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
-                localStorage.setItem("visitedRelation", "yes")
+                
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
@@ -178,16 +183,31 @@ function Relation() {
                     setdata(data1.slice(0, num));
                     num = num + 1;
                     if (num === maxlength + 1) {
+                        localStorage.setItem("visitedRelation", "yes")
                         infoFinish();
                         clearInterval(timer);
-                        // setfirstTime(data);
+                        setfirstTime(1);
+                        setdata0(1)
+                        // if(constructType=='cool')
+                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                        //     setStep(3)
+                        // }else{
+                        //     setStep(2)
+                        // }}
                         console.log("This is the first time!");
                     }
                 }, 150);
             }
         }
     },[data1])
-
+    useEffect(()=>{
+        if(constructType=='cool'&&firstTime===1)
+        {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+            setStep(3)
+        }else{
+            setStep(2)
+        }}
+    },[data0])
     function nameCheck(originName) {
         var tempName = originName;
         if (originName.search('\\+') != -1){

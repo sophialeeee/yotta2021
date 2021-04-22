@@ -10,7 +10,9 @@ import {drawTree,drawTreeNumber} from '../../../modules/facetTree';
 import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
-
+import cookie from 'react-cookies';
+import useConstructTypeModel from '../../../models/construct-type';
+import useStepModel from '../../../models/construct-step';
 const {confirm} = Modal;
 
 
@@ -41,6 +43,10 @@ function Assemble() {
     const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
     const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
     const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
+    const {step,setStep} = useStepModel(); 
+    const [firstTime,setfirstTime]=useState(0);
+    const {constructType} = useConstructTypeModel();
+    const [data0,setdata0]=useState(0);
     const {TextArea} = Input;
     
 
@@ -470,6 +476,15 @@ function Assemble() {
 
         }
     }, [appendAssembleContentFlagToSort, deleteAssembleToSort, assembles, currentTopic])
+    // 自动构建时的fetch tree data
+    useEffect(() => {
+        console.log(autocurrentTopic);
+        async function autofetchTreeData() {
+            const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
+            setautotreeData(autotreeData);
+        }
+        autofetchTreeData();
+    }, [autocurrentTopic]);
 
     // 自动构建时的fetch tree data
     useEffect(() => {
@@ -512,7 +527,17 @@ function Assemble() {
                     var autoInterval = setInterval(()=>{
                     if(i==topicsData.length){
                         clearInterval(autoInterval);
+                        localStorage.setItem("visitedAssemble", "yes")
+                        // if(constructType=='cool')
+                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                        //     setStep(0)
+                        // }else{
+                        //     setStep(3)
+                        // }}
                         infoFinish();
+                        setfirstTime(1)
+                        setdata0(1)
+                        
                     }else        
                     { 
                         setautocurrentTopic(topicsData[i].topicName);
@@ -522,13 +547,26 @@ function Assemble() {
             }
         }
         if (currentSubjectDomain.domain&&autoCons==1){
-            fetchAutoConstruct();
+            fetchAutoConstruct()
         }
-    }, [autoCons])
-
-
+    }, [autoCons])   
+    useEffect(()=>{
+      if (localStorage.getItem("visitedAssemble")) {
+                setautoCons(0)
+            }else{
+                setautoCons(1)            
+        }
+    },[])  
+    useEffect(()=>{
+        if(constructType=='cool'&&firstTime===1)
+        {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+            setStep(0)
+        }else{
+            setStep(3)
+        }}
+    },[data0])
     const infoFinish = () => {
-        message.config({duration: 1,  maxCount: 3})
+        //message.config({duration: 1,  maxCount: 3})
         message.success('碎片构建成功，已全部展示！')
     };
     const infoDelete = () => {
