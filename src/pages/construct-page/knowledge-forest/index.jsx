@@ -27,8 +27,10 @@ function KnowledgeForest() {
         width: '56%',
         position: 'absolute',
         left: '0%',
+        height: '810px',
         textAlign: 'center',
-        top: '5px'
+        top: '5px',
+        //overflow:'scroll'
     }
     const assembleStyle = {
         width: '42%',
@@ -254,7 +256,8 @@ function KnowledgeForest() {
                         marginLeft: 26,
                         visibility: 'hidden',
                         top: 10,
-                        marginTop: 30
+                        marginTop: 30,
+                        //overflow:'scroll'
                     }}></svg>
                 </div>
             </Card>

@@ -151,7 +151,7 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic));
+                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic),2000);
                     
                     
                         }
@@ -314,10 +314,33 @@ function SingleConstruct() {
     
     
     //删除分面调用接口
+    const onClickBranch = (facetId) => {
+        if(facetId){
+        confirm({
+        title: "确认删除该分面吗？",
+        okText: '确定',
+        cancelText: '取消',
+        async onOk() {
+            ClickBranch(facetId)
 
+            // if (res.code == 200) {
+            //     message.info(res.msg)
+            //     fetchMap();
+
+            // } else {
+            //     message.warn(res.msg)
+            // }
+        },
+        onCancel() {
+            console.log('cancel')
+        }
+    })
+}
+};
     
 
     async function ClickBranch(facetId){
+        
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id", facetId);
