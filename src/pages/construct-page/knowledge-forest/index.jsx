@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Badge, Divider, Modal, Alert, Input} from 'antd';
+import {Card, Badge, Divider, Modal, Alert, Input, message} from 'antd';
 import {useState} from 'react';
 import {useEffect} from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -13,6 +13,7 @@ function KnowledgeForest() {
 
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     // const [mapdata,setmapdata] = useState();
+
     const [learningPath, setlearningPath] = useState([]);
 
     const [currentTopic, setcurrentTopic] = useState('树状数组');
@@ -42,38 +43,27 @@ function KnowledgeForest() {
     }
     const mapRef = useRef();
     const treeRef = useRef();
-    // 画认知关系图
-    useEffect(() => {
-        async function fetchDependencesMap() {
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    // setmapdata(res.data);
-                    if (res.data && mapRef&&mapRef.current.clientHeight) {
 
-                        console.log(res.data)
-                    
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onInsertTopic, OnDeleteTopic);
-                        
-                    } else {
-                        alert("该课程下无知识森林数据！")
-                        //history.push({pathname:'/nav',state:{login:true}})
-                    }
-                }
-            )
-
+    function emptyChildren(dom) {
+        const children = dom.childNodes;
+        while (children.length > 0) {
+            dom.removeChild(children[0]);
         }
-
-        fetchDependencesMap();
+    };
+    useEffect(() => {
+        fetchMap();
     }, [currentSubjectDomain.domain]);
 
     /***  insert  ===============================================================================================================**/
     const textareaValueRef = useRef('');
     const {TextArea} = Input;
-    const [insertTopic, setInsertTopic] = useState();
     const handleTextareaChange = (e) => {
         textareaValueRef.current = e.target.value;
     }
     const onInsertTopic = () => {
+        setTimeout(hide, 0);
+        reSet()
+
         confirm({
             title: '请输入主题名称',
             icon: <ExclamationCircleOutlined/>,
@@ -82,69 +72,126 @@ function KnowledgeForest() {
             </>,
             okText: '确定',
             cancelText: '取消',
-            onOk() {
+            async onOk() {
                 const Topic1 = textareaValueRef.current;
                 textareaValueRef.current = '';
-                setInsertTopic(Topic1);
-                console.log('Topic1', Topic1);
 
+                console.log(currentSubjectDomain.domain,Topic1)
+                const res = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, Topic1);
+                if (res.code == 200) {
+                    //重新获取重绘
+                    message.info(res.msg)
+
+                    fetchMap();
+                } else {
+                    message.warn(res.msg)
+                }
             },
             onCancel() {
-
             }
         })
     };
-    useEffect(() => {
-        async function insert() {
-            await YottaAPI.insertTopic(currentSubjectDomain.domain, insertTopic);
-            setCurrentSubjectDomain()
-            // const res = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-
-            // settopicData(topicsData);
-        }
-
-        if (insertTopic) {
-            insert(insertTopic);
-        }
-    }, [insertTopic])
-
     /***  insert   ===============================================================================================================**/
-
-
 
 
     /***  delete  ===============================================================================================================**/
 
-    async function OnDeleteTopic(id) {
+    const onDeleteTopic = (name,id) => {
+        console.log(name)
+        setTimeout(hide, 0);
+        reSet()
         confirm({
-            title: "确认删除该主题吗？",
+            title: "确认删除主题："+name+" 吗？",
             okText: '确定',
             cancelText: '取消',
             async onOk() {
+                const res = await YottaAPI.deleteTopic_zyl(currentSubjectDomain.domain, name);
 
-                const res = id
-                const res_data = res.data
-                if (!res_data) {
-                    alert('删除失败')
-                    return
-                }
-                if (res_data.code == 200) {
-                    //重新获取重绘
-                    setCurrentSubjectDomain()
+                if (res.code == 200) {
+                    message.info(res.msg)
+                    fetchMap();
 
                 } else {
-                    alert(res_data.msg)
+                    message.warn(res.msg)
                 }
             },
             onCancel() {
                 console.log('cancel')
             }
         })
+
+    };
+
+    /***  delete  end  ===============================================================================================================**/
+    /***  addRelation   start ===============================================================================================================**/
+    let statu = 0
+
+    let  firstSelect_Name = ''
+    let  secSelect_Name = ''
+    let hide=null
+    const selecting = function (content) {
+        hide = message.loading(content,20000);
+    };
+    const reSet = function () {
+        statu = 0
+        firstSelect_Name = ''
+        secSelect_Name = ''
+    };
+
+    const select = async (par1, par2) => {
+        console.log(par1, par2)
+        if (par1 == -1) {
+            message.info("该主题不可选")
+        }
+
+        if (statu == 0) {
+            firstSelect_Name = par2
+            selecting("已经选定主题: " + par2 + ", 请选择另一主题")
+            statu = 1
+        } else {
+            secSelect_Name = par2
+            if (statu == 1) {
+                if (firstSelect_Name == secSelect_Name) {
+                    message.info("不可选相同主题")
+                    secSelect_Name = ''
+                    return
+                }
+                setTimeout(hide, 0);
+
+                const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+                if (res.code == 185) {
+                    message.warn(res.msg)
+                } else {
+                    message.info(res.msg)
+                    console.log(currentSubjectDomain.domain)
+
+                    fetchMap();
+                    console.log(currentSubjectDomain.domain)
+                    // ser
+                }
+                reSet()
+            }
+        }
     }
+    /***  addRelation end ===============================================================================================================**/
 
 
-    /***  delete  ===============================================================================================================**/
+    async function fetchMap() {
+        emptyChildren(mapRef.current)
+        emptyChildren(treeRef.current)
+        await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            (res) => {
+                // setmapdata(res.data);
+                if (res.data && mapRef) {
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+                } else {
+                    alert("该课程下无知识森林数据！")
+                    // history({pathname:'/nav',state:{login:true}})
+                }
+            }
+        )
 
+    }
 
     async function clickFacet(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);
@@ -192,8 +239,12 @@ function KnowledgeForest() {
     }
 
     useEffect(() => {
+
         console.log("starttttt")
+        setTimeout(hide, 0);
+        reSet()
         init(currentSubjectDomain.domain)
+
     }, [])
     return (
         <>

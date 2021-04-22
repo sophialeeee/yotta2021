@@ -10,7 +10,9 @@ import {drawTree,drawTreeNumber} from '../../../modules/facetTree';
 import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
-
+import cookie from 'react-cookies';
+import useConstructTypeModel from '../../../models/construct-type';
+import useStepModel from '../../../models/construct-step';
 const {confirm} = Modal;
 
 
@@ -24,6 +26,10 @@ function Assemble() {
     const [treeData,settreeData] = useState();
     const [assnum,setassnum] = useState(0);
     const [renderFinish,setrenderFinish] = useState(0);
+    const [topicConfirm,settopicConfirm] = useState();   //临时加的 存增量爬虫结果
+    const [autoCons, setautoCons] = useState(0);
+    const [autocurrentTopic, setautocurrentTopic] = useState();
+    const [autotreeData, setautotreeData] = useState();
 
     const [newassnum, setnewassnum] = useState(0);
     const [facet, setfacet] = useState();
@@ -37,6 +43,10 @@ function Assemble() {
     const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
     const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
     const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
+    const {step,setStep} = useStepModel(); 
+    const [firstTime,setfirstTime]=useState(0);
+    const {constructType} = useConstructTypeModel();
+    const [data0,setdata0]=useState(0);
     const {TextArea} = Input;
     
 
@@ -92,40 +102,60 @@ function Assemble() {
         overflow: 'auto',
     }
 
+    // 自动构建，临时
+    useEffect(() => {
+        async function ontopicConfirm(){
+            confirm({
+                title: '是否要装配该主题？',
+                icon: <ExclamationCircleOutlined/>,
+                okText: '确定',
+                cancelText: '取消',
+                onOk() {
+                    setcurrentTopic(topicConfirm);
+                },
+                onCancel() {
 
-    const onAutoConstructClick = () => {
-        let currentTopic1 = '';
-        const onSelectChange = (e) => { 
-            currentTopic1 = e;  
+                }
+            })
         }
-        confirm({
-            title: '请选择要装配的主题',
-            icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                <span>
-                    主题：
-                </span>
-                    <Select onSelect={onSelectChange}>
-                        {
-                            topics.map((topicName)=>(
-                            <option value={topicName} >{topicName}</option> 
-                            ))
-                        }
-                    </Select> 
-                </div>   
+        if(topicConfirm)
+            ontopicConfirm();
+
+    },[topicConfirm])
+
+    // const onAutoConstructClick = () => {
+    //     let currentTopic1 = '';
+    //     const onSelectChange = (e) => { 
+    //         currentTopic1 = e;  
+    //     }
+    //     confirm({
+    //         title: '请选择要装配的主题',
+    //         icon: <ExclamationCircleOutlined/>,
+    //         content: <>
+    //             <div style={{display: 'flex', flexDirection: 'column'}}>
+    //             <span>
+    //                 主题：
+    //             </span>
+    //                 <Select onSelect={onSelectChange}>
+    //                     {
+    //                         topics.map((topicName)=>(
+    //                         <option value={topicName} >{topicName}</option> 
+    //                         ))
+    //                     }
+    //                 </Select> 
+    //             </div>   
                 
-            </>,
-            okText: '开始装配',
-            cancelText: '取消',
-            onOk() {
-                setcurrentTopic(currentTopic1);
-            },
-            onCancel() {
+    //         </>,
+    //         okText: '开始装配',
+    //         cancelText: '取消',
+    //         onOk() {
+    //             setcurrentTopic(currentTopic1);
+    //         },
+    //         onCancel() {
                 
-            }
-        })
-    };
+    //         }
+    //     })
+    // };
 
 
     const onAppendAssemble = () => {
@@ -317,8 +347,13 @@ function Assemble() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if(res.data&&mapRef){
-                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet);}
+                    if(res.data&&mapRef&&mapRef.current){
+                        drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{
+
+                        },insertTopic,()=>{
+
+                        });
+                    }
                 }
             )
         }
@@ -337,7 +372,19 @@ function Assemble() {
     }
 
     async function clickTopic(topicId,topicName){
-        setcurrentTopic(topicName);
+       // setcurrentTopic(topicName);
+    }
+
+    async function insertTopic(){
+    }
+
+    async function deleteTopic(topicId){
+    }
+
+    async function assembleTopic(topicId,topicName){
+        console.log("成功啦成功啦");
+        console.log("此时的主题名为",topicName);
+        settopicConfirm(topicName);
     }
 
     //新增和渲染完成后获取碎片列表
@@ -367,14 +414,34 @@ function Assemble() {
         }
         fetchAssembleData();
     },[deleteAssembleToFetch])
-        
+
     //动态渲染碎片
     var arr=new Array();
     useEffect(() => {   
         async function fetchAssembleData2() {
             console.log("开始动态渲染");
             setrenderFinish(0);
+            //const res = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain, currentTopic);
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+
+            // var myvar1 = setInterval(
+            //     async function GDM() {
+            //      if(currentSubjectDomain.domain && currentTopic) {
+                   
+            //         const result = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain,currentTopic);
+            //          if(result){
+            //             console.log('result.code',result.code);
+            //             if(result.code == 200 ){
+            //                  clearInterval(myvar1);
+            //                  setres(result);
+            //             }  
+            //          }
+            //      }
+            //      else{
+            //          clearInterval(myvar1);
+            //      }
+            //    },10000);
+
             if(res){
                 infoConstructing();
                 var i=0;
@@ -419,11 +486,100 @@ function Assemble() {
 
         }
     }, [appendAssembleContentFlagToSort, deleteAssembleToSort, assembles, currentTopic])
+    // 自动构建时的fetch tree data
+    useEffect(() => {
+        console.log(autocurrentTopic);
+        async function autofetchTreeData() {
+            const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
+            setautotreeData(autotreeData);
+        }
+        autofetchTreeData();
+    }, [autocurrentTopic]);
 
-    
-  
+    // 自动构建时的fetch tree data
+    useEffect(() => {
+        console.log(autocurrentTopic);
+        async function autofetchTreeData() {
+            const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
+            setautotreeData(autotreeData);
+        }
+        autofetchTreeData();
+    }, [autocurrentTopic]);
+
+    // 自动构建时的draw tree data
+    useEffect(() => {
+        if (treeRef && autotreeData) {
+            drawTreeNumber(treeRef.current, autotreeData, d => { });
+            console.log("树",treeRef.current)
+        }
+    }, [autotreeData])
+
+
+    // 自动构建时计算碎片个数
+    useEffect(() => {
+        async function autofetchAssembleData(){         
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,autocurrentTopic);
+            if(res){
+                setassnum(res.length);
+                setassembles(res);
+                console.log("res.length",res.length);
+            }
+        }
+        autofetchAssembleData();
+    },[autocurrentTopic])
+
+
+    useEffect(() => {
+        async function fetchAutoConstruct() {
+            const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+            if(topicsData){
+                    var i=0;
+                    var autoInterval = setInterval(()=>{
+                    if(i==topicsData.length){
+                        clearInterval(autoInterval);
+                        localStorage.setItem("visitedAssemble", "yes")
+                        // if(constructType=='cool')
+                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                        //     setStep(0)
+                        // }else{
+                        //     setStep(3)
+                        // }}
+                        infoFinish();
+                        setfirstTime(1)
+                        setdata0(1)
+                        
+                    }else        
+                    { 
+                        setautocurrentTopic(topicsData[i].topicName);
+                        i++;
+                    }
+                },500);
+            }
+        }
+        if (currentSubjectDomain.domain&&autoCons==1){
+            fetchAutoConstruct();
+        }
+    }, [autoCons])   
+
+    useEffect(()=>{
+      if (localStorage.getItem("visitedAssemble")) {
+                setautoCons(0)
+            }else{
+                setautoCons(1)            
+        }
+    },[])  
+
+    useEffect(()=>{
+        if(constructType=='cool'&&firstTime===1)
+        {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+            setStep(0)
+        }else{
+            setStep(3)
+        }}
+    },[data0])
+
     const infoFinish = () => {
-        message.config({duration: 1,  maxCount: 3})
+        //message.config({duration: 1,  maxCount: 3})
         message.success('碎片构建成功，已全部展示！')
     };
     const infoDelete = () => {
@@ -480,7 +636,6 @@ function Assemble() {
                                                 !renderFinish ?
                                                 (
                                                     <>
-                                                    <div>{assemble.assembleScratchTime}</div>
                                                     <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
                                                     </>
                                                 ) :

@@ -196,9 +196,54 @@ const YottaAPI = {
     },
 
     async insertTopic_zyl(domainName,topicName){
-        // return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
-        return await axios.get(`http://47.95.145.72:8083/topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        let result = undefined;
+        try{
+            result = await axios.get(`http://47.95.145.72:8083/topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
     },
+    async deleteTopic_zyl(domainName,topicName){
+
+        let result = undefined;
+        try{
+            result = await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
+    },
+
+    async insertRelation_zyl(domainName, startTopicName, endTopicName){
+        let result = undefined;
+        try{
+            result = await axios.post(`http://47.95.145.72:8083/dependency/insertDependency?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`);
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
+    },
+
+
 
     async countUpdateAssemble(domainName){
         return await gets((`assemble/countUpdateAssemble?domainName=${encodeURI(domainName)}`));
@@ -244,15 +289,16 @@ const YottaAPI = {
 
     // 删除主题
     async deleteTopic(domainName,topicName){
-           return await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
-        // return await axios.post(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        return await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
     async deleteTopic_zyl(topicId){
-        return await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
-        // return await axios.post(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
+        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
+
 };
 
 export default YottaAPI;

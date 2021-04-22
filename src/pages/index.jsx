@@ -21,6 +21,7 @@ function App() {
     const [subjects,setSubjects]=useState()
     const {setAutoConstructType} = useConstructModel();
     const {confirm} = Modal;
+
     // data
    
     const userT = cookie.load('userType')
@@ -68,13 +69,24 @@ function App() {
     
     const location = useLocation();
     const [menuKey, setMenuKey] = useState('/nav');
-    if (localStorage.getItem("visitedRelation")){
-        localStorage.removeItem("visitedRelation");
-    }
-    if (localStorage.getItem("visitedTopic")){
-        localStorage.removeItem("visitedTopic");
-    }
     
+    useEffect(()=>{
+        async function fetch() {
+            if (localStorage.getItem("visitedRelation")){
+                    localStorage.removeItem("visitedRelation");
+                }
+            if (localStorage.getItem("visitedTopic")){
+                    localStorage.removeItem("visitedTopic");
+                }
+            if (localStorage.getItem("visitedStep1")){
+                    localStorage.removeItem("visitedStep1");
+                }
+            if (localStorage.getItem("visitedAssemble")){
+                    localStorage.removeItem("visitedAssemble");
+                }    
+        }
+        fetch();
+    },[currentSubjectDomain])
     function onAutoConstructClick(){
         
         let subject = '';

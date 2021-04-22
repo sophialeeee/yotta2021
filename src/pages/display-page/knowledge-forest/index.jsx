@@ -1,17 +1,20 @@
 import React from 'react';
-import { Card, Badge, Divider,Alert } from 'antd';
+import {Card, Badge, Divider, Modal, Alert, Input, message} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import { drawMap } from '../../../module/topicDependenceVisualization';
+import { drawMap } from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
+import {ExclamationCircleOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
-  const { currentSubjectDomain } = useCurrentSubjectDomainModel();
+  const { currentSubjectDomain,setCurrentSubjectDomain } = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
+  const {confirm} = Modal;
+
   const history = useHistory();
   const [learningPath, setlearningPath] = useState([]);
   const [currentTopic, setcurrentTopic] = useState('字符串');
@@ -41,9 +44,13 @@ function KnowledgeForest () {
   useEffect(() => {
     async function fetchDependencesMap () {
       await YottaAPI.getMap(currentSubjectDomain.domain).then(
+        
         (res) => {
           if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
           // if (res.data && mapRef && (learningPath.length !== 0)) {
+          //   drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
+          //     alert("装载主题")
+          //   },select,onInsertTopic);
             drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
           } else {
             alert("该课程下无知识森林数据！")
@@ -56,6 +63,122 @@ function KnowledgeForest () {
     fetchDependencesMap();
 
   }, [currentSubjectDomain.domain]);
+
+  /***  insert  ===============================================================================================================**/
+  const textareaValueRef = useRef('');
+  const {TextArea} = Input;
+  const handleTextareaChange = (e) => {
+    textareaValueRef.current = e.target.value;
+  }
+  // const [insertTopic, setInsertTopic] = useState();
+
+  const onInsertTopic = () => {
+    setTimeout(hide, 0);
+    reSet()
+
+    confirm({
+      title: '请输入主题名称',
+      icon: <ExclamationCircleOutlined/>,
+      content: <>
+        <TextArea maxLength={100} onChange={handleTextareaChange}/>
+      </>,
+      okText: '确定',
+      cancelText: '取消',
+      async onOk() {
+        const Topic1 = textareaValueRef.current;
+        textareaValueRef.current = '';
+
+        console.log(currentSubjectDomain.domain,Topic1)
+        const res = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, Topic1);
+        if (res.code == 200) {
+          //重新获取重绘
+          message.info(res.msg)
+          init(currentSubjectDomain.domain)
+        } else {
+          message.warn(+res.msg)
+        }
+      },
+      onCancel() {
+      }
+    })
+  };
+  /***  insert   ===============================================================================================================**/
+
+  /***  delete  ===============================================================================================================**/
+
+  const onDeleteTopic = (name,id) => {
+    console.log(name)
+    setTimeout(hide, 0);
+    reSet()
+    confirm({
+      title: "确认删除主题："+name+" 吗？",
+      okText: '确定',
+      cancelText: '取消',
+      async onOk() {
+        const res = await YottaAPI.deleteTopic_zyl(currentSubjectDomain.domain, name);
+
+        if (res.code == 200) {
+          message.info(res.msg)
+          init(currentSubjectDomain.domain)
+        } else {
+          message.warn(res.msg)
+        }
+      },
+      onCancel() {
+        console.log('cancel')
+      }
+    })
+
+  };
+
+  /***  delete  end  ===============================================================================================================**/
+  /***  addRelation   start ===============================================================================================================**/
+  let statu = 0
+  let  firstSelect_Name = ''
+  let  secSelect_Name = ''
+  let hide=null
+  const selecting = function (content) {
+    hide = message.loading(content,20000);
+  };
+  const reSet = function () {
+    statu = 0
+    firstSelect_Name = ''
+    secSelect_Name = ''
+  };
+
+  const select = async (par1, par2) => {
+    console.log(par1, par2)
+    if (par1 == -1) {
+      message.info("该主题不可选")
+    }
+
+    if (statu == 0) {
+      firstSelect_Name = par2
+      selecting("已经选定主题: " + par2 + ", 请选择另一主题")
+      statu = 1
+    } else {
+      secSelect_Name = par2
+      if (statu == 1) {
+        if (firstSelect_Name == secSelect_Name) {
+          message.info("不可选相同主题")
+          secSelect_Name = ''
+          return
+        }
+        setTimeout(hide, 0);
+
+        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+        if (res.code == 185) {
+          message.warn(res.msg)
+        } else {
+          message.info(res.msg)
+          setCurrentSubjectDomain(currentSubjectDomain.domain)
+          // init(currentSubjectDomain.domain)
+        }
+        reSet()
+      }
+    }
+  }
+  /***  addRelation end ===============================================================================================================**/
 
 
   async function clickFacet (facetId) {
@@ -97,14 +220,17 @@ function KnowledgeForest () {
       if((!assembles)&&domain){
 
         const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-        setcurrentTopic(topicsData[0].topicName);
+        if(topicsData)
+        {setcurrentTopic(topicsData[0].topicName); 
         console.log("cTopic",currentTopic)
         await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicsData[0].topicName).then(res=>{
           setassembles(res)
-      })
+      })}
           }
   }
   useEffect(()=>{
+    setTimeout(hide, 0);
+    reSet()
       console.log("starttttt")
       init(currentSubjectDomain.domain)
   },[])
