@@ -508,7 +508,7 @@ function Assemble() {
 
     // 自动构建时的draw tree data
     useEffect(() => {
-        if (treeRef && autotreeData) {
+        if (treeRef && autotreeData && autotreeData.childrenNumber !== 0) {
             drawTreeNumber(treeRef.current, autotreeData, d => { });
             console.log("树",treeRef.current)
         }
