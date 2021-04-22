@@ -1,5 +1,6 @@
 import React from 'react';
-import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
+// import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modulebatch/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
 import { useState } from 'react';
@@ -91,9 +92,9 @@ function BatchConstruct() {
     message.success('主题插入成功！')
     };
 
-    useEffect(() => { // 就这样改得了
-        console.log(document.querySelector(`#topicitem-${topics[0]}`));
-    }, [topics])
+    // useEffect(() => { // 就这样改得了
+    //     console.log(document.querySelector(`#topicitem-${topics[0]}`));
+    // }, [topics])
     
     function emptyChildren(dom) {
         const children = dom.childNodes;
@@ -115,6 +116,7 @@ function BatchConstruct() {
                 var stopCommand1 = false;
                 setstopCommand(stopCommand1);
                 console.log(stopCommand);
+                message.info("待当前主题分面树构建完成后将暂停批量构建！")
             }
         })
     }
@@ -136,14 +138,10 @@ function BatchConstruct() {
                 setstopCommand(stopCommand2);
                 console.log(stopCommand);
                 setcurrentTopic(batchData[0]);
+                message.info("继续批量构建！")
             }
         })
     }
-
-    //继续批量构建
-    useEffect(()=>{
-        // setcurrentTopic(batchData[0]);
-    })
 
     const onInsertTopic = () => {
         confirm({
@@ -181,142 +179,11 @@ function BatchConstruct() {
     useEffect(()=>{
         setcurrentTopic(topics[0]);
         console.log('currentTopic',currentTopic);
+        var stopCommand3 = true;
+        setstopCommand(stopCommand3);
+        console.log(stopCommand);
     },[topics])
-
-    // useEffect(()=>{
-    //     var stopCommand = 'True'
-    //     setstopCommand(stopCommand);
-    //     console.log(stopCommand);
-    // },[topics])
-
-    // useEffect(()=>{
-    //     emptyChildren(treeRef.current) 
-    //     setcurrentTopic(topics[i])
-    // },[i])
-
-    useEffect(() => {  
-        const topicNode = document.getElementById(`topicitem-${currentTopic}`);
-        console.log('topicNode',topicNode)
-        if(topicNode){
-            console.log("style",topicNode.style)
-            let my = setInterval(() => {
-               let opacity = topicNode.style.opacity;
-               topicNode.style.opacity = 1-(+opacity||0)
-               topicNode.style.color = 'red';     
-            }, 500);
-            var myvar1 = setInterval(
-            async function fetchTreeData() {
-             if(currentSubjectDomain.domain && currentTopic) {
-                //  const result = await YottaAPI.getDynamicTreeData(currentSubjectDomain.domain,currentTopic,true);
-                const result = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain,currentTopic);
-                resultTree.current = result;
-                //  const result = resultTree.current;
-                //  console.log('resulttttttt',result);
-                 if(result){
-                    console.log('result.code',result.code);
-                    if(result.code == 200 ){
-                       emptyChildren(treeRef.current)
-                       topicNode.style.opacity = 1
-                       topicNode.style.color = 'green'
-                         clearInterval(myvar1);
-                         clearInterval(my)
-                    }  
-                 }
-             }
-             else{
-                 clearInterval(myvar1);
-             }
-           },10000)
-        }
-        
-       
-        var myvar = setInterval(
-                    async function fetchTreeData() {
-                     if(currentSubjectDomain.domain && currentTopic && stopCommand){
-                        //  const result = await YottaAPI.getDynamicTreeData(currentSubjectDomain.domain,currentTopic,true);
-                        //  const result = await YottaAPI.getDynamicMulti(currentSubjectDomain.domain,currentTopic); 
-                        // resultTree.current = result;
-                        // console.log(resultTree.current)
-                        // console.log('stopCommand');
-                         const result = resultTree.current;
-                         if(result){
-                            const treeData = result.data;
-                            console.log('result.code',result.code);
-                            statusCode.current = result.code
-                            console.log('statusCode',statusCode.current);
-                            const topicNode = document.getElementById(`topicitem-${currentTopic}`);
-                            if(result.code === 200 && topicNode.style.color== 'green'){
-                               clearInterval(myvar);
-                               //   let j = i+1; 
-                               //   seti(j);
-                               emptyChildren(treeRef.current);
-                               const index = topics.indexOf(currentTopic);
-                               setbatchData(topics.slice(index+1));
-                               console.log('restTopics', batchData);
-                               (index < topics.length) && (setcurrentTopic(topics[index+1])); 
-                               
-                            }
-                            settreeData(treeData);
-                         }
-                         
-                     }
-                     else{
-                         clearInterval(myvar);  
-                     }  
-        },1000)
-    }, [currentTopic]);
-
-    // 画分面树
-    useEffect(() => {
-        if (treeRef && treeData) {
-            if(treeData.childrenNumber == 0){
-                emptyChildren(treeRef.current); 
-                console.log('该主题下暂无数据');    
-            }
-            else{
-                if(treeRef.current.childNodes.length === 0 && statusCode.current !== 200){
-                    console.log('调用drawTree函数')
-                    drawTree(treeRef.current,treeData,d => { });
-                 }
-                 else if(treeRef.current.childNodes.length !== 0){
-                    console.log('调用drawTreeNumber函数')
-                    drawTreeNumber(treeRef.current, treeData, d => { });
-                    if(statusCode.current === 200){
-                        console.log('laaaaaaaaaaaaaaaaaa')
-                       // emptyChildren(treeRef.current)
-                    }
-                 }
-                 else{
-
-                 }
-            }
-        }
-    }, [treeData])
- 
-    // 获取一个课程下所有的主题数据
-    // useEffect(() => {
-    //     async function fetchTopicsData() {
-    //         const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
-    //         const topicsData = res.data.data;
-    //         //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
-    //         settopicsData(topicsData);
-    //         if(topicsData){
-    //             dataTemp = (topicsData.map((topic) =>topic.topicName
-    //             ));
-    //             let topics = topicsData.map((topic) => topic.topicName);
-    //             console.log('qianqianqian',topics)
-    //             topics = topics.filter((topic)=>topic!='B+树')
-    //             console.log('houhouhou',topics)
-    //             settopics(topics)
-    //         }
-    //         console.log('dataTemp',dataTemp);
-    //         setdata1(dataTemp.slice(-topics.length));
-    //     }
-    //     if (currentSubjectDomain.domain) {
-    //         fetchTopicsData();
-    //     }
-    // }, [insertTopic1, deleteTopic2])
-
+    
     useEffect(() => {
         async function fetchTopicsData() {
             const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
@@ -324,10 +191,10 @@ function BatchConstruct() {
             settopicsData(topicsData);
             if(topicsData){
                 let topics = topicsData.map((topic) => topic.topicName);
-                console.log('qianqianqian',topics)
                 topics = topics.filter((topic)=>topic!='B+树')
-                console.log('houhouhou',topics)
+                console.log('主题列表',topics)
                 settopics(topics)
+                setcurrentTopic(topics[0])
                 setbatchData(topics)
                // settopics(topicsData.map((topic) => topic.topicName));
             }
@@ -335,46 +202,52 @@ function BatchConstruct() {
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
         }
-    }, [insertTopic1])
+    }, [currentSubjectDomain.domain])
 
-    // useEffect(()=>{
-    //     if(data1) {
-    //         // console.log("firstTime", firstTime);
-    //    if (localStorage.getItem("visitedTopic")) {
-    //             setdata(data1);
-    //             console.log("This is not the first time!")
-    //         }else{
-    //     localStorage.setItem("visitedTopic", "yes")
-    //             var num = 1;
-    //             var maxlength = data1.length;
-    //             // setdata(data1.slice(-relationData.length));
-    //             const timer = setInterval(() => {
-    //                 setdata(data1.slice(0, num));
-    //                 num = num + 1;
-    //                 if (num === maxlength + 1) {
-    //                     infoFinish();
-    //                     clearInterval(timer);
-    //         setfirstTime(data1);
-    //                     console.log("This is the first time!");
-    //         // console.log("firstTime", firstTime);
-    //                 }
-    //             }, 100);
-    //         }
-    //     }
-    // },[data1])
-
-
-
-    useEffect(() => {
-        if (statusCode.code == 200) {
-            Modal.info({
-                title: '提示',
-                content: '该课程主题分面树构建完毕',
-            })
+    useEffect(() => {  
+        const topicNode = document.getElementById(`topicitem-${currentTopic}`);
+        console.log('topicNode',topicNode);
+        if(stopCommand){
+            if(topicNode){
+        
+                let my = setInterval(() => {
+                let opacity = topicNode.style.opacity;
+                topicNode.style.opacity = 1-(+opacity||0)
+                topicNode.style.color = 'red';     
+                }, 500);
+                setTimeout(()=>{
+                    clearInterval(my);
+                    topicNode.style.color = 'green';  
+                },6000)
+                async function fetchTreeData(){
+                    const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+                    settreeData(result);
+                    console.log('result',result)
+                }
+                fetchTreeData();
+                console.log('currentTopic',currentTopic);
+            }
         }
-
-    }, []);
-    
+    }, [currentTopic,stopCommand]);
+  
+    useEffect(()=>{
+        console.log('treeData',treeData);
+        if(stopCommand){
+            if(treeData){
+                setTimeout(()=>{
+                    drawTree(treeRef.current,treeData,d => { },d => { },d => { },300);
+                    emptyChildren(treeRef.current);
+                    setTimeout(()=>{
+                        const index = topics.indexOf(currentTopic);
+                        console.log('index',index)
+                        setbatchData(topics.slice(index+1));
+                        (index < topics.length) && (setcurrentTopic(topics[index+1])); 
+                    },3000)
+                    
+            },3000)
+        }
+    }
+    },[treeData,stopCommand])
    
     return (
         <>
