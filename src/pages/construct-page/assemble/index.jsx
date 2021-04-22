@@ -26,7 +26,7 @@ function Assemble() {
     const [treeData,settreeData] = useState();
     const [assnum,setassnum] = useState(0);
     const [renderFinish,setrenderFinish] = useState(0);
-    const [res,setres] = useState();   //临时加的 存增量爬虫结果
+    const [topicConfirm,settopicConfirm] = useState();   //临时加的 存增量爬虫结果
     const [autoCons, setautoCons] = useState(0);
     const [autocurrentTopic, setautocurrentTopic] = useState();
     const [autotreeData, setautotreeData] = useState();
@@ -103,20 +103,25 @@ function Assemble() {
     }
 
     // 自动构建，临时
-    const onAutoConstruct = () => {
-        confirm({
-            title: '是否要自动构建？',
-            icon: <ExclamationCircleOutlined/>,
-            okText: '确定',
-            cancelText: '取消',
-            onOk() {
-                setautoCons(1); 
-            },
-            onCancel() {
-                
-            }
-        })
-    }
+    useEffect(() => {
+        async function ontopicConfirm(){
+            confirm({
+                title: '是否要装配该主题？',
+                icon: <ExclamationCircleOutlined/>,
+                okText: '确定',
+                cancelText: '取消',
+                onOk() {
+                    setcurrentTopic(topicConfirm); 
+                },
+                onCancel() {
+                    
+                }
+            })
+        }
+        if(topicConfirm)
+            ontopicConfirm();
+
+    },[topicConfirm])
 
     // const onAutoConstructClick = () => {
     //     let currentTopic1 = '';
@@ -342,7 +347,7 @@ function Assemble() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if(res.data&&mapRef&&mapRef.current){
+                    if(res.data&&mapRef){
                         drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             )
@@ -374,7 +379,7 @@ function Assemble() {
     async function assembleTopic(topicId,topicName){
         console.log("成功啦成功啦");
         console.log("此时的主题名为",topicName);
-        setcurrentTopic(topicName);
+        settopicConfirm(topicName);
     }
 
     //新增和渲染完成后获取碎片列表
@@ -547,9 +552,10 @@ function Assemble() {
             }
         }
         if (currentSubjectDomain.domain&&autoCons==1){
-            fetchAutoConstruct()
+            fetchAutoConstruct();
         }
     }, [autoCons])   
+
     useEffect(()=>{
       if (localStorage.getItem("visitedAssemble")) {
                 setautoCons(0)
@@ -557,6 +563,7 @@ function Assemble() {
                 setautoCons(1)            
         }
     },[])  
+
     useEffect(()=>{
         if(constructType=='cool'&&firstTime===1)
         {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
@@ -565,6 +572,7 @@ function Assemble() {
             setStep(3)
         }}
     },[data0])
+
     const infoFinish = () => {
         //message.config({duration: 1,  maxCount: 3})
         message.success('碎片构建成功，已全部展示！')
@@ -602,7 +610,7 @@ function Assemble() {
                 </Card.Grid> 
                 
              </Card>
-             <Card extra={<PlusOutlined style={{top:'50px'}} onClick={onAutoConstruct}/>} title="增量统计" style={increaseStyle}>
+             <Card title="增量统计" style={increaseStyle}>
                 <Card.Grid style={{width:'100%',height:'100px'}} >
                     近一个月新增碎片数量：<span style={{color:'red',fontWeight:'bolder'}}>{newassnum}</span>
                 </Card.Grid>  
