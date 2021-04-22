@@ -91,7 +91,7 @@ function KnowledgeForest () {
         if (res.code == 200) {
           //重新获取重绘
           message.info(res.msg)
-          setCurrentSubjectDomain()
+          init(currentSubjectDomain.domain)
         } else {
           message.warn(+res.msg)
         }
@@ -117,7 +117,7 @@ function KnowledgeForest () {
 
         if (res.code == 200) {
           message.info(res.msg)
-          setCurrentSubjectDomain(currentSubjectDomain.domain)
+          init(currentSubjectDomain.domain)
         } else {
           message.warn(res.msg)
         }
