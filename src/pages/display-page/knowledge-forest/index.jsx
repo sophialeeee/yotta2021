@@ -199,8 +199,9 @@ function KnowledgeForest () {
     const res = await YottaAPI.getASsembleByFacetId(facetId);
     setassembles(res);
     const res1 = await YottaAPI.getFacetName1(facetId);
-    //if (res1.facetName){
+    if (res1.facetName){
     setfacetName(res1.facetName);
+    }
   }
 
   async function clickTopic (topicId, topicName) {

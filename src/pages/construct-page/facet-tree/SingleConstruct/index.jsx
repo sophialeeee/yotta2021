@@ -151,7 +151,7 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic));
+                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic),2000);
                     
                     
                         }
@@ -314,10 +314,33 @@ function SingleConstruct() {
     
     
     //删除分面调用接口
+    const onClickBranch = (facetId) => {
+        if(facetId){
+        confirm({
+        title: "确认删除该分面吗？",
+        okText: '确定',
+        cancelText: '取消',
+        async onOk() {
+            ClickBranch(facetId)
 
+            // if (res.code == 200) {
+            //     message.info(res.msg)
+            //     fetchMap();
+
+            // } else {
+            //     message.warn(res.msg)
+            // }
+        },
+        onCancel() {
+            console.log('cancel')
+        }
+    })
+}
+};
     
 
     async function ClickBranch(facetId){
+        
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id", facetId);
@@ -386,20 +409,43 @@ function SingleConstruct() {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
-                
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
                 const timer = setInterval(() => {
                     setdata(data1.slice(0, num));
+                    
+                    // async function fetchTreeData() {
+                    //     const result = await YottaAPI.getCompleteTopicByTopicName(data[num]);
+                    //     console.log("画树用",result);
+                    //     settreeData(result);          
+                    //     console.log(data[num]);
+                    // }
+                    // if(data[num]){
+                    //     fetchTreeData();
+                    // }
+                    window.lock = false
+                    window.flag = false;
+                    if(treeRef)
+                    {emptyChildren(treeRef.current);}
+                    setcurrentTopic(data1[num]);
                     num = num + 1;
                     if (num === maxlength + 1) {
                         infoFinish();
                         localStorage.setItem("visitedTopic", "yes")
                         clearInterval(timer);
-                        setfirstTime(1);
+                        setfirstTime(1);     
+                        num=num-1                     
+                        window.lock = false
+                        window.flag = false;                      
+                        if(treeRef)
+                        {emptyChildren(treeRef.current);}
+                        console.log('[[[[[[[',data1[num-1])
+                        setcurrentTopic(data1[num-1]);
                         console.log("This is the first time!");
                         setdata0(1)
+
+
                         // if(constructType==='cool')
                         // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
                         //     setStep(2)
@@ -409,7 +455,7 @@ function SingleConstruct() {
                        
             // console.log("firstTime", firstTime);
                     }
-                }, 100);
+                }, 200);
             }
         }
     },[data1])
