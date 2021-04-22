@@ -305,7 +305,7 @@ function Relation() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
-                    if(res.data&&mapRef){
+                    if(res.data&&mapRef&&mapRef.current){
                     // console.log('res.data',res.data);
                     drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation( a, b);
