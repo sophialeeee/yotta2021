@@ -149,13 +149,13 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd);
+                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic));
                     
                     
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
-                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd);
+                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic));
                     
                         }
                     }
@@ -455,8 +455,8 @@ function SingleConstruct() {
                 <a onClick={onBatchStop}>暂停</a>
           </Button>
       </Card> */}
-      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={clickBranchAdd.bind(null, currentTopic)}/>} title="主题分面树" style={treeStyle}>
-        <Card.Grid style={{ width: '100%', height: '850px' }} >
+      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={clickBranchAdd.bind(null, currentTopic)}/>} title="主题分面树" hoverable={false} style={treeStyle}>
+        <Card.Grid style={{ width: '100%', height: '850px' }}  hoverable={false}>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
                 </Card.Grid>

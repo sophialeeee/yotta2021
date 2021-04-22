@@ -287,7 +287,10 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},(a,b) => {
+                        onDeleteRelation( a, b);
+                        console.log("deleting");
+                    });}
                 }
             )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -314,7 +317,10 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},(a,b) => {
+                        onDeleteRelation( a, b);
+                        console.log("deleting2");
+                    });}
                 }
             ) 
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -341,7 +347,10 @@ function Relation() {
                     }
                     else if(res.data&&mapRef){
                     console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {});}
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},(a,b) => {
+                        onDeleteRelation(a, b);
+                        console.log("deleting3")
+                    });}
                 }
             )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
