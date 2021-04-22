@@ -1,5 +1,5 @@
 import React from 'react';
-import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../module/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modules/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
 import { useState } from 'react';
@@ -149,13 +149,13 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch);
+                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd);
                     
                     
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
-                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch);
+                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd);
                     
                         }
                     }
@@ -244,7 +244,7 @@ function SingleConstruct() {
     }
 
   //插入分面
-    const onInsertFacet = (topicName2) => {
+    const clickBranchAdd = (topicName2) => {
         confirm({
             title: '请输入分面名称',
             icon: <ExclamationCircleOutlined/>,
@@ -281,8 +281,8 @@ function SingleConstruct() {
         async function insertFacet(){
             await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
       const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
-      window.flag = false;
-      console.log("shanchuhou", window.flag);
+    //   window.flag = false;
+    //   console.log("shanchuhou", window.flag);
       if (treeData) {
         console.log("新的画树数据", treeData2);
         emptyChildren(treeRef.current);
@@ -455,7 +455,7 @@ function SingleConstruct() {
                 <a onClick={onBatchStop}>暂停</a>
           </Button>
       </Card> */}
-      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={onInsertFacet.bind(null, currentTopic)}/>} title="主题分面树" style={treeStyle}>
+      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={clickBranchAdd.bind(null, currentTopic)}/>} title="主题分面树" style={treeStyle}>
         <Card.Grid style={{ width: '100%', height: '850px' }} >
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>

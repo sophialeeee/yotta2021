@@ -19,10 +19,10 @@ async function posts(apiName){
     }
     return result && result.data.data;
 }
-async function gets_8084(apiName){
+async function gets_8083(apiName){
     let result = undefined;
     try{
-        result = await axios.get(CONSTS.BASE_URL_8084 + apiName);
+        result = await axios.get(CONSTS.BASE_URL_8083 + apiName);
     }catch (e) {
         console.log(e);
     }
@@ -34,7 +34,7 @@ const YottaAPI = {
     Login(userName,password){
        
         
-        // let result =  axios.post(`http://47.95.145.72:8084/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
+        // let result =  axios.post(`http://47.95.145.72:8083/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
         let result = axios.post(`http://zscl.xjtudlc.com:8083/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
         return result;
     },
@@ -63,7 +63,7 @@ const YottaAPI = {
     // 获取画课程间认知关系的图
     async getDomainGraph(domain){
         return await posts(`dependency/getDependenciesByDomainNameSaveAsGexf?domainName=${encodeURI(domain)}`);
-        // return await gets_8084('dependency/getDependenciesByDomainNameSaveAsGexf?domainName=${encodeURI(domain)}')
+        // return await gets_8083('dependency/getDependenciesByDomainNameSaveAsGexf?domainName=${encodeURI(domain)}')
     },
     
     // 根据分面id获取碎片内容
@@ -129,9 +129,9 @@ const YottaAPI = {
     async getDynamicMulti(domainName,topicName,flag){
         let result = undefined;
         try{
-            // result = await axios.post(`http://10.181.204.48:8084/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
-            result = await axios.post(`http://47.95.145.72:8084/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
-            //  result = await axios.post(`http://10.181.58.80:8084/newSpiderFor2021/spiderTopicAndFragmentByDomainName?domainName=${encodeURI(domainName)}`)
+            // result = await axios.post(`http://10.181.204.48:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            //  result = await axios.post(`http://10.181.58.80:8083/newSpiderFor2021/spiderTopicAndFragmentByDomainName?domainName=${encodeURI(domainName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -197,7 +197,7 @@ const YottaAPI = {
 
     async insertTopic_zyl(domainName,topicName){
         // return await gets((`topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`));
-        return await axios.get(`http://47.95.145.72:8084/topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        return await axios.get(`http://47.95.145.72:8083/topic/insertTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
 
     async countUpdateAssemble(domainName){
@@ -226,7 +226,7 @@ const YottaAPI = {
 
     // 主题关系删除
     async deleteRelation(domainName, startTopicName, endTopicName){
-        return await axios.post((`http://47.95.145.72:8084/dependency/deleteDependencyByTopicName?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
+        return await axios.post((`http://47.95.145.72:8083/dependency/deleteDependencyByTopicName?domainName=${encodeURI(domainName)}&startTopicName=${encodeURI(startTopicName)}&endTopicName=${encodeURI(endTopicName)}`))
     },
 
     // 主题关系插入
@@ -244,13 +244,13 @@ const YottaAPI = {
 
     // 删除主题
     async deleteTopic(domainName,topicName){
-           return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
-        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+           return await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        // return await axios.post(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
     async deleteTopic_zyl(topicId){
-        return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
-        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        return await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
+        // return await axios.post(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
 };
