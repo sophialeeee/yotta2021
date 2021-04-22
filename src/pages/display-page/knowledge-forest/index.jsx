@@ -40,38 +40,44 @@ function KnowledgeForest () {
   }
   const mapRef = useRef();
   const treeRef = useRef();
-  // 画认知关系图
   useEffect(() => {
-    async function fetchDependencesMap () {
-      await YottaAPI.getMap(currentSubjectDomain.domain).then(
-        
-        (res) => {
-          if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
-          // if (res.data && mapRef && (learningPath.length !== 0)) {
-          //   drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
-          //     alert("装载主题")
-          //   },select,onInsertTopic);
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
-          } else {
-            alert("该课程下无知识森林数据！")
-            history.push({pathname:'/nav',state:{login:true}})
-          }
-        }
-      )
-    }
-
-    fetchDependencesMap();
-
+    fetchMap();
   }, [currentSubjectDomain.domain]);
 
   /***  insert  ===============================================================================================================**/
+  function emptyChildren(dom) {
+    if (dom){
+      const children = dom.childNodes;
+      while (children.length > 0) {
+        dom.removeChild(children[0]);
+      }
+    }
+  };
+  async function fetchMap() {
+    emptyChildren(mapRef.current)
+    emptyChildren(treeRef.current)
+    await YottaAPI.getMap(currentSubjectDomain.domain).then(
+        (res) => {
+          // setmapdata(res.data);
+          if (res.data && mapRef && mapRef.current) {
+            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},onInsertTopic,()=>{});
+
+            // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+          } else {
+            if (res.data ){
+            }else {
+              alert("该课程下无知识森林数据！")
+            }            // history({pathname:'/nav',state:{login:true}})
+          }
+        }
+    )
+
+  }
   const textareaValueRef = useRef('');
   const {TextArea} = Input;
   const handleTextareaChange = (e) => {
     textareaValueRef.current = e.target.value;
   }
-  // const [insertTopic, setInsertTopic] = useState();
-
   const onInsertTopic = () => {
     setTimeout(hide, 0);
     reSet()
@@ -93,9 +99,10 @@ function KnowledgeForest () {
         if (res.code == 200) {
           //重新获取重绘
           message.info(res.msg)
-          init(currentSubjectDomain.domain)
+
+          fetchMap();
         } else {
-          message.warn(+res.msg)
+          message.warn(res.msg)
         }
       },
       onCancel() {
@@ -103,6 +110,7 @@ function KnowledgeForest () {
     })
   };
   /***  insert   ===============================================================================================================**/
+
 
   /***  delete  ===============================================================================================================**/
 
@@ -119,7 +127,8 @@ function KnowledgeForest () {
 
         if (res.code == 200) {
           message.info(res.msg)
-          init(currentSubjectDomain.domain)
+          fetchMap();
+
         } else {
           message.warn(res.msg)
         }
@@ -134,6 +143,7 @@ function KnowledgeForest () {
   /***  delete  end  ===============================================================================================================**/
   /***  addRelation   start ===============================================================================================================**/
   let statu = 0
+
   let  firstSelect_Name = ''
   let  secSelect_Name = ''
   let hide=null
@@ -171,14 +181,18 @@ function KnowledgeForest () {
           message.warn(res.msg)
         } else {
           message.info(res.msg)
-          setCurrentSubjectDomain(currentSubjectDomain.domain)
-          // init(currentSubjectDomain.domain)
+          console.log(currentSubjectDomain.domain)
+
+          fetchMap();
+          console.log(currentSubjectDomain.domain)
+          // ser
         }
         reSet()
       }
     }
   }
   /***  addRelation end ===============================================================================================================**/
+
 
 
   async function clickFacet (facetId) {

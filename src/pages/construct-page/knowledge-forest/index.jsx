@@ -43,16 +43,40 @@ function KnowledgeForest() {
     const treeRef = useRef();
 
     function emptyChildren(dom) {
-        const children = dom.childNodes;
-        while (children.length > 0) {
-            dom.removeChild(children[0]);
+        if (dom){
+            const children = dom.childNodes;
+            while (children.length > 0) {
+                dom.removeChild(children[0]);
+            }
         }
+
     };
     useEffect(() => {
         fetchMap();
     }, [currentSubjectDomain.domain]);
 
     /***  insert  ===============================================================================================================**/
+    async function fetchMap() {
+        emptyChildren(mapRef.current)
+        emptyChildren(treeRef.current)
+        await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            (res) => {
+                // setmapdata(res.data);
+                if (res.data && mapRef&&mapRef.current) {
+                    // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+                } else {
+                    if (res.data){
+                    }else {
+                        alert("该课程下无知识森林数据！")
+                    }
+
+                    // history({pathname:'/nav',state:{login:true}})
+                }
+            }
+        )
+
+    }
     const textareaValueRef = useRef('');
     const {TextArea} = Input;
     const handleTextareaChange = (e) => {
@@ -174,22 +198,7 @@ function KnowledgeForest() {
     /***  addRelation end ===============================================================================================================**/
 
 
-    async function fetchMap() {
-        emptyChildren(mapRef.current)
-        emptyChildren(treeRef.current)
-        await YottaAPI.getMap(currentSubjectDomain.domain).then(
-            (res) => {
-                // setmapdata(res.data);
-                if (res.data && mapRef) {
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
-                } else {
-                    alert("该课程下无知识森林数据！")
-                    // history({pathname:'/nav',state:{login:true}})
-                }
-            }
-        )
 
-    }
 
     async function clickFacet(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);
