@@ -167,13 +167,15 @@ function SingleConstruct() {
             //alert("请等待当前页面构建完成！");}
     }, [treeData])
 
-    
+
     function emptyChildren(dom) {
-        const children = dom.childNodes;
-        console.log('children',children);
-        while (children.length > 0) {
-            dom.removeChild(children[0]);
+        if (dom){
+            const children = dom.childNodes;
+            while (children.length > 0) {
+                dom.removeChild(children[0]);
+            }
         }
+
     };
 
     useEffect(()=>{

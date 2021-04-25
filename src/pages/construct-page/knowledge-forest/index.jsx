@@ -180,20 +180,31 @@ function KnowledgeForest() {
                     secSelect_Name = ''
                     return
                 }
-                setTimeout(hide, 0);
 
-                const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
-                if (res.code == 185) {
-                    message.warn(res.msg)
-                } else {
-                    message.info(res.msg)
-                    console.log(currentSubjectDomain.domain)
+                confirm({
+                    title: "确认添加关系："+ firstSelect_Name+"--> "+secSelect_Name+" 吗？",
+                    okText: '确定',
+                    cancelText: '取消',
+                    async onOk() {
+                        setTimeout(hide, 0);
 
-                    fetchMap();
-                    console.log(currentSubjectDomain.domain)
-                    // ser
-                }
-                reSet()
+                        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+                        if (res.code == 185) {
+                            message.warn(res.msg)
+                        } else {
+                            message.info(res.msg)
+                            console.log(currentSubjectDomain.domain)
+
+                            fetchMap();
+                            console.log(currentSubjectDomain.domain)
+                            // ser
+                        }
+                        reSet()
+                    },
+                    onCancel() {
+                        console.log('cancel')
+                    }
+                })
             }
         }
     }

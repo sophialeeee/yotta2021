@@ -103,6 +103,7 @@ function BatchConstruct() {
             dom.removeChild(children[0]);
         }}
     };
+ 
 
     const onBatchStop = () =>{
         confirm({
