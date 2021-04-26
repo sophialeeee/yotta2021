@@ -48,7 +48,8 @@ function Charts(props) {
         fetchGephi();
     }, []);
 
-   
+    // console.log('subjects', subjects);
+
     const subjectOptions = options.map(op => {
         return {
             value: op.value,
@@ -86,6 +87,7 @@ function Charts(props) {
         const onSelectChange = (e) => { 
             subject = e;  
         }
+        
         confirm({
             
             title: '请选择构建学科，并输入要构建的课程',

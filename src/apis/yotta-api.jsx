@@ -179,6 +179,11 @@ const YottaAPI = {
         return await axios.get(`http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}`);
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
+
+    async generateMap(domainName){
+        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
+        // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
+    },
     
     // 根据分面id获取碎片信息
     async getFacetName(facetId){
