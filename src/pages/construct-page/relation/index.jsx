@@ -225,7 +225,15 @@ function Relation() {
             title: '请输入两个主题的名称',
             icon: <ExclamationCircleOutlined/>,
             content: <>
-                <Input placeholder="主题一 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange1 } style={{marginBottom: 5}}/>
+            {(subjects)?(
+                    <Select onSelect={onSelectChange}>
+                        {
+                            subjects.map((SubjectsName)=>(
+                            <option value={SubjectsName.subjectName} >{SubjectsName.subjectName}</option> 
+                            ))
+                        }
+                    </Select>):
+                <Input placeholder="主题一 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange1 } style={{marginBottom: 5}}/>}
                 <Input placeholder="主题二 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange2} />
                 {/* <TextArea showCount maxLength={20} onChange={handleTextareaChange1}/>
                 <TextArea showCount maxLength={20} onChange={handleTextareaChange2}/> */}
