@@ -53,20 +53,42 @@ function KnowledgeForest() {
         }
 
     };
+    function nameCheck(originName) {
+        var tempName = originName;
+        if (originName.search('\\+') != -1){
+            console.log("tempName", tempName);
+            tempName = originName.replace("+", "jiahao");
+            console.log("tempName", tempName);
+        };
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
 
     useEffect(() => {
         fetchMap()
     }, [currentSubjectDomain.domain]);
-
-    let data;
+    let dataTemp=[]
     /***  insert  ===============================================================================================================**/
     async function fetchMap() {
         emptyChildren(mapRef.current)
         emptyChildren(treeRef.current)
+        const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+        res.map((relation,index)=>{
+            dataTemp.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
+
+        })
+        dataTemp = dataTemp.slice(-res.length)
         await YottaAPI.getMap(currentSubjectDomain.domain).then(
             (res) => {
                 // setmapdata(res.data);
                 if (res.data && mapRef&&mapRef.current) {
+                    data_temp=res.data
                     // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
                     drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes');
                 } else {
@@ -154,6 +176,8 @@ function KnowledgeForest() {
 
     let  firstSelect_Name = ''
     let  secSelect_Name = ''
+    let  firstSelect_id = 0
+    let  secSelect_id = 0
     let hide=null
     const selecting = function (content) {
         hide = message.loading(content,8,()=>{
@@ -165,7 +189,19 @@ function KnowledgeForest() {
         firstSelect_Name = ''
         secSelect_Name = ''
     };
+    let data_temp;
+    function checkExitRelation() {
 
+        let has=false;
+        for (var i=0; i<dataTemp.length; i++) {
+            let relation = dataTemp[i]
+            if (relation['主题一']==firstSelect_Name&&relation['主题二']==secSelect_Name){
+                has= true
+            }
+
+        }
+        return has
+    }
     const select = async (par1, par2) => {
         console.log(par1, par2)
         if (par1 == -1) {
@@ -174,15 +210,25 @@ function KnowledgeForest() {
 
         if (statu == 0) {
             firstSelect_Name = par2
+            firstSelect_id=par1
             selecting("已经选定主题: " + par2 + ", 请选择另一主题")
             statu = 1
         } else {
             secSelect_Name = par2
+            secSelect_id=par1
             if (statu == 1) {
 
                 if (firstSelect_Name == secSelect_Name) {
                     message.info("不可选相同主题")
                     secSelect_Name = ''
+                    firstSelect_id=0
+                    return
+                }
+                let has = checkExitRelation()
+                if (has){
+                    message.info("关系已经存在")
+                    setTimeout(hide, 0);
+                    reSet()
                     return
                 }
 
