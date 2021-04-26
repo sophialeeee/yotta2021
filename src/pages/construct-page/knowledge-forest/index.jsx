@@ -53,10 +53,12 @@ function KnowledgeForest() {
         }
 
     };
+
     useEffect(() => {
-        fetchMap();
+        fetchMap()
     }, [currentSubjectDomain.domain]);
 
+    let data;
     /***  insert  ===============================================================================================================**/
     async function fetchMap() {
         emptyChildren(mapRef.current)
@@ -66,7 +68,7 @@ function KnowledgeForest() {
                 // setmapdata(res.data);
                 if (res.data && mapRef&&mapRef.current) {
                     // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes');
                 } else {
                     if (res.data){
                     }else {
@@ -154,7 +156,9 @@ function KnowledgeForest() {
     let  secSelect_Name = ''
     let hide=null
     const selecting = function (content) {
-        hide = message.loading(content,20000);
+        hide = message.loading(content,8,()=>{
+            reSet()
+        });
     };
     const reSet = function () {
         statu = 0
@@ -175,6 +179,7 @@ function KnowledgeForest() {
         } else {
             secSelect_Name = par2
             if (statu == 1) {
+
                 if (firstSelect_Name == secSelect_Name) {
                     message.info("不可选相同主题")
                     secSelect_Name = ''
@@ -193,11 +198,7 @@ function KnowledgeForest() {
                             message.warn(res.msg)
                         } else {
                             message.info(res.msg)
-                            console.log(currentSubjectDomain.domain)
-
                             fetchMap();
-                            console.log(currentSubjectDomain.domain)
-                            // ser
                         }
                         reSet()
                     },
@@ -210,6 +211,15 @@ function KnowledgeForest() {
     }
     /***  addRelation end ===============================================================================================================**/
 
+
+    /***  assembleTopic start ===============================================================================================================**/
+
+
+    async function assembleTopic(topicId,topicName){
+
+        // settopicConfirm(topicName);
+    }
+    /***  assembleTopic end ===============================================================================================================**/
 
 
 
@@ -272,7 +282,7 @@ function KnowledgeForest() {
                 <div style={{width: '100%', height: '700px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{
-                        position: 'absolute', left: '0', 
+                        position: 'absolute', left: '0',
                         marginLeft: 26,
                         visibility: 'hidden',
                         top: 10,
