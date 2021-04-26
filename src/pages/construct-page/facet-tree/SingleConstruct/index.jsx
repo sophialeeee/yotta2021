@@ -1,13 +1,14 @@
 import React from 'react';
-import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../module/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modules/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
+import useStepModel from '../../../../models/construct-step';
 import { useState } from 'react';
 import YottaAPI from '../../../../apis/yotta-api';
 import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
 import { Card,Input,Modal,message,Button,Select } from 'antd';
-
-
+import cookie from 'react-cookies';
+import useConstructTypeModel from '../../../../models/construct-type';
 const topicsStyle = {
     width: '35%',
     height: '800px',
@@ -42,7 +43,8 @@ const stopStyle={
 const {Option} = Select;
 
 function SingleConstruct() {
-    
+    const {step,setStep} = useStepModel(); 
+    const [data0,setdata0]=useState(0);
     const { currentSubjectDomain } = useCurrentSubjectDomainModel();
     const [topics, settopics] = useState([]);
     const [topicsData,settopicsData] = useState();
@@ -57,10 +59,10 @@ function SingleConstruct() {
     const [topiclength, settopiclength] = useState();  //判断topic列表长度
     const [deleteTopic1,setdeleteTopic1] = useState();
     const [deleteTopic2,setdeleteTopic2] = useState();
-
+    const {constructType} = useConstructTypeModel();
     const [insertFacet1,setinsertFacet1] = useState();
     const [topicName2,settopicName2] = useState();
-    const [firstTime,setfirstTime] = useState();
+    const [firstTime,setfirstTime] = useState(0);
     const [data1,setdata1] = useState();
     
     var [topicData, settopicData] = useState();
@@ -149,13 +151,13 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch);
+                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic),2000);
                     
                     
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
-                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch);
+                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic));
                     
                         }
                     }
@@ -165,13 +167,15 @@ function SingleConstruct() {
             //alert("请等待当前页面构建完成！");}
     }, [treeData])
 
-    
+
     function emptyChildren(dom) {
-        const children = dom.childNodes;
-        console.log('children',children);
-        while (children.length > 0) {
-            dom.removeChild(children[0]);
+        if (dom){
+            const children = dom.childNodes;
+            while (children.length > 0) {
+                dom.removeChild(children[0]);
+            }
         }
+
     };
 
     useEffect(()=>{
@@ -244,7 +248,7 @@ function SingleConstruct() {
     }
 
   //插入分面
-    const onInsertFacet = (topicName2) => {
+    const clickBranchAdd = (topicName2) => {
         confirm({
             title: '请输入分面名称',
             icon: <ExclamationCircleOutlined/>,
@@ -281,8 +285,8 @@ function SingleConstruct() {
         async function insertFacet(){
             await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
       const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
-      window.flag = false;
-      console.log("shanchuhou", window.flag);
+    //   window.flag = false;
+    //   console.log("shanchuhou", window.flag);
       if (treeData) {
         console.log("新的画树数据", treeData2);
         emptyChildren(treeRef.current);
@@ -312,10 +316,33 @@ function SingleConstruct() {
     
     
     //删除分面调用接口
+    const onClickBranch = (facetId) => {
+        if(facetId){
+        confirm({
+        title: "确认删除该分面吗？",
+        okText: '确定',
+        cancelText: '取消',
+        async onOk() {
+            ClickBranch(facetId)
 
+            // if (res.code == 200) {
+            //     message.info(res.msg)
+            //     fetchMap();
+
+            // } else {
+            //     message.warn(res.msg)
+            // }
+        },
+        onCancel() {
+            console.log('cancel')
+        }
+    })
+}
+};
     
 
     async function ClickBranch(facetId){
+        
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id", facetId);
@@ -384,25 +411,64 @@ function SingleConstruct() {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
-        localStorage.setItem("visitedTopic", "yes")
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
                 const timer = setInterval(() => {
                     setdata(data1.slice(0, num));
+                    
+                    // async function fetchTreeData() {
+                    //     const result = await YottaAPI.getCompleteTopicByTopicName(data[num]);
+                    //     console.log("画树用",result);
+                    //     settreeData(result);          
+                    //     console.log(data[num]);
+                    // }
+                    // if(data[num]){
+                    //     fetchTreeData();
+                    // }
+                    window.lock = false
+                    window.flag = false;
+                    if(treeRef)
+                    {emptyChildren(treeRef.current);}
+                    setcurrentTopic(data1[num]);
                     num = num + 1;
                     if (num === maxlength + 1) {
                         infoFinish();
+                        localStorage.setItem("visitedTopic", "yes")
                         clearInterval(timer);
-            setfirstTime(data1);
+                        setfirstTime(1);     
+                        num=num-1                     
+                        window.lock = false
+                        window.flag = false;                      
+                        if(treeRef)
+                        {emptyChildren(treeRef.current);}
+                        console.log('[[[[[[[',data1[num-1])
+                        setcurrentTopic(data1[num-1]);
                         console.log("This is the first time!");
+                        setdata0(1)
+
+
+                        // if(constructType==='cool')
+                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                        //     setStep(2)
+                        //     }else{
+                        //         setStep(1)
+                        //     }}
+                       
             // console.log("firstTime", firstTime);
                     }
-                }, 100);
+                }, 200);
             }
         }
     },[data1])
-
+    useEffect(()=>{
+        if(constructType==='cool'&&firstTime===1)
+            {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                setStep(2)
+                }else{
+                    setStep(1)
+                }}
+    },[data0])
     return (
         <>
         <Card style={stopStyle}>
@@ -455,8 +521,8 @@ function SingleConstruct() {
                 <a onClick={onBatchStop}>暂停</a>
           </Button>
       </Card> */}
-      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={onInsertFacet.bind(null, currentTopic)}/>} title="主题分面树" style={treeStyle}>
-        <Card.Grid style={{ width: '100%', height: '850px' }} >
+      <Card extra={<PlusOutlined style={{ top: '50px' }} onClick={clickBranchAdd.bind(null, currentTopic)}/>} title="主题分面树" hoverable={false} style={treeStyle}>
+        <Card.Grid style={{ width: '100%', height: '850px' }}  hoverable={false}>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
                 </Card.Grid>
