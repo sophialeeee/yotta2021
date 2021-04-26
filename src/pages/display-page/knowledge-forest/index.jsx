@@ -10,7 +10,7 @@ import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
-  const { currentSubjectDomain,setCurrentSubjectDomain } = useCurrentSubjectDomainModel();
+  const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
   const {confirm} = Modal;
@@ -65,8 +65,8 @@ function KnowledgeForest () {
           // setmapdata(res.data);
           if (res.data && mapRef&&mapRef.current) {
 
-            // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{},'no','no','no');
+             drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
+            //drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{},'no','no','no');
             // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
           } else {
             if (res.data){
@@ -122,7 +122,7 @@ function KnowledgeForest () {
   /***  delete  ===============================================================================================================**/
 
   const onDeleteTopic = (name,id) => {
-    console.log(name)
+    console.log("浏览",name)
     setTimeout(hide, 0);
     reSet()
     confirm({

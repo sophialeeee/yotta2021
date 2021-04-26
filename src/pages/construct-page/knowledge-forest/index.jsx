@@ -145,7 +145,7 @@ function KnowledgeForest() {
     /***  delete  ===============================================================================================================**/
 
     const onDeleteTopic = (name,id) => {
-        console.log(name)
+        console.log("构建delete",name)
         setTimeout(hide, 0);
         reSet()
         confirm({

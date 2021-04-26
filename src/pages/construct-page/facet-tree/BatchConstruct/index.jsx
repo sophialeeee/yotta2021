@@ -9,7 +9,9 @@ import {ExclamationCircleOutlined,PlusOutlined,DeleteOutlined, CompassOutlined} 
 import { Card,Descriptions,Input,message,Modal, Select } from 'antd';
 import {Menu,Dropdown,Button,notification,Alert} from 'antd';
 import ReactDOM from 'react-dom'
-
+import cookie from 'react-cookies';
+import useConstructTypeModel from '../../../../models/construct-type';
+import useStepModel from '../../../../models/construct-step';
 
 const topicsStyle = {
     width: '35%',
@@ -66,6 +68,9 @@ function BatchConstruct() {
     const [topicName2,settopicName2] = useState();
     const [firstTime,setfirstTime] = useState();
     const [batchData,setbatchData] = useState([]);
+    const {step,setStep} = useStepModel(); 
+    const {constructType} = useConstructTypeModel();
+    const [done,setdone]=useState(0)
 
     var [topicData, settopicData] = useState();
     var [batchConstruct, setbatchConstruct] = useState();
@@ -81,7 +86,7 @@ function BatchConstruct() {
     }
     // 将请求的状态码设置为全局状态
     const statusCode = useRef();
-   
+    const [data0,setdata0]=useState(0);
     const infoFinish = () => {
     message.success('主题构建成功，已全部展示！')
     };
@@ -211,7 +216,7 @@ function BatchConstruct() {
         console.log('topicNode',topicNode);
         if(stopCommand){
             if(topicNode){
-        
+                setdone(1);
                 let my = setInterval(() => {
                 let opacity = topicNode.style.opacity;
                 topicNode.style.opacity = 1-(+opacity||0)
@@ -228,10 +233,16 @@ function BatchConstruct() {
                             drawTree(treeRef.current,result,d => { },d => { },d => { },300);
                             emptyChildren(treeRef.current);
                             setTimeout(()=>{
+                                
                                 const index = topics.indexOf(currentTopic);
-                                console.log('index',index)
+                                console.log('index',index,topics.length)
                                 setbatchData(topics.slice(index+1));
                                 (index < topics.length) && (setcurrentTopic(topics[index+1])); 
+                                // (index < topics.length)?(setcurrentTopic(topics[index+1])):(()=>{
+                                //     infoFinish();
+                                //     localStorage.setItem("visitedTopic", "yes");
+                                //     setdata0(1);
+                                // })()
                             },3000)
                             
                         },3000)
@@ -240,11 +251,24 @@ function BatchConstruct() {
                 }
                 fetchTreeData();
                 console.log('currentTopic',currentTopic);
+            }else{
+                if(done===1){
+                    infoFinish();
+                    localStorage.setItem("visitedTopic", "yes");
+                    setdata0(1);
+                }
             }
         }
     }, [currentTopic,stopCommand]);
   
-    
+    useEffect(()=>{
+        if(constructType==='cool'&&data0===1)
+            {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+                setStep(2)
+                }else{
+                    setStep(1)
+                }}
+    },[data0])
    
     return (
         <>
