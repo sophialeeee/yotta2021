@@ -376,7 +376,7 @@ function Relation() {
                     drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting");
-                    },TopicEdit, RelationEdit, FacetEdit);}
+                    },'no','yes','no',()=>{},()=>{});}
                 }
             )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -406,7 +406,7 @@ function Relation() {
                     drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting2");
-                    }, TopicEdit, RelationEdit, FacetEdit);}
+                    },'no','yes','no',()=>{},()=>{});}
                 }
             ) 
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -437,7 +437,7 @@ function Relation() {
                         () => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation(a, b);
                         console.log("deleting3")
-                    }, TopicEdit, RelationEdit, FacetEdit);}
+                    },'no','yes','no',()=>{},()=>{});}
                 }
             )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
