@@ -118,6 +118,7 @@ function DisplayPage() {
                 cookie.remove("c-type")
                 cookie.save('c-type','1')
                 console.log(cookie.loadAll(),'======================================')
+
             // ({pathname:'/construct-page',state:{login:true}});
                 history.push('/construct-page');
         }
