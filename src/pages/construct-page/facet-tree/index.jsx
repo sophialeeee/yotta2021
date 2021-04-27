@@ -29,7 +29,7 @@ const stopStyle={
 
 function FacetTree() {
     
-   const [type,settype] = useState();
+   const [type,settype] = useState("0");
 
    const handleType = (value)=>{
        console.log('value',value);
@@ -47,7 +47,7 @@ function FacetTree() {
                     继续
                 </Button>
            </Card> */}
-           <Select defaultValue="单个更新" size='large' style={batchStyle} onChange={handleType}>
+           <Select defaultValue="批量更新" size='large' style={batchStyle} onChange={handleType}>
                <Option value="0" size='large'>批量更新</Option>
                <Option value="1" size='large'>单个更新</Option>
            </Select>
