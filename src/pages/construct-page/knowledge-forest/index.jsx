@@ -55,16 +55,64 @@ function KnowledgeForest() {
     const treeRef = useRef();
 
     function emptyChildren(dom) {
-        const children = dom.childNodes;
-        while (children.length > 0) {
-            dom.removeChild(children[0]);
+        if (dom){
+            const children = dom.childNodes;
+            while (children.length > 0) {
+                dom.removeChild(children[0]);
+            }
         }
-    };
-    useEffect(() => {
-        fetchMap();
-    }, [currentSubjectDomain.domain]);
 
+    };
+    function nameCheck(originName) {
+        var tempName = originName;
+        if (originName.search('\\+') != -1){
+            console.log("tempName", tempName);
+            tempName = originName.replace("+", "jiahao");
+            console.log("tempName", tempName);
+        };
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
+
+    useEffect(() => {
+        fetchMap()
+    }, [currentSubjectDomain.domain]);
+    let dataTemp=[]
     /***  insert  ===============================================================================================================**/
+    async function fetchMap() {
+        emptyChildren(mapRef.current)
+        emptyChildren(treeRef.current)
+        const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+        res.map((relation,index)=>{
+            dataTemp.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
+
+        })
+        dataTemp = dataTemp.slice(-res.length)
+        await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            (res) => {
+                // setmapdata(res.data);
+                if (res.data && mapRef&&mapRef.current) {
+                    data_temp=res.data
+                    // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes');
+                } else {
+                    if (res.data){
+                    }else {
+                        alert("该课程下无知识森林数据！")
+                    }
+
+                    // history({pathname:'/nav',state:{login:true}})
+                }
+            }
+        )
+
+    }
     const textareaValueRef = useRef('');
     const {TextArea} = Input;
     const handleTextareaChange = (e) => {
@@ -107,7 +155,7 @@ function KnowledgeForest() {
     /***  delete  ===============================================================================================================**/
 
     const onDeleteTopic = (name,id) => {
-        console.log(name)
+        console.log("构建delete",name)
         setTimeout(hide, 0);
         reSet()
         confirm({
@@ -138,16 +186,32 @@ function KnowledgeForest() {
 
     let  firstSelect_Name = ''
     let  secSelect_Name = ''
+    let  firstSelect_id = 0
+    let  secSelect_id = 0
     let hide=null
     const selecting = function (content) {
-        hide = message.loading(content,20000);
+        hide = message.loading(content,8,()=>{
+            reSet()
+        });
     };
     const reSet = function () {
         statu = 0
         firstSelect_Name = ''
         secSelect_Name = ''
     };
+    let data_temp;
+    function checkExitRelation() {
 
+        let has=false;
+        for (var i=0; i<dataTemp.length; i++) {
+            let relation = dataTemp[i]
+            if (relation['主题一']==firstSelect_Name&&relation['主题二']==secSelect_Name){
+                has= true
+            }
+
+        }
+        return has
+    }
     const select = async (par1, par2) => {
         console.log(par1, par2)
         if (par1 == -1) {
@@ -156,54 +220,64 @@ function KnowledgeForest() {
 
         if (statu == 0) {
             firstSelect_Name = par2
+            firstSelect_id=par1
             selecting("已经选定主题: " + par2 + ", 请选择另一主题")
             statu = 1
         } else {
             secSelect_Name = par2
+            secSelect_id=par1
             if (statu == 1) {
+
                 if (firstSelect_Name == secSelect_Name) {
                     message.info("不可选相同主题")
                     secSelect_Name = ''
+                    firstSelect_id=0
                     return
                 }
-                setTimeout(hide, 0);
-
-                const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
-                if (res.code == 185) {
-                    message.warn(res.msg)
-                } else {
-                    message.info(res.msg)
-                    console.log(currentSubjectDomain.domain)
-
-                    fetchMap();
-                    console.log(currentSubjectDomain.domain)
-                    // ser
+                let has = checkExitRelation()
+                if (has){
+                    message.info("关系已经存在")
+                    setTimeout(hide, 0);
+                    reSet()
+                    return
                 }
-                reSet()
+
+                confirm({
+                    title: "确认添加关系："+ firstSelect_Name+"--> "+secSelect_Name+" 吗？",
+                    okText: '确定',
+                    cancelText: '取消',
+                    async onOk() {
+                        setTimeout(hide, 0);
+
+                        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+                        if (res.code == 185) {
+                            message.warn(res.msg)
+                        } else {
+                            message.info(res.msg)
+                            fetchMap();
+                        }
+                        reSet()
+                    },
+                    onCancel() {
+                        console.log('cancel')
+                    }
+                })
             }
         }
     }
     /***  addRelation end ===============================================================================================================**/
 
 
-    async function fetchMap() {
-        emptyChildren(mapRef.current)
-        emptyChildren(treeRef.current)
-        await YottaAPI.getMap(currentSubjectDomain.domain).then(
-            (res) => {
-                // setmapdata(res.data);
-                if (res.data && mapRef) {
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
-                        onDeleteRelation(a, b)
-                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
-                } else {
-                    alert("该课程下无知识森林数据！")
-                    // history({pathname:'/nav',state:{login:true}})
-                }
-            }
-        )
+    /***  assembleTopic start ===============================================================================================================**/
 
+
+    async function assembleTopic(topicId,topicName){
+
+        // settopicConfirm(topicName);
     }
+    /***  assembleTopic end ===============================================================================================================**/
+
+
 
     async function clickFacet(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);
@@ -455,7 +529,7 @@ function KnowledgeForest() {
                 <div style={{width: '100%', height: '700px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{
-                        position: 'absolute', left: '0', 
+                        position: 'absolute', left: '0',
                         marginLeft: 26,
                         visibility: 'hidden',
                         top: 10,

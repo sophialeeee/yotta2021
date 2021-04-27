@@ -10,7 +10,7 @@ import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
-  const { currentSubjectDomain,setCurrentSubjectDomain } = useCurrentSubjectDomainModel();
+  const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
   const {confirm} = Modal;
@@ -40,38 +40,51 @@ function KnowledgeForest () {
   }
   const mapRef = useRef();
   const treeRef = useRef();
-  // 画认知关系图
-  useEffect(() => {
-    async function fetchDependencesMap () {
-      await YottaAPI.getMap(currentSubjectDomain.domain).then(
-        
-        (res) => {
-          if (res.data.relationCrossCommunity.length !==0 && mapRef ) {
-          // if (res.data && mapRef && (learningPath.length !== 0)) {
-          //   drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{
-          //     alert("装载主题")
-          //   },select,onInsertTopic);
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet);
-          } else {
-            alert("该课程下无知识森林数据！")
-            history.push({pathname:'/nav',state:{login:true}})
-          }
-        }
-      )
+
+
+  function emptyChildren(dom) {
+    if (dom){
+      const children = dom.childNodes;
+      while (children.length > 0) {
+        dom.removeChild(children[0]);
+      }
     }
 
-    fetchDependencesMap();
-
+  };
+  useEffect(() => {
+    fetchMap();
   }, [currentSubjectDomain.domain]);
 
+  let data;
   /***  insert  ===============================================================================================================**/
+  async function fetchMap() {
+    emptyChildren(mapRef.current)
+    emptyChildren(treeRef.current)
+    await YottaAPI.getMap(currentSubjectDomain.domain).then(
+        (res) => {
+          // setmapdata(res.data);
+          if (res.data && mapRef&&mapRef.current) {
+
+             drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
+            //drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{},'no','no','no');
+            // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
+          } else {
+            if (res.data){
+            }else {
+              alert("该课程下无知识森林数据！")
+            }
+
+            // history({pathname:'/nav',state:{login:true}})
+          }
+        }
+    )
+
+  }
   const textareaValueRef = useRef('');
   const {TextArea} = Input;
   const handleTextareaChange = (e) => {
     textareaValueRef.current = e.target.value;
   }
-  // const [insertTopic, setInsertTopic] = useState();
-
   const onInsertTopic = () => {
     setTimeout(hide, 0);
     reSet()
@@ -93,9 +106,10 @@ function KnowledgeForest () {
         if (res.code == 200) {
           //重新获取重绘
           message.info(res.msg)
-          init(currentSubjectDomain.domain)
+
+          fetchMap();
         } else {
-          message.warn(+res.msg)
+          message.warn(res.msg)
         }
       },
       onCancel() {
@@ -104,10 +118,11 @@ function KnowledgeForest () {
   };
   /***  insert   ===============================================================================================================**/
 
+
   /***  delete  ===============================================================================================================**/
 
   const onDeleteTopic = (name,id) => {
-    console.log(name)
+    console.log("浏览",name)
     setTimeout(hide, 0);
     reSet()
     confirm({
@@ -119,7 +134,8 @@ function KnowledgeForest () {
 
         if (res.code == 200) {
           message.info(res.msg)
-          init(currentSubjectDomain.domain)
+          fetchMap();
+
         } else {
           message.warn(res.msg)
         }
@@ -134,11 +150,12 @@ function KnowledgeForest () {
   /***  delete  end  ===============================================================================================================**/
   /***  addRelation   start ===============================================================================================================**/
   let statu = 0
+
   let  firstSelect_Name = ''
   let  secSelect_Name = ''
   let hide=null
   const selecting = function (content) {
-    hide = message.loading(content,20000);
+    hide = message.loading(content,10000);
   };
   const reSet = function () {
     statu = 0
@@ -159,26 +176,56 @@ function KnowledgeForest () {
     } else {
       secSelect_Name = par2
       if (statu == 1) {
+
+
+
+
+
+
+
         if (firstSelect_Name == secSelect_Name) {
           message.info("不可选相同主题")
           secSelect_Name = ''
           return
         }
-        setTimeout(hide, 0);
 
-        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
-        if (res.code == 185) {
-          message.warn(res.msg)
-        } else {
-          message.info(res.msg)
-          setCurrentSubjectDomain(currentSubjectDomain.domain)
-          // init(currentSubjectDomain.domain)
-        }
-        reSet()
+        confirm({
+          title: "确认添加关系："+ firstSelect_Name+"--> "+secSelect_Name+" 吗？",
+          okText: '确定',
+          cancelText: '取消',
+          async onOk() {
+            setTimeout(hide, 0);
+
+            const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+            if (res.code == 185) {
+              message.warn(res.msg)
+            } else {
+              message.info(res.msg)
+              fetchMap();
+
+
+            }
+            reSet()
+          },
+          onCancel() {
+            console.log('cancel')
+          }
+        })
       }
     }
   }
   /***  addRelation end ===============================================================================================================**/
+
+
+  /***  assembleTopic start ===============================================================================================================**/
+
+
+  async function assembleTopic(topicId,topicName){
+
+    // settopicConfirm(topicName);
+  }
+  /***  assembleTopic end ===============================================================================================================**/
+
 
 
   async function clickFacet (facetId) {

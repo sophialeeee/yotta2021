@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Input, Modal, message} from 'antd';
+import {Card, Input, Modal, message, Select} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -15,6 +15,7 @@ import useConstructTypeModel from '../../../models/construct-type';
 function Relation() {
     const {step,setStep} = useStepModel();
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
+    const [topicsData, settopicsData] = useState();
     var [data,setdata] =  useState([]);
     var [dataTemp,setdataTemp] =  useState([]);
     const [data0,setdata0]=useState(0);
@@ -32,6 +33,9 @@ function Relation() {
     var topicInsertRef2 = useRef('');
     var [insertTopic1,setinsertTopic1] = useState();
     var [insertTopic2,setinsertTopic2] = useState();
+    const TopicEdit = 'yes';
+    const RelationEdit = 'yes';
+    const FacetEdit = 'yes';
 
     // var isEnglish = new Boolean(false);
     // const {TextArea} = Input;
@@ -126,6 +130,21 @@ function Relation() {
     const handleTextareaChange2= (e)=>{
         topicInsertRef2.current = e.target.value;
     }
+    // 获得该课程下的所有主题
+    useEffect(() => {
+        async function fetchTopicsData() {
+            var res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
+            // var topicsData = res.data.data;
+            //const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
+            settopicsData(res.data.data);
+            // if(topicsData){
+            //     settopics(topicsData.map((topic) =>topic.topicName));
+            // }
+        }
+        if (currentSubjectDomain.domain) {
+            fetchTopicsData();
+        }
+    },[currentSubjectDomain.domain])
 
     useEffect(()=>{
         async function fetchrelationData(){
@@ -240,13 +259,55 @@ function Relation() {
             }
         })
     }; 
+
+    // console.log("currentSubjectDomainTopics", topicsData);
     const onInsertRelation = (relationOne, relationTwo, e) => {
         confirm({
-            title: '请输入两个主题的名称',
+            title: '请选择认知关系的头主题和尾主题',
             icon: <ExclamationCircleOutlined/>,
             content: <>
-                <Input placeholder="主题一 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange1 } style={{marginBottom: 5}}/>
-                <Input placeholder="主题二 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange2} />
+            {(topicsData)?(
+                    <Select 
+                        showSearch 
+                        placeholder="请选择头主题(可搜索)" 
+                        optionFilterProp="children"   
+                        filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        filterSort={(optionA, optionB) =>
+                            optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+                        } 
+                        onSelect={onSelectTopic1} 
+                        style={{width: 280, marginBottom: 10}}
+                    >
+                        {
+                            topicsData.map((topic)=>(
+                            <option value={topic.topicName} >{topic.topicName}</option> 
+                            ))
+                        }
+                    </Select>):
+                <Input placeholder="头主题 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange1} style={{marginBottom: 10}}/>}
+            {(topicsData)?(
+                    <Select 
+                        showSearch 
+                        placeholder="请选择尾主题(可搜索)" 
+                        optionFilterProp="children"   
+                        filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        filterSort={(optionA, optionB) =>
+                            optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+                        } 
+                        onSelect={onSelectTopic2} 
+                        style={{width: 280}}
+                    >
+                    {
+                        topicsData.map((topic)=>(
+                        <option value={topic.topicName} >{topic.topicName}</option> 
+                        ))
+                    }
+                </Select>):
+                <Input placeholder="尾主题 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange2}/>}
                 {/* <TextArea showCount maxLength={20} onChange={handleTextareaChange1}/>
                 <TextArea showCount maxLength={20} onChange={handleTextareaChange2}/> */}
             </>,
@@ -271,7 +332,12 @@ function Relation() {
             }
         })
     }; 
-
+    const onSelectTopic1 = (e) => { 
+        topicInsertRef1.current = e
+    }
+    const onSelectTopic2 = (e) => { 
+        topicInsertRef1.current = e
+    }
     function emptyChildren(dom) {
         const children = dom.childNodes;
         console.log('children',children);
@@ -302,7 +368,7 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
@@ -332,10 +398,10 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
-                    if(res.data&&mapRef){
+                    if(res.data && mapRef){
                     // console.log('res.data',res.data);
                     drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation( a, b);
@@ -359,7 +425,7 @@ function Relation() {
     // 画认知关系图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
                     if(JSON.stringify(res.data.topics)=='{}'){
@@ -367,7 +433,8 @@ function Relation() {
                     }
                     else if(res.data&&mapRef){
                     console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
+                    drawMap(res.data, mapRef.current, treeRef.current,currentSubjectDomain.domain,learningPath,
+                        () => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
                         onDeleteRelation(a, b);
                         console.log("deleting3")
                     },'no','yes','no',()=>{},()=>{});}
@@ -387,11 +454,7 @@ function Relation() {
                 关系个数：   <span style={{ color: 'red', fontWeight: 'bolder' }}>{data.length}</span>
             </Card.Grid>
         </Card>
-        {/* <Card title="新增主题关系数量统计" style={countStyle1}>
-            <Card.Grid style={{ width: '100%', height: '50px' }} >
-                关系个数：   <span style={{ color: 'red', fontWeight: 'bolder' }}>{data.length}</span>
-            </Card.Grid>
-        </Card> */}
+
         <Card extra={<PlusOutlined style={{top: '50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
             {
                 data.map(

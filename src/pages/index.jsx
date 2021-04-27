@@ -89,8 +89,8 @@ function App() {
     },[currentSubjectDomain])
     function onAutoConstructClick(){
         
-        let subject = '';
-        let domain = '';
+        let subject = '法律经济学';
+        let domain = '经济学';
         const onTextSubjectChange = (e) => {
             subject = e.target.value;
         };
@@ -120,7 +120,7 @@ function App() {
                         }
                     </Select>):                 
                 (
-                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange}/>)}
+                    <Input placeholder={'请输入学科'} onChange={onTextSubjectChange} value={subject} />)}
 
 
                 </div>

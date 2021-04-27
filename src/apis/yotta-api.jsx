@@ -179,6 +179,11 @@ const YottaAPI = {
         return await axios.get(`http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}`);
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
+
+    async generateMap(domainName){
+        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
+        // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
+    },
     
     // 根据分面id获取碎片信息
     async getFacetName(facetId){
@@ -293,11 +298,7 @@ const YottaAPI = {
         // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
-    async deleteTopic_zyl(topicId){
-        return await axios.get(`http://47.95.145.72:8084/topic/deleteTopicByTopicId?topicId=${encodeURI(topicId)}`);
-        // return await axios.post(`http://47.95.145.72:8084/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
-        // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
-    },
+
 
 };
 
