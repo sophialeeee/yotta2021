@@ -180,8 +180,8 @@ const YottaAPI = {
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
 
-    async generateMap(domainName){
-        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
+    async generateMap(domainName, isEnglish){
+        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
     
