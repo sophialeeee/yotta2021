@@ -13,15 +13,25 @@ function KnowledgeForest() {
 
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     // const [mapdata,setmapdata] = useState();
+    const [mapdata,setmapdata] = useState();
 
     const [learningPath, setlearningPath] = useState([]);
-
+    const [insertFacet1,setinsertFacet1] = useState();
     const [currentTopic, setcurrentTopic] = useState('树状数组');
-
+    const [topicName2,settopicName2] = useState();
     const [assembles, setassembles] = useState();
     const [assnum, setassnum] = useState(0);
+    const [treeData, settreeData] = useState();
+    var [relationData,setrelationData] = useState();
+    var [deleteTopicStart,setDeleteTopic1] = useState();
+    var [deleteTopicEnd,setDeleteTopic2] = useState();
+    var [insertTopic1,setinsertTopic1] = useState();
+    var [insertTopic2,setinsertTopic2] = useState();
     // const [facetId,setfacetId] = useState();
     const [facetName, setfacetName] = useState('摘要');
+    const infoDelete = () => {
+        message.success('关系删除成功！')
+    }
     const {confirm} = Modal;
     const mapStyle = {
         width: '56%',
@@ -183,7 +193,9 @@ function KnowledgeForest() {
             (res) => {
                 // setmapdata(res.data);
                 if (res.data && mapRef) {
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
+                        onDeleteRelation(a, b)
+                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
                 } else {
                     alert("该课程下无知识森林数据！")
                     // history({pathname:'/nav',state:{login:true}})
@@ -246,6 +258,197 @@ function KnowledgeForest() {
         init(currentSubjectDomain.domain)
 
     }, [])
+
+
+
+     //插入分面
+     const clickBranchAdd = (topicName2) => {
+        confirm({
+            title: '请输入分面名称',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <TextArea showCount maxLength={100} onChange={handleTextareaChange}/>
+            </>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                settopicName2(topicName2);
+                const insertFacet1 = textareaValueRef.current;
+                textareaValueRef.current = '';
+                setinsertFacet1(insertFacet1);
+            },
+            onCancel() {
+
+            }
+        })
+    };
+
+    useEffect(()=>{
+        async function insertFacet(){
+            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+            fetchMap();
+      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+
+    //   window.flag = false;
+    //   console.log("shanchuhou", window.flag);
+      if (treeData) {
+        console.log("新的画树数据", treeData2);
+        emptyChildren(treeRef.current);
+        settreeData(treeData2);
+        fetchMap();
+      }
+        }
+        if(topicName2 && insertFacet1){
+            insertFacet(topicName2, insertFacet1);
+        }
+  },[topicName2])
+
+  //删除分面调用接口
+  let clickflag = true;
+  const onClickBranch = (facetId) => {
+      if(!clickflag){
+          clickflag=true;
+          console.log("return flag");
+          return
+      }
+      if(facetId){
+      confirm({
+      title: "确认删除该分面吗？",
+      okText: '确定',
+      cancelText: '取消',
+      async onOk() {
+          ClickBranch(facetId)
+
+        //   if (res.code == 200) {
+        //       message.info(res.msg)
+        //       fetchMap();
+
+        //   } else {
+        //       message.warn(res.msg)
+        //   }
+          clickflag = false;
+      },
+      onCancel() {
+          //clickflag = false;
+          console.log('cancel')
+      }
+  })
+    }
+    };
+  
+
+  async function ClickBranch(facetId){
+      
+      if (facetId > 0){
+      const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+      console.log("传入删除id", facetId);
+      setassembles(res);
+        if (res.code == 200) {
+              message.info(res.msg)
+              fetchMap();
+
+          } else {
+              message.warn(res.msg)
+          }
+      }
+  
+      console.log("currentTopic clickbranch",currentTopic);
+  // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+  // window.flag = false;
+  // console.log("shanchuhou",window.flag);
+  //     if(treeData){
+  //         console.log("新的画树数据",treeData);
+  //         emptyChildren(treeRef.current);
+  //         settreeData(treeData);
+  //     }
+      setcurrentTopic(topic => {
+          (async () => {
+              const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+              console.log('t-tt', topic);
+              window.flag = false;
+              console.log("shanchuhou", window.flag);
+              if (treeData) {
+                  console.log("新的画树数据", treeData);
+                  emptyChildren(treeRef.current);
+                  settreeData(treeData);
+              }
+          })();
+          return topic
+      })
+    }
+    //删除依赖
+    function nameCheck(originName) {
+        var tempName = originName;
+        if (originName.search('\\+') != -1){
+            console.log("tempName", tempName);
+            tempName = originName.replace("+", "jiahao");
+            console.log("tempName", tempName);
+        };
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
+      useEffect(()=>{
+        async function deleteRelation(){
+
+            const response = await YottaAPI.deleteRelation(currentSubjectDomain.domain, nameCheck(deleteTopicStart).checkedName, nameCheck(deleteTopicEnd).checkedName);
+            if (response){
+                infoDelete();
+            };
+            const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+            setrelationData(res);
+            fetchMap();
+            emptyChildren(mapRef.current);
+            emptyChildren(treeRef.current);
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                (res) => {
+                    setmapdata(res.data);
+                    if(res.data&&mapRef){
+                    // console.log('res.data',res.data);
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
+                        onDeleteRelation(a, b)
+                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    }
+                }
+            ) 
+            const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
+            //setGephi(result);
+        }
+        if(deleteTopicStart){
+            console.log('useEffect:', deleteTopicStart, deleteTopicEnd)
+            deleteRelation(deleteTopicStart, deleteTopicEnd);
+            if (insertTopic1 === deleteTopicStart && insertTopic2 === deleteTopicEnd){
+                setinsertTopic1("***"); 
+            };
+            setDeleteTopic1();
+        }
+    },[deleteTopicStart, deleteTopicEnd])     
+      
+  
+  const onDeleteRelation = (relationOne, relationTwo, e) => {
+    confirm({
+        title: '确定删除关系吗？',
+        icon: <ExclamationCircleOutlined/>,
+        okText: '确定',
+        cancelText: '取消',
+        onOk() {
+            console.log("ll",relationOne);
+            setDeleteTopic1(relationOne); 
+            console.log('relationOne',deleteTopicStart);
+            // setDeleteTopic1('relationOne'); 
+            // console.log('relationOne',deleteTopicStart);
+            setDeleteTopic2(relationTwo); 
+            console.log('relationTwo',deleteTopicEnd);
+        },
+        onCancel() {
+        }
+    })
+}; 
     return (
         <>
             <Card title="主题间认知路径图" style={mapStyle}>

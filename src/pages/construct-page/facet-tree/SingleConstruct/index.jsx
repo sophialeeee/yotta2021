@@ -151,13 +151,13 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic),2000);
+                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'yes',200);
                     
                     
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
-                        drawTreeNumber(treeRef.current,treeData,clickFacet,ClickBranch,clickBranchAdd.bind(null, currentTopic));
+                        drawTreeNumber(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'yes');
                     
                         }
                     }
@@ -314,7 +314,13 @@ function SingleConstruct() {
     
     
     //删除分面调用接口
+    let clickflag = true;
     const onClickBranch = (facetId) => {
+        if(!clickflag){
+            clickflag=true;
+            console.log("return flag");
+            return
+        }
         if(facetId){
         confirm({
         title: "确认删除该分面吗？",
@@ -330,8 +336,10 @@ function SingleConstruct() {
             // } else {
             //     message.warn(res.msg)
             // }
+            clickflag = false;
         },
         onCancel() {
+            //clickflag = false;
             console.log('cancel')
         }
     })
