@@ -10,7 +10,7 @@ import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
-  const { currentSubjectDomain,setCurrentSubjectDomain } = useCurrentSubjectDomainModel();
+  const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
   const {confirm} = Modal;
@@ -40,11 +40,23 @@ function KnowledgeForest () {
   }
   const mapRef = useRef();
   const treeRef = useRef();
-  useEffect(() => {
-    fetchMap();
-  }, [currentSubjectDomain.domain]);
 
-  /***  insert  ===============================================================================================================**/
+  function nameCheck(originName) {
+    // var tempName = originName;
+    // if (originName.search('\\+') != -1){
+    //     console.log("tempName", tempName);
+    //     tempName = originName.replace("+", "jiahao");
+    //     console.log("tempName", tempName);
+    // };
+    var english_name = /^[a-zA-Z]+$/.test(originName);
+    // if (topicName.search('\\(') != -1){
+    //     tempName = topicName.replace("(", " (");
+    // };
+    return {
+        // checkedName: tempName,
+        isEnglish: english_name
+    }
+}
   function emptyChildren(dom) {
     if (dom){
       const children = dom.childNodes;
@@ -52,22 +64,32 @@ function KnowledgeForest () {
         dom.removeChild(children[0]);
       }
     }
+
   };
+  useEffect(() => {
+    fetchMap();
+  }, [currentSubjectDomain.domain]);
+
+  let data;
+  /***  insert  ===============================================================================================================**/
   async function fetchMap() {
     emptyChildren(mapRef.current)
     emptyChildren(treeRef.current)
     await YottaAPI.getMap(currentSubjectDomain.domain).then(
         (res) => {
           // setmapdata(res.data);
-          if (res.data && mapRef && mapRef.current) {
-            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},onInsertTopic,()=>{});
+          if (res.data && mapRef&&mapRef.current) {
 
-            // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{});
+             drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
+            //drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{},'no','no','no');
+            // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
           } else {
-            if (res.data ){
+            if (res.data){
             }else {
               alert("该课程下无知识森林数据！")
-            }            // history({pathname:'/nav',state:{login:true}})
+            }
+
+            // history({pathname:'/nav',state:{login:true}})
           }
         }
     )
@@ -115,7 +137,7 @@ function KnowledgeForest () {
   /***  delete  ===============================================================================================================**/
 
   const onDeleteTopic = (name,id) => {
-    console.log(name)
+    console.log("浏览",name)
     setTimeout(hide, 0);
     reSet()
     confirm({
@@ -148,7 +170,7 @@ function KnowledgeForest () {
   let  secSelect_Name = ''
   let hide=null
   const selecting = function (content) {
-    hide = message.loading(content,20000);
+    hide = message.loading(content,10000);
   };
   const reSet = function () {
     statu = 0
@@ -169,29 +191,55 @@ function KnowledgeForest () {
     } else {
       secSelect_Name = par2
       if (statu == 1) {
+
+
+
+
+
+
+
         if (firstSelect_Name == secSelect_Name) {
           message.info("不可选相同主题")
           secSelect_Name = ''
           return
         }
-        setTimeout(hide, 0);
 
-        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
-        if (res.code == 185) {
-          message.warn(res.msg)
-        } else {
-          message.info(res.msg)
-          console.log(currentSubjectDomain.domain)
+        confirm({
+          title: "确认添加关系："+ firstSelect_Name+"--> "+secSelect_Name+" 吗？",
+          okText: '确定',
+          cancelText: '取消',
+          async onOk() {
+            setTimeout(hide, 0);
 
-          fetchMap();
-          console.log(currentSubjectDomain.domain)
-          // ser
-        }
-        reSet()
+            const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+            if (res.code == 185) {
+              message.warn(res.msg)
+            } else {
+              message.info(res.msg)
+              fetchMap();
+
+
+            }
+            reSet()
+          },
+          onCancel() {
+            console.log('cancel')
+          }
+        })
       }
     }
   }
   /***  addRelation end ===============================================================================================================**/
+
+
+  /***  assembleTopic start ===============================================================================================================**/
+
+
+  async function assembleTopic(topicId,topicName){
+
+    // settopicConfirm(topicName);
+  }
+  /***  assembleTopic end ===============================================================================================================**/
 
 
 
