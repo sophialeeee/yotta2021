@@ -111,7 +111,7 @@ function DisplayPage() {
         
         if(subject&&domain)
             {
-                
+                console.log("con",constructType)
                 console.log("S&D",subject,domain)
                 setAutoConstructType();
                 setCurrentSubjectDomain(subject, domain);
@@ -119,8 +119,8 @@ function DisplayPage() {
                 cookie.save('c-type','1')
                 console.log(cookie.loadAll(),'======================================')
             // ({pathname:'/construct-page',state:{login:true}});
-            
-                history.push('/construct-page');
+                setTimeout(()=>{history.push('/construct-page');},50)
+                
 
         }
            

@@ -9,12 +9,14 @@ import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
 import {ExclamationCircleOutlined} from "@ant-design/icons";
+//import constructType from '../../../models/construct-type';
+import useConstructTypeModel from '../../../models/construct-type';
 function KnowledgeForest () {
   const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
   const initialAssemble = useRef();
   const {confirm} = Modal;
-
+  const {constructType}=useConstructTypeModel();
   const history = useHistory();
   const [learningPath, setlearningPath] = useState([]);
   const [currentTopic, setcurrentTopic] = useState('字符串');
@@ -54,7 +56,11 @@ function KnowledgeForest () {
   useEffect(() => {
     fetchMap();
   }, [currentSubjectDomain.domain]);
-
+  // useEffect(() => {
+  //   //console.log('aaaaaa')
+  //   emptyChildren(mapRef.current)
+  //   emptyChildren(treeRef.current)
+  // }, [constructType]);
   let data;
   /***  insert  ===============================================================================================================**/
   async function fetchMap() {
@@ -64,10 +70,11 @@ function KnowledgeForest () {
         (res) => {
           // setmapdata(res.data);
           if (res.data && mapRef&&mapRef.current) {
-
+             console.log("这里是浏览1")
              drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
             //drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{},'no','no','no');
             // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
+            console.log("这里是浏览2")
           } else {
             if (res.data){
             }else {
@@ -122,6 +129,7 @@ function KnowledgeForest () {
   /***  delete  ===============================================================================================================**/
 
   const onDeleteTopic = (name,id) => {
+    console.log("浏览map",mapRef.current)
     console.log("浏览",name)
     setTimeout(hide, 0);
     reSet()
@@ -238,6 +246,7 @@ function KnowledgeForest () {
   }
 
   async function clickTopic (topicId, topicName) {
+    console.log("当前是浏览")
     setcurrentTopic(topicName);
     setfacetName("未选择")
     await YottaAPI.getAssembleByName(currentSubjectDomain.domain,topicName).then(res=>{

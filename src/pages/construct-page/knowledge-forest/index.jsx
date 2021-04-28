@@ -99,8 +99,10 @@ function KnowledgeForest() {
                 // setmapdata(res.data);
                 if (res.data && mapRef&&mapRef.current) {
                     data_temp=res.data
+                    console.log("这里是构建3")
                     // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes');
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    console.log("这里是构建4")
                 } else {
                     if (res.data){
                     }else {
@@ -213,7 +215,7 @@ function KnowledgeForest() {
         return has
     }
     const select = async (par1, par2) => {
-        console.log(par1, par2)
+        console.log("构建",par1, par2)
         if (par1 == -1) {
             message.info("该主题不可选")
         }
@@ -380,6 +382,7 @@ function KnowledgeForest() {
   //删除分面调用接口
   let clickflag = true;
   const onClickBranch = (facetId) => {
+        console.log("click分面删除",facetId)
       if(!clickflag){
           clickflag=true;
           console.log("return flag");
@@ -415,8 +418,8 @@ function KnowledgeForest() {
       
       if (facetId > 0){
       const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-      console.log("传入删除id", facetId);
-      setassembles(res);
+      console.log("传入删除id", facetId,res);
+      //setassembles(res); res是提示信息... 这咋能set的
         if (res.code == 200) {
               message.info(res.msg)
               fetchMap();
@@ -484,10 +487,12 @@ function KnowledgeForest() {
                     setmapdata(res.data);
                     if(res.data&&mapRef){
                     // console.log('res.data',res.data);
+                    console.log("这里是构建1")
                     drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
                         onDeleteRelation(a, b)
                         console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
                     }
+                    console.log("这里是构建2")
                 }
             ) 
             const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);

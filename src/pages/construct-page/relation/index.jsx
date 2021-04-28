@@ -431,7 +431,7 @@ function Relation() {
                     if(JSON.stringify(res.data.topics)=='{}'){
                         alert("该课程下无依赖关系！");
                     }
-                    else if(res.data&&mapRef){
+                    else if(res.data&&mapRef&&mapRef.current){
                     console.log('res.data',res.data);
                     drawMap(res.data, mapRef.current, treeRef.current,currentSubjectDomain.domain,learningPath,
                         () => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
