@@ -337,7 +337,7 @@ function Relation() {
         topicInsertRef1.current = e
     }
     const onSelectTopic2 = (e) => { 
-        topicInsertRef1.current = e
+        topicInsertRef2.current = e
     }
     function emptyChildren(dom) {
         const children = dom.childNodes;
@@ -354,7 +354,6 @@ function Relation() {
 
     useEffect(()=>{
         async function insertRelation(){
-
             const response = await YottaAPI.insertRelation(currentSubjectDomain.domain, nameCheck(insertTopic1).checkedName, nameCheck(insertTopic2).checkedName);
             // console.log("Responsedata", response)
             if (response){
@@ -369,7 +368,7 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
@@ -399,7 +398,7 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data && mapRef){
@@ -426,7 +425,7 @@ function Relation() {
     // 画认知关系图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            await YottaAPI.generateMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     setmapdata(res.data);
                     if(JSON.stringify(res.data.topics)=='{}'){

@@ -108,7 +108,7 @@ const YottaAPI = {
     async getDynamicSingle(domainName,topicName,flag){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -148,6 +148,11 @@ const YottaAPI = {
         }
         return result;
     },
+
+    async startSpider(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startIncrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+
     // 根据课程名获取所有的主题名
     async getTopicsByDomainName(domainName){
         return await gets(`topic/getTopicsByDomainName?domainName=${encodeURI(domainName)}`);
