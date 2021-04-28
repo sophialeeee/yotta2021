@@ -53,7 +53,7 @@ function KnowledgeForest() {
     }
     const mapRef = useRef();
     const treeRef = useRef();
-
+    // localStorage.removeItem('state');//刷新清空状态量
     function emptyChildren(dom) {
         if (dom){
             const children = dom.childNodes;
