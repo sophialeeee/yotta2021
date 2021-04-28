@@ -78,6 +78,15 @@ function App() {
             if (localStorage.getItem("visitedTopic")){
                     localStorage.removeItem("visitedTopic");
                 }
+            if (localStorage.getItem("finishedData")){
+                    localStorage.removeItem("finishedData");
+                }
+            if (localStorage.getItem("batchData")){
+                    localStorage.removeItem("batchData");
+                }
+            if (localStorage.getItem("visitedBatch")){
+                    localStorage.removeItem("visitedBatch");
+                }
             if (localStorage.getItem("visitedStep1")){
                     localStorage.removeItem("visitedStep1");
                 }
