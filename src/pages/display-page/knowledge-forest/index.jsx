@@ -41,7 +41,22 @@ function KnowledgeForest () {
   const mapRef = useRef();
   const treeRef = useRef();
 
-
+  function nameCheck(originName) {
+    // var tempName = originName;
+    // if (originName.search('\\+') != -1){
+    //     console.log("tempName", tempName);
+    //     tempName = originName.replace("+", "jiahao");
+    //     console.log("tempName", tempName);
+    // };
+    var english_name = /^[a-zA-Z]+$/.test(originName);
+    // if (topicName.search('\\(') != -1){
+    //     tempName = topicName.replace("(", " (");
+    // };
+    return {
+        // checkedName: tempName,
+        isEnglish: english_name
+    }
+}
   function emptyChildren(dom) {
     if (dom){
       const children = dom.childNodes;
