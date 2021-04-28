@@ -462,7 +462,7 @@ function Assemble() {
 
 
     // 右键点击装配，调用动态爬虫
-    useEffect(() => {   
+    useEffect(() => {
         async function fetchAssembleData2() {
             console.log("开始动态渲染");
             setrenderFinish(0);
@@ -492,7 +492,7 @@ function Assemble() {
                                     setdynamicRenderAss(result);
                                     console.log("+++++++++++++++++++");
                                     //setassembles(result);
-                                }  
+                                }
                             }
                     }
                     else{
@@ -507,7 +507,7 @@ function Assemble() {
 
 
     // 动态爬虫结果碎片 渲染
-    useEffect(() => {   
+    useEffect(() => {
         async function fetchAssembleData3() {
             console.log("开始动态渲染");
             setrenderFinish(0);
@@ -530,16 +530,16 @@ function Assemble() {
             //         setrenderFinish(1);
             //         clearInterval(myvar);
 
-            //     }else        
-            //     { 
+            //     }else
+            //     {
             //         arr1.push(asslist[i]);
             //         setassembles(arr1);
             //         setassnum(arr1.length);
             //         i++;
             //     }
-                
+
             // },100);
-                
+
             }
         }
         if (currentTopic) {

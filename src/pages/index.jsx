@@ -89,8 +89,8 @@ function App() {
     },[currentSubjectDomain])
     function onAutoConstructClick(){
         
-        let subject = '法律经济学';
-        let domain = '经济学';
+        let subject = '';
+        let domain = '';
         const onTextSubjectChange = (e) => {
             subject = e.target.value;
         };

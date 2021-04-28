@@ -220,11 +220,63 @@ const YottaAPI = {
         }
         return result;
     },
+
+
+
+    async startSpider_zyl(domainName,topicName){
+        let result = undefined;
+        try{
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
+    },
+
+    async spiderFacet_zyl(domainName,topicName){
+        let result = undefined;
+        try{
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
+    },
+
+    async getGenerateDependency_zyl(domainName,topicName){
+        let result = undefined;
+        try{
+            result = await axios.post(`http://47.95.145.72:8083/dependency/getGenerateDependencyWithNewTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:10000});
+            result = result.data;
+        }
+        catch(error){
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+            }
+        }
+        return result;
+    },
+
+
     async deleteTopic_zyl(domainName,topicName){
 
         let result = undefined;
         try{
-            result = await axios.get(`http://47.95.145.72:8083/topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+            result = await axios.post(`http://47.95.145.72:8083/topic/deleteTopicCompleteByDomainNameAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
             result = result.data;
         }
         catch(error){
