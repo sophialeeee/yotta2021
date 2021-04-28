@@ -130,6 +130,7 @@ function Relation() {
     const handleTextareaChange2= (e)=>{
         topicInsertRef2.current = e.target.value;
     }
+    // localStorage.removeItem('state');//刷新清空状态量
     // 获得该课程下的所有主题
     useEffect(() => {
         async function fetchTopicsData() {
