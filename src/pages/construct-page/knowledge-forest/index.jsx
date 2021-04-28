@@ -172,6 +172,9 @@ function KnowledgeForest() {
                 message.info('爬取结束，共有碎片' + caluNum(resIncremental.data) + '个')
                 await sleep();
 
+                getGenerateDependency(topicName)
+                setTimeout(timer)
+
             } else if (resIncremental.code == 301) {
                 // message.info(resIncremental.msg)
                 message.info('已经爬取碎片' + caluNum(resIncremental.data) + '个')
