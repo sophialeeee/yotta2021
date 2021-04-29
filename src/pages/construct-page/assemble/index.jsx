@@ -361,14 +361,15 @@ function Assemble() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
-                    if (res.data && mapRef && mapRef.current&&treeRef.current) {
+                    if(res.data&&mapRef){
                         drawMap(res.data, mapRef.current, treeRef1.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{}, ()=>{}, ()=>{}, 'yes','yes','yes');
                         //drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             }
         )
     }
-        console.log("当前主题为",currentSubjectDomain.domain);
+    console.log("当前主题为",currentSubjectDomain.domain);
+    if (currentSubjectDomain)
         fetchDependencesMap();
 
     },[currentSubjectDomain.domain]);
@@ -385,6 +386,7 @@ function Assemble() {
     async function clickTopic(topicId,topicName){
         setcurrentTopic(topicName);
         setstaticRenderAss(topicName);
+        console.log("点击主题");
     }
 
     async function deleteTopic(topicId){
@@ -572,7 +574,9 @@ function Assemble() {
         console.log(autocurrentTopic);
         async function autofetchTreeData() {
             const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
-            setautotreeData(autotreeData);
+            console.log("fetch tree data:",autotreeData);
+            if (autotreeData)
+                setautotreeData(autotreeData);
         }
         autofetchTreeData();
     }, [autocurrentTopic]);
@@ -584,8 +588,11 @@ function Assemble() {
                 alert("当前页面无分面树");
             }
             else{
-                drawTreeNumber(treeRef.current, autotreeData, d => { });
-                console.log("树",treeRef.current);
+                console.log("autotreeData.children.length",autotreeData.children.length);
+                if (treeRef.current && autotreeData && autotreeData.children.length !==0) {
+                    drawTreeNumber(treeRef.current, autotreeData, d => { });
+                    console.log("树",treeRef.current);
+                }
             }
         }
     }, [autotreeData])
@@ -714,7 +721,7 @@ function Assemble() {
                                                 !renderFinish ?
                                                 (
                                                     <>
-                                                    <div dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
+                                                    <div style={{textAlign:"left"}} dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
                                                     </>
                                                 ) :
                                                 (

@@ -187,14 +187,14 @@ function KnowledgeForest() {
         let pre_num=0
         var timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
-            if (resIncremental.code) {
+            if (resIncremental) {
 
-                if (resIncremental.code == 200) {
+            if (resIncremental.code == 200) {
                     message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个', key},0);
-                    await sleep();
-                    getGenerateDependency(topicName)
-                    setTimeout(timer)
-                } else if (resIncremental.code == 301) {
+                await sleep();
+                getGenerateDependency(topicName)
+                setTimeout(timer)
+            } else if (resIncremental.code == 301) {
                     let now_num = caluNum(resIncremental.data)
                     if (now_num != pre_num) {
                         message.loading({content: '已经爬取' + now_num + '个', key},0);
@@ -202,7 +202,7 @@ function KnowledgeForest() {
 
                 } else if (resIncremental.code == 300) {
                     await sleep();
-                }
+            }
             }
         }, 1800);
 
@@ -215,7 +215,6 @@ function KnowledgeForest() {
 
         for (let i = 0; i < res.childrenNumber; i++) {
             let child = res.children[i]
-            console.log(child.length)
 
             for (let j = 0; j < child.children.length; j++) {
                 total_num += child.children[j].childrenNumber
@@ -233,14 +232,14 @@ function KnowledgeForest() {
 
     async function startSpider(topicName) {
         const resStartSpider = await YottaAPI.startSpider_zyl(currentSubjectDomain.domain, topicName);
-        if(resStartSpider.code) {
+        if(resStartSpider) {
             if (resStartSpider.code == 200) {
                 await sleep();
                 askIncremental(topicName)
             } else {
-                message.loading({content: resStartSpider.msg, key});
-            }
+            message.loading({content:resStartSpider.msg,key});
         }
+
 
     }
 
@@ -264,6 +263,7 @@ function KnowledgeForest() {
         }
     }
     const key = 'updatable';
+
 
     const onInsertTopic = () => {
         setTimeout(hide, 0);
