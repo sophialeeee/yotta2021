@@ -65,26 +65,26 @@ function Login(){
     
     return(
         <div>
-        <img src={img} style={{zIndex:-1}}/>
+        <img src={img} style={{zIndex:-1, width:'100%'}}/>
         <div>
-          <h1 style={{position:'absolute',top:'200px',left:'880px',fontSize:'30px'}}>统一用户认证</h1>
-          <Input style={{width:350,height:50,position:'absolute',top:'280px',left:'800px'}}
+          <h1 style={{ position: 'absolute', textAlign:'center',width:'12%',left:'44%', top: '25%'/*top:'200px',left:'880px'*/, fontSize: '30px' }}>统一用户认证</h1>
+          <Input style={{width:'22%',height:'7%',position:'absolute',left:'39%',top:'35%'/*top:'280px',left:'800px'*/}}
             prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)'}} />}
             placeholder="用户名"
             value={userName}
             onChange={handleUsernameChange}
           />
-          <Input style={{width:350,height:50,position:'absolute',top:'350px',left:'800px'}}
+          <Input style={{width:'22%',height:'7%',position:'absolute',left:'39%',top:'45%'/*top:'350px',left:'800px'*/}}
             prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
             type="password"
             placeholder="密码"
             value={password}
             onChange={handlePasswdChange}
           />
-          <h4 id="errText" style={{ position: 'absolute', top: '400px', left: '800px', fontSize: '13px', color: '#FF0000', display: errText ? 'block' : 'none'}}>用户名或密码错误，请重试</h4>      
-          <Button type="primary" onClick={handleLogin} style={{position:'absolute',top:'430px',left:'930px'}}>
+          <h4 id="errText" style={{ position: 'absolute', left:'39%',top:'52%'/*top: '400px', left: '800px'*/, fontSize: '13px', color: '#FF0000', display: errText ? 'block' : 'none'}}>用户名或密码错误，请重试</h4>      
+          <Button type="primary" onClick={handleLogin} style={{position:'absolute',width:'4%',left:'48%', top:'56%'/*top:'430px',left:'930px'*/}}>
             登录
-         </Button>
+          </Button>
         </div>
         </div>
     )
