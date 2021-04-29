@@ -117,7 +117,13 @@ function KnowledgeForest() {
                 if (res.data && mapRef && mapRef.current&&treeRef.current) {
                     data_temp=res.data
                     console.log("这里是构建3")
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
+                        learningPath, clickTopic, clickFacet,onDeleteTopic,
+                        ()=>{},select,onInsertTopic,(a,b) => {
+                            onDeleteRelation( a, b);
+                            console.log("deleting");
+                        },
+                        'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
                     console.log("这里是构建4")
                 } else {
                     if (res.data) {
@@ -144,22 +150,25 @@ function KnowledgeForest() {
         await sleep();
         await sleep();
 
-        let getGenerateDependency_loading  = message.loading({content:'生成碎片关系...',key},0,()=>{
-
+        let getGenerateDependency_loading  = message.loading({content:'生成碎片关系...',key},10,()=>{
+            fetchMap()
         });
 
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, topicName);
-        if (resGetGenerateDependency.code){
+        for (let i = 0; i < 10; i++) {
+            await sleep();
+        }
+        if (resGetGenerateDependency){
             if (resGetGenerateDependency.code == 200) {
                 message.loading({content:resGetGenerateDependency.msg,key}, 3)
                 setTimeout(getGenerateDependency_loading, 2)
-                message.loading({content:'刷新知识森林概览'}, 3)
+                message.loading({content:'刷新知识森林概览'}, 1)
                 fetchMap()
             } else {
                 message.loading({content:resGetGenerateDependency.msg,key}, 3)
                 setTimeout(getGenerateDependency_loading, 1)
-                message.loading({content:'刷新知识森林概览'}, 3)
+                message.loading({content:'刷新知识森林概览'}, 1)
 
                 fetchMap()
             }
@@ -178,20 +187,22 @@ function KnowledgeForest() {
         let pre_num=0
         var timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
+            if (resIncremental.code) {
 
-            if (resIncremental.code == 200) {
-                message.loading({content:'爬取结束，共有' + caluNum( resIncremental.data) + '个',key});
-                await sleep();
-                getGenerateDependency(topicName)
-                setTimeout(timer)
-            } else if (resIncremental.code == 301) {
-                let  now_num=caluNum( resIncremental.data)
-                if (now_num!=pre_num){
-                    message.loading({content:'已经爬取' +now_num + '个',key});
+                if (resIncremental.code == 200) {
+                    message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个', key},0);
+                    await sleep();
+                    getGenerateDependency(topicName)
+                    setTimeout(timer)
+                } else if (resIncremental.code == 301) {
+                    let now_num = caluNum(resIncremental.data)
+                    if (now_num != pre_num) {
+                        message.loading({content: '已经爬取' + now_num + '个', key},0);
+                    }
+
+                } else if (resIncremental.code == 300) {
+                    await sleep();
                 }
-
-            } else if (resIncremental.code == 300) {
-                await sleep();
             }
         }, 1800);
 
@@ -222,13 +233,14 @@ function KnowledgeForest() {
 
     async function startSpider(topicName) {
         const resStartSpider = await YottaAPI.startSpider_zyl(currentSubjectDomain.domain, topicName);
-        if (resStartSpider.code == 200) {
-            await sleep();
-            askIncremental(topicName)
-        } else {
-            message.loading({content:resStartSpider.msg,key});
+        if(resStartSpider.code) {
+            if (resStartSpider.code == 200) {
+                await sleep();
+                askIncremental(topicName)
+            } else {
+                message.loading({content: resStartSpider.msg, key});
+            }
         }
-
 
     }
 
@@ -240,8 +252,8 @@ function KnowledgeForest() {
         await sleep();
         const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
         if (resInsertTopic.code == 200) {
-            message.loading({content:resInsertTopic.msg,key});
-            message.loading({content:'开始启动爬虫,爬取主题' + topicName + '相关碎片',key});
+            message.loading({content:resInsertTopic.msg,key},0);
+            message.loading({content:'开始启动爬虫,爬取主题' + topicName + '相关碎片',key},0);
 
             await sleep();
 
@@ -253,12 +265,6 @@ function KnowledgeForest() {
     }
     const key = 'updatable';
 
-    const openMessage = () => {
-        message.loading({ content: 'Loading...', key });
-        setTimeout(() => {
-            message.loading({ content: 'Loaded!', key});
-        }, 1000);
-    };
     const onInsertTopic = () => {
         setTimeout(hide, 0);
         reSet()
