@@ -26,6 +26,7 @@ const IconFont = createFromIconfontCN({
 const {Step} = Steps;
 
 function DisplayPage() {
+
     const {setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const location = useLocation();
     const {confirm} = Modal;
@@ -152,8 +153,8 @@ function DisplayPage() {
                             ))
                         }
                     </Steps>
-                    <Button type="link" style={{float:'left',color:'black'}}>对现有构建不满意？</Button>
-                    <Button type="default" onClick={onAutoConstructClick} style={{}}>重新构建</Button>
+                    <Button type="link" style={{float:'left',color:'black', padding:'0'}}>对现有构建不满意？</Button>
+                    <Button type="default" onClick={onAutoConstructClick} style={{}}>更新知识森林</Button>
                     
                 </Col>
                 <Col span={1} className={classes.divider}>

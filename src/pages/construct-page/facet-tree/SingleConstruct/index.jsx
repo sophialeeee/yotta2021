@@ -151,13 +151,13 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'yes',200);
+                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200);
                     
                     
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
-                        drawTreeNumber(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'yes');
+                        drawTreeNumber(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree');
                     
                         }
                     }

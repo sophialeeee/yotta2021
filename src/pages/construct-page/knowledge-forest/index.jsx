@@ -77,26 +77,41 @@ function KnowledgeForest() {
     }, [currentSubjectDomain.domain]);
     let dataTemp = []
 
-    /***  assemble start  ===============================================================================================================**/
+    /***  assembleTopic start ===============================================================================================================**/
+    const [topicConfirm,settopicConfirm] = useState();   //临时加的 存增量爬虫结果
 
-    async function assembleTopic(topicId, topicName) {
-        confirm({
-            title: '是否要装配该主题？',
-            icon: <ExclamationCircleOutlined/>,
-            okText: '确定',
-            cancelText: '取消',
-            onOk() {
-                setcurrentTopic(currentTopic);
-            },
-            onCancel() {
+    // 自动构建，临时
+    useEffect(() => {
+        async function ontopicConfirm(){
+            confirm({
+                title: '是否要装配该主题？',
+                icon: <ExclamationCircleOutlined/>,
+                okText: '确定',
+                cancelText: '取消',
+                onOk() {
+                    // setdynamicSpider(topicConfirm);    //动态爬虫
+                    setcurrentTopic(topicConfirm);
+                },
+                onCancel() {
 
-            }
-        })
+                }
+            })
+        }
+        if(topicConfirm)
+            ontopicConfirm();
 
+    },[topicConfirm])
+
+    async function assembleTopic(topicId,topicName){
+        console.log("成功啦成功啦");
+        console.log("此时的主题名为",topicName);
+        settopicConfirm(topicName);
     }
 
 
-    /***  assemble end  ===============================================================================================================**/
+
+    /***  assembleTopic end ===============================================================================================================**/
+
 
 
     /***  insert  ===============================================================================================================**/
@@ -118,12 +133,20 @@ function KnowledgeForest() {
                     data_temp=res.data
                     console.log("这里是构建3")
                     drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
-                        learningPath, clickTopic, clickFacet,onDeleteTopic,
-                        ()=>{},select,onInsertTopic,(a,b) => {
+                        learningPath,
+                        clickTopic,
+                        clickFacet,
+                        onDeleteTopic,
+                        assembleTopic,
+                        select,
+                        onInsertTopic,
+                        (a,b) => {
                             onDeleteRelation( a, b);
                             console.log("deleting");
                         },
-                        'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                       'knowledge-forest',
+                        onClickBranch,
+                        clickBranchAdd.bind(null, currentTopic));
                     console.log("这里是构建4")
                 } else {
                     if (res.data) {
@@ -156,55 +179,60 @@ function KnowledgeForest() {
 
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, topicName);
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 5; i++) {
             await sleep();
         }
-        if (resGetGenerateDependency){
+        if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
                 message.loading({content:resGetGenerateDependency.msg,key}, 3)
                 setTimeout(getGenerateDependency_loading, 2)
-                message.loading({content:'刷新知识森林概览'}, 1)
+                message.loading({content: '刷新知识森林概览',key}, 1)
                 fetchMap()
             } else {
                 message.loading({content:resGetGenerateDependency.msg,key}, 3)
                 setTimeout(getGenerateDependency_loading, 1)
-                message.loading({content:'刷新知识森林概览'}, 1)
+                message.loading({content: '刷新知识森林概览',key}, 1)
 
                 fetchMap()
             }
-        }else {
+        } else {
             fetchMap()
 
         }
-
-
-
     }
+
 
 
     async function askIncremental(topicName) {
 
         let pre_num=0
+
+        let spy_data = message.loading({content: '爬取碎片中...', key}, 0);
         var timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
             if (resIncremental) {
 
             if (resIncremental.code == 200) {
-                    message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个', key},0);
+                message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个碎片', key},0);
                 await sleep();
+                setTimeout(spy_data)
                 getGenerateDependency(topicName)
                 setTimeout(timer)
             } else if (resIncremental.code == 301) {
                     let now_num = caluNum(resIncremental.data)
                     if (now_num != pre_num) {
-                        message.loading({content: '已经爬取' + now_num + '个', key},0);
+                        setTimeout(spy_data)
+                        message.loading({content: '已经爬取' + now_num + '个碎片', key},0);
+                        pre_num=now_num
                     }
 
                 } else if (resIncremental.code == 300) {
                     await sleep();
+                    setTimeout(timer)
+
             }
             }
-        }, 1800);
+        }, 1000);
 
 
     }
@@ -238,9 +266,10 @@ function KnowledgeForest() {
                 askIncremental(topicName)
             } else {
             message.loading({content:resStartSpider.msg,key});
+            }
+
+
         }
-
-
     }
 
     async function handleInsert() {
@@ -252,7 +281,7 @@ function KnowledgeForest() {
         const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
         if (resInsertTopic.code == 200) {
             message.loading({content:resInsertTopic.msg,key},0);
-            message.loading({content:'开始启动爬虫,爬取主题' + topicName + '相关碎片',key},0);
+            message.loading({content:'启动爬虫，爬取主题：' + topicName + '相关的碎片',key},0);
 
             await sleep();
 
@@ -404,12 +433,6 @@ function KnowledgeForest() {
         }
     }
     /***  addRelation end ===============================================================================================================**/
-
-
-    /***  assembleTopic start ===============================================================================================================**/
-
-
-    /***  assembleTopic end ===============================================================================================================**/
 
 
 
@@ -630,9 +653,23 @@ function KnowledgeForest() {
                     if(res.data&&mapRef){
                     // console.log('res.data',res.data);
                     console.log("这里是构建1")
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,assembleTopic,select,onInsertTopic,(a,b) => {
-                        onDeleteRelation(a, b)
-                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+
+                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
+                            learningPath,
+                            clickTopic,
+                            clickFacet,
+                            onDeleteTopic,
+                            assembleTopic,
+                            select,
+                            onInsertTopic,
+                            (a,b) => {
+                                onDeleteRelation( a, b);
+                                console.log("deleting");
+                            },
+                            'knowledge-forest',
+                            onClickBranch,
+                            clickBranchAdd.bind(null, currentTopic));
+                        console.log("这里是构建4");
                     }
                 }
             )
@@ -672,40 +709,40 @@ function KnowledgeForest() {
         })
     };
 
-    //删除碎片后，获取碎片列表
-    useEffect(() => {
-        async function fetchAssembleData() {
-            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
-            if (res) {
-                setassembles(res);
-                console.log("获取碎片");
-                setdeleteAssembleToSort(res);
-            }
-        }
+    // //删除碎片后，获取碎片列表
+    // useEffect(() => {
+    //     async function fetchAssembleData() {
+    //         const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
+    //         if (res) {
+    //             setassembles(res);
+    //             console.log("获取碎片");
+    //             setdeleteAssembleToSort(res);
+    //         }
+    //     }
 
-        fetchAssembleData();
-    }, [deleteAssembleToFetch])
+    //     fetchAssembleData();
+    // }, [deleteAssembleToFetch])
 
 
-    // 重新计算碎片
-    useEffect(() => {
-        if (assembles) {
-            console.log("重新计算碎片个数");
-            setassnum(assembles.length);
-            if (appendAssembleContentFlagToSort) {
-                for (var ass_index = 0; ass_index < assembles.length; ass_index++) {
-                    if (assembles[ass_index].assembleContent == appendAssembleContent) {
-                        const assemble_temp = assembles[ass_index];
-                        assembles.splice(ass_index, 1);
-                        assembles.unshift(assemble_temp);
-                        console.log("置顶成功");
-                        console.log(assembles[0]);
-                        break;
-                    }
-                }
-            }
-        }
-    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
+    // // 重新计算碎片
+    // useEffect(() => {
+    //     if (assembles) {
+    //         console.log("重新计算碎片个数");
+    //         setassnum(assembles.length);
+    //         if (appendAssembleContentFlagToSort) {
+    //             for (var ass_index = 0; ass_index < assembles.length; ass_index++) {
+    //                 if (assembles[ass_index].assembleContent == appendAssembleContent) {
+    //                     const assemble_temp = assembles[ass_index];
+    //                     assembles.splice(ass_index, 1);
+    //                     assembles.unshift(assemble_temp);
+    //                     console.log("置顶成功");
+    //                     console.log(assembles[0]);
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
 
 
     /*碎片部分增删操作*/
@@ -859,7 +896,7 @@ function KnowledgeForest() {
                 }
             }
         }
-    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
+    }, [appendAssembleContentFlagToSort, currentTopic])
 
 
     const infoFinish = () => {
@@ -899,9 +936,11 @@ function KnowledgeForest() {
             <Card title="碎片" style={assembleStyle}
                   extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
                 <div style={{height: "54px", marginTop: "25px"}}>
-                    <Badge color="purple" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
-                    <Badge color="purple" text={'分面:' + facetName}/> &nbsp;&nbsp;&nbsp;
-                    <Badge color="purple" text={'碎片数量:' + assnum}/> &nbsp;&nbsp; &nbsp;
+                    <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
+                    <span style={{fontSize:"25px"}}>→</span>
+                    <Badge color="white" text={'分面:' + facetName}/> &nbsp;&nbsp;&nbsp;
+                    <span style={{fontSize:"25px"}}>→</span>
+                    <Badge color="white" text={'碎片数量:' + assnum}/> &nbsp;&nbsp; &nbsp;
                 </div>
 
 
@@ -910,7 +949,7 @@ function KnowledgeForest() {
                             assembles.map(
                                 (assemble, index) =>
                                     (
-                                        <Card.Grid style={{width: "100%"}}>
+                                        <Card.Grid style={{width: "100%"}} key={index}>
                                             <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm"
                                                     onClick={onDeleteAssemble.bind(null, assemble.assembleId)}
                                                     style={{position: "absolute", right: '3%'}}>
