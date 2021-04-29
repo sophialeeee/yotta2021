@@ -362,7 +362,7 @@ function SingleConstruct() {
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id", facetId);
-        setassembles(res);
+        //setassembles(res);
         }
     
         console.log("currentTopic clickbranch",currentTopic);

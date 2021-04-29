@@ -114,11 +114,11 @@ function KnowledgeForest() {
             (res) => {
                 // setmapdata(res.data);
                 if (res.data && mapRef && mapRef.current&&treeRef.current) {
-                    data_temp = res.data
+                    data_temp=res.data
+                    console.log("这里是构建3")
                     // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, () => {
-                    }, select, onInsertTopic, () => {
-                    }, 'yes', 'yes', 'yes');
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    console.log("这里是构建4")
                 } else {
                     if (res.data) {
                     } else {
@@ -143,7 +143,7 @@ function KnowledgeForest() {
         await sleep();
         await sleep();
         await sleep();
-        let getGenerateDependency_loading = message.loading('生成碎片关系...', 0, () => {
+        let getGenerateDependency_loading = message.loading('耗时操作，生成碎片关系...', 0, () => {
 
         })
 
@@ -600,12 +600,12 @@ function KnowledgeForest() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
-                    if (res.data && mapRef) {
-                        // console.log('res.data',res.data);
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, assembleTopic, select, onInsertTopic, (a, b) => {
-                            onDeleteRelation(a, b)
-                            console.log("relationdata", a, b);
-                        }, 'yes', 'yes', 'yes', onClickBranch, clickBranchAdd.bind(null, currentTopic));
+                    if(res.data&&mapRef){
+                    // console.log('res.data',res.data);
+                    console.log("这里是构建1")
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
+                        onDeleteRelation(a, b)
+                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
                     }
                 }
             )
