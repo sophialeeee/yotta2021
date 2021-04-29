@@ -221,8 +221,16 @@ function SingleConstruct() {
             onOk() {
                 const Topic1 = textareaValueRef.current;
                 textareaValueRef.current = '';
-                setinsertTopic1(Topic1); 
-                console.log('Topic1',Topic1);
+                confirm({
+                    title:"确认添加该主题？",
+                    okText:'确定',
+                    cancelText:'取消',
+                    onOk(){
+                        setinsertTopic1(Topic1); 
+                        console.log('Topic1',Topic1);
+                    },
+                    onCancel(){}
+                })
                 
             },
             onCancel() {
@@ -302,7 +310,7 @@ function SingleConstruct() {
     useEffect(()=>{
         async function insert(){
             await YottaAPI.insertTopic(currentSubjectDomain.domain,insertTopic1);
-            const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.domain);
+            const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
             const topicsData = res.data.data;
             settopicData(topicsData);
         }
@@ -354,7 +362,7 @@ function SingleConstruct() {
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id", facetId);
-        setassembles(res);
+        //setassembles(res);
         }
     
         console.log("currentTopic clickbranch",currentTopic);
@@ -401,8 +409,9 @@ function SingleConstruct() {
             if(topicsData){
                 dataTemp = (topicsData.map((topic) =>topic.topicName
                ));
-        // setcurrentTopic(topicsData[0].topicName);  // 默认topic
-        // window.flag = false;
+            window.flag = false;
+            setcurrentTopic(topicsData[0].topicName);  // 默认topic
+            console.log("默认topic",currentTopic);
             }
             console.log('dataTemp',dataTemp);
             setdata1(dataTemp.slice(-topics.length));
@@ -415,7 +424,7 @@ function SingleConstruct() {
     useEffect(()=>{
         if(data1) {
             // console.log("firstTime", firstTime);
-      if (localStorage.getItem("visitedTopic")) {
+        if (localStorage.getItem("visitedTopic")) {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
@@ -434,11 +443,11 @@ function SingleConstruct() {
                     // if(data[num]){
                     //     fetchTreeData();
                     // }
-                    window.lock = false
-                    window.flag = false;
-                    if(treeRef)
-                    {emptyChildren(treeRef.current);}
-                    setcurrentTopic(data1[num]);
+                    // window.lock = false
+                    // window.flag = false;
+                    // if(treeRef)
+                    // {emptyChildren(treeRef.current);}
+                    // setcurrentTopic(data1[num]);
                     num = num + 1;
                     if (num === maxlength + 1) {
                         infoFinish();

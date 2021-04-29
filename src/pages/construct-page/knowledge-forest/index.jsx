@@ -8,24 +8,33 @@ import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {useRef} from 'react';
 import Leaf from '../../../components/Leaf'
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import axios from "axios";
+import {getMap} from "echarts/lib/echarts";
 
 function KnowledgeForest() {
-    const [appendAssembleContent,setappendAssembleContent] = useState();
+    const [appendAssembleContent, setappendAssembleContent] = useState();
     const [currentFacetId, setcurrentFacetId] = useState();
     const [facet, setfacet] = useState();
-    const [deleteAssemble,setdeleteAssemble] = useState();
-    const [appendAssembleContentFlagToFetch,setappendAssembleContentFlagToFetch] = useState();  //新增碎片后前往获取碎片列表
-    const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
-    const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
-    const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
+    const [deleteAssemble, setdeleteAssemble] = useState();
+    const [appendAssembleContentFlagToFetch, setappendAssembleContentFlagToFetch] = useState();  //新增碎片后前往获取碎片列表
+    const [appendAssembleContentFlagToSort, setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
+    const [deleteAssembleToFetch, setdeleteAssembleToFetch] = useState();
+    const [deleteAssembleToSort, setdeleteAssembleToSort] = useState();
+    const [treeData, settreeData] = useState();
+    const [mapdata, setmapdata] = useState();
 
+    var [relationData, setrelationData] = useState();
+    var [deleteTopicStart, setDeleteTopic1] = useState();
+    var [deleteTopicEnd, setDeleteTopic2] = useState();
+    var [insertTopic1, setinsertTopic1] = useState();
+    var [insertTopic2, setinsertTopic2] = useState();
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     // const [mapdata,setmapdata] = useState();
 
     const [learningPath, setlearningPath] = useState([]);
-
+    const [insertFacet1, setinsertFacet1] = useState();
     const [currentTopic, setcurrentTopic] = useState('树状数组');
-
+    const [topicName2, settopicName2] = useState();
     const [assembles, setassembles] = useState();
     const [assnum, setassnum] = useState(0);
     // const [facetId,setfacetId] = useState();
@@ -53,7 +62,7 @@ function KnowledgeForest() {
     const treeRef = useRef();
     // localStorage.removeItem('state');//刷新清空状态量
     function emptyChildren(dom) {
-        if (dom){
+        if (dom) {
             const children = dom.childNodes;
             while (children.length > 0) {
                 dom.removeChild(children[0]);
@@ -61,47 +70,64 @@ function KnowledgeForest() {
         }
 
     };
-    function nameCheck(originName) {
-        var tempName = originName;
-        if (originName.search('\\+') != -1){
-            console.log("tempName", tempName);
-            tempName = originName.replace("+", "jiahao");
-            console.log("tempName", tempName);
-        };
-        var english_name = /^[a-zA-Z]+$/.test(originName);
-        // if (topicName.search('\\(') != -1){
-        //     tempName = topicName.replace("(", " (");
-        // };
-        return {
-            checkedName: tempName,
-            isEnglish: english_name
-        }
-    }
+
 
     useEffect(() => {
         fetchMap()
     }, [currentSubjectDomain.domain]);
-    let dataTemp=[]
+    let dataTemp = []
+
+    /***  assemble start  ===============================================================================================================**/
+
+    async function assembleTopic(topicId, topicName) {
+        confirm({
+            title: '是否要装配该主题？',
+            icon: <ExclamationCircleOutlined/>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                setcurrentTopic(currentTopic);
+            },
+            onCancel() {
+
+            }
+        })
+
+    }
+
+
+    /***  assemble end  ===============================================================================================================**/
+
+
     /***  insert  ===============================================================================================================**/
     async function fetchMap() {
         emptyChildren(mapRef.current)
         emptyChildren(treeRef.current)
-        const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
-        res.map((relation,index)=>{
-            dataTemp.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
+        const res_de = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+        if (res_de) {
+            res_de.map((relation, index) => {
+                dataTemp.push({'key': String(index + 1), '主题一': relation.startTopicName, '主题二': relation.endTopicName})
+            })
+            dataTemp = dataTemp.slice(-res_de.length)
+        }
 
-        })
-        dataTemp = dataTemp.slice(-res.length)
         await YottaAPI.getMap(currentSubjectDomain.domain).then(
             (res) => {
                 // setmapdata(res.data);
-                if (res.data && mapRef&&mapRef.current) {
+                if (res.data && mapRef && mapRef.current&&treeRef.current) {
                     data_temp=res.data
-                    // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes');
+                    console.log("这里是构建3")
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
+                        learningPath, clickTopic, clickFacet,onDeleteTopic,
+                        ()=>{},select,onInsertTopic,(a,b) => {
+                            onDeleteRelation( a, b);
+                            console.log("deleting");
+                        },
+                        'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    console.log("这里是构建4")
                 } else {
-                    if (res.data){
-                    }else {
+                    if (res.data) {
+                    } else {
                         alert("该课程下无知识森林数据！")
                     }
 
@@ -111,11 +137,134 @@ function KnowledgeForest() {
         )
 
     }
+
     const textareaValueRef = useRef('');
     const {TextArea} = Input;
     const handleTextareaChange = (e) => {
         textareaValueRef.current = e.target.value;
     }
+
+
+    async function getGenerateDependency(topicName) {
+        await sleep();
+        await sleep();
+        await sleep();
+
+        let getGenerateDependency_loading  = message.loading({content:'生成碎片关系...',key},10,()=>{
+            fetchMap()
+        });
+
+
+        const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, topicName);
+        for (let i = 0; i < 10; i++) {
+            await sleep();
+        }
+        if (resGetGenerateDependency){
+            if (resGetGenerateDependency.code == 200) {
+                message.loading({content:resGetGenerateDependency.msg,key}, 3)
+                setTimeout(getGenerateDependency_loading, 2)
+                message.loading({content:'刷新知识森林概览'}, 1)
+                fetchMap()
+            } else {
+                message.loading({content:resGetGenerateDependency.msg,key}, 3)
+                setTimeout(getGenerateDependency_loading, 1)
+                message.loading({content:'刷新知识森林概览'}, 1)
+
+                fetchMap()
+            }
+        }else {
+            fetchMap()
+
+        }
+
+
+
+    }
+
+
+    async function askIncremental(topicName) {
+
+        let pre_num=0
+        var timer = setInterval(async function () {
+            const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
+            if (resIncremental.code) {
+
+                if (resIncremental.code == 200) {
+                    message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个', key},0);
+                    await sleep();
+                    getGenerateDependency(topicName)
+                    setTimeout(timer)
+                } else if (resIncremental.code == 301) {
+                    let now_num = caluNum(resIncremental.data)
+                    if (now_num != pre_num) {
+                        message.loading({content: '已经爬取' + now_num + '个', key},0);
+                    }
+
+                } else if (resIncremental.code == 300) {
+                    await sleep();
+                }
+            }
+        }, 1800);
+
+
+    }
+
+    function caluNum(res) {
+        let total_num = 0
+        console.log(res.childrenNumber)
+
+        for (let i = 0; i < res.childrenNumber; i++) {
+            let child = res.children[i]
+            console.log(child.length)
+
+            for (let j = 0; j < child.children.length; j++) {
+                total_num += child.children[j].childrenNumber
+            }
+        }
+        return total_num
+    }
+
+
+    const sleepTime = 1000
+
+    function sleep() {
+        return new Promise(resolve => setTimeout(resolve, sleepTime))
+    }
+
+    async function startSpider(topicName) {
+        const resStartSpider = await YottaAPI.startSpider_zyl(currentSubjectDomain.domain, topicName);
+        if(resStartSpider.code) {
+            if (resStartSpider.code == 200) {
+                await sleep();
+                askIncremental(topicName)
+            } else {
+                message.loading({content: resStartSpider.msg, key});
+            }
+        }
+
+    }
+
+    async function handleInsert() {
+        const topicName = textareaValueRef.current;
+        textareaValueRef.current = '';
+        message.loading({content:'插入主题：'+topicName,key});
+
+        await sleep();
+        const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
+        if (resInsertTopic.code == 200) {
+            message.loading({content:resInsertTopic.msg,key},0);
+            message.loading({content:'开始启动爬虫,爬取主题' + topicName + '相关碎片',key},0);
+
+            await sleep();
+
+            startSpider(topicName)
+
+        } else {
+            message.loading(resInsertTopic.msg,key)
+        }
+    }
+    const key = 'updatable';
+
     const onInsertTopic = () => {
         setTimeout(hide, 0);
         reSet()
@@ -128,20 +277,9 @@ function KnowledgeForest() {
             </>,
             okText: '确定',
             cancelText: '取消',
-            async onOk() {
-                const Topic1 = textareaValueRef.current;
-                textareaValueRef.current = '';
-
-                console.log(currentSubjectDomain.domain,Topic1)
-                const res = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, Topic1);
-                if (res.code == 200) {
-                    //重新获取重绘
-                    message.info(res.msg)
-
-                    fetchMap();
-                } else {
-                    message.warn(res.msg)
-                }
+            onOk() {
+                handleInsert()
+                // openMessage()
             },
             onCancel() {
             }
@@ -152,12 +290,12 @@ function KnowledgeForest() {
 
     /***  delete  ===============================================================================================================**/
 
-    const onDeleteTopic = (name,id) => {
-        console.log(name)
+    const onDeleteTopic = (name, id) => {
+        console.log("构建delete", name)
         setTimeout(hide, 0);
         reSet()
         confirm({
-            title: "确认删除主题："+name+" 吗？",
+            title: "确认删除主题：" + name + " 吗？",
             okText: '确定',
             cancelText: '取消',
             async onOk() {
@@ -182,13 +320,13 @@ function KnowledgeForest() {
     /***  addRelation   start ===============================================================================================================**/
     let statu = 0
 
-    let  firstSelect_Name = ''
-    let  secSelect_Name = ''
-    let  firstSelect_id = 0
-    let  secSelect_id = 0
-    let hide=null
+    let firstSelect_Name = ''
+    let secSelect_Name = ''
+    let firstSelect_id = 0
+    let secSelect_id = 0
+    let hide = null
     const selecting = function (content) {
-        hide = message.loading(content,8,()=>{
+        hide = message.loading(content, 8, () => {
             reSet()
         });
     };
@@ -198,18 +336,20 @@ function KnowledgeForest() {
         secSelect_Name = ''
     };
     let data_temp;
+
     function checkExitRelation() {
 
-        let has=false;
-        for (var i=0; i<dataTemp.length; i++) {
+        let has = false;
+        for (var i = 0; i < dataTemp.length; i++) {
             let relation = dataTemp[i]
-            if (relation['主题一']==firstSelect_Name&&relation['主题二']==secSelect_Name){
-                has= true
+            if (relation['主题一'] == firstSelect_Name && relation['主题二'] == secSelect_Name) {
+                has = true
             }
 
         }
         return has
     }
+
     const select = async (par1, par2) => {
         console.log(par1, par2)
         if (par1 == -1) {
@@ -218,22 +358,22 @@ function KnowledgeForest() {
 
         if (statu == 0) {
             firstSelect_Name = par2
-            firstSelect_id=par1
+            firstSelect_id = par1
             selecting("已经选定主题: " + par2 + ", 请选择另一主题")
             statu = 1
         } else {
             secSelect_Name = par2
-            secSelect_id=par1
+            secSelect_id = par1
             if (statu == 1) {
 
                 if (firstSelect_Name == secSelect_Name) {
                     message.info("不可选相同主题")
                     secSelect_Name = ''
-                    firstSelect_id=0
+                    firstSelect_id = 0
                     return
                 }
                 let has = checkExitRelation()
-                if (has){
+                if (has) {
                     message.info("关系已经存在")
                     setTimeout(hide, 0);
                     reSet()
@@ -241,7 +381,7 @@ function KnowledgeForest() {
                 }
 
                 confirm({
-                    title: "确认添加关系："+ firstSelect_Name+"--> "+secSelect_Name+" 吗？",
+                    title: "确认添加关系：" + firstSelect_Name + "--> " + secSelect_Name + " 吗？",
                     okText: '确定',
                     cancelText: '取消',
                     async onOk() {
@@ -269,10 +409,6 @@ function KnowledgeForest() {
     /***  assembleTopic start ===============================================================================================================**/
 
 
-    async function assembleTopic(topicId,topicName){
-
-        // settopicConfirm(topicName);
-    }
     /***  assembleTopic end ===============================================================================================================**/
 
 
@@ -332,24 +468,263 @@ function KnowledgeForest() {
     }, [])
 
 
+    //插入分面
+    const clickBranchAdd = (topicName2) => {
+        confirm({
+            title: '请输入分面名称',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <TextArea showCount maxLength={100} onChange={handleTextareaChange}/>
+            </>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                settopicName2(topicName2);
+                const insertFacet1 = textareaValueRef.current;
+                textareaValueRef.current = '';
+                setinsertFacet1(insertFacet1);
+            },
+            onCancel() {
 
-    /*碎片部分增删操作*/ 
+            }
+        })
+    };
+
+    useEffect(() => {
+        async function insertFacet() {
+            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+            fetchMap();
+            const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+
+            //   window.flag = false;
+            //   console.log("shanchuhou", window.flag);
+            if (treeData) {
+                console.log("新的画树数据", treeData2);
+                emptyChildren(treeRef.current);
+                settreeData(treeData2);
+                fetchMap();
+            }
+        }
+
+        if (topicName2 && insertFacet1) {
+            insertFacet(topicName2, insertFacet1);
+        }
+    }, [topicName2])
+
+    //删除分面调用接口
+    let clickflag = true;
+    const onClickBranch = (facetId) => {
+        if (!clickflag) {
+            clickflag = true;
+            console.log("return flag");
+            return
+        }
+        if (facetId) {
+            confirm({
+                title: "确认删除该分面吗？",
+                okText: '确定',
+                cancelText: '取消',
+                async onOk() {
+                    ClickBranch(facetId)
+
+                    //   if (res.code == 200) {
+                    //       message.info(res.msg)
+                    //       fetchMap();
+
+                    //   } else {
+                    //       message.warn(res.msg)
+                    //   }
+                    clickflag = false;
+                },
+                onCancel() {
+                    //clickflag = false;
+                    console.log('cancel')
+                }
+            })
+        }
+    };
+
+
+    async function ClickBranch(facetId) {
+
+        if (facetId > 0) {
+            const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+            console.log("传入删除id", facetId);
+            setassembles(res);
+            if (res.code == 200) {
+                message.info(res.msg)
+                fetchMap();
+
+            } else {
+                message.warn(res.msg)
+            }
+        }
+
+        console.log("currentTopic clickbranch", currentTopic);
+        // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+        // window.flag = false;
+        // console.log("shanchuhou",window.flag);
+        //     if(treeData){
+        //         console.log("新的画树数据",treeData);
+        //         emptyChildren(treeRef.current);
+        //         settreeData(treeData);
+        //     }
+        setcurrentTopic(topic => {
+            (async () => {
+                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+                console.log('t-tt', topic);
+                window.flag = false;
+                console.log("shanchuhou", window.flag);
+                if (treeData) {
+                    console.log("新的画树数据", treeData);
+                    emptyChildren(treeRef.current);
+                    settreeData(treeData);
+                }
+            })();
+            return topic
+        })
+    }
+
+    //删除依赖
+    function nameCheck(originName) {
+        var tempName = originName;
+        if (originName == undefined) {
+            return {
+                checkedName: '',
+                isEnglish: ''
+            }
+        }
+        if (originName.search('\\+') != -1) {
+            console.log("tempName", tempName);
+            tempName = originName.replace("+", "jiahao");
+            console.log("tempName", tempName);
+        }
+        ;
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
+
+    useEffect(() => {
+        async function deleteRelation() {
+
+            const response = await YottaAPI.deleteRelation(currentSubjectDomain.domain, nameCheck(deleteTopicStart).checkedName, nameCheck(deleteTopicEnd).checkedName);
+            if (response) {
+                infoDelete();
+            }
+            ;
+            const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+            setrelationData(res);
+            fetchMap();
+            emptyChildren(mapRef.current);
+            emptyChildren(treeRef.current);
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+                (res) => {
+                    setmapdata(res.data);
+                    if(res.data&&mapRef){
+                    // console.log('res.data',res.data);
+                    console.log("这里是构建1")
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
+                        onDeleteRelation(a, b)
+                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    }
+                }
+            )
+            const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
+            //setGephi(result);
+        }
+
+        if (deleteTopicStart) {
+            console.log('useEffect:', deleteTopicStart, deleteTopicEnd)
+            deleteRelation(deleteTopicStart, deleteTopicEnd);
+            if (insertTopic1 === deleteTopicStart && insertTopic2 === deleteTopicEnd) {
+                setinsertTopic1("***");
+            }
+            ;
+            setDeleteTopic1();
+        }
+    }, [deleteTopicStart, deleteTopicEnd])
+
+
+    const onDeleteRelation = (relationOne, relationTwo, e) => {
+        confirm({
+            title: '确定删除关系吗？',
+            icon: <ExclamationCircleOutlined/>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                console.log("ll", relationOne);
+                setDeleteTopic1(relationOne);
+                console.log('relationOne', deleteTopicStart);
+                // setDeleteTopic1('relationOne');
+                // console.log('relationOne',deleteTopicStart);
+                setDeleteTopic2(relationTwo);
+                console.log('relationTwo', deleteTopicEnd);
+            },
+            onCancel() {
+            }
+        })
+    };
+
+    //删除碎片后，获取碎片列表
+    useEffect(() => {
+        async function fetchAssembleData() {
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
+            if (res) {
+                setassembles(res);
+                console.log("获取碎片");
+                setdeleteAssembleToSort(res);
+            }
+        }
+
+        fetchAssembleData();
+    }, [deleteAssembleToFetch])
+
+
+    // 重新计算碎片
+    useEffect(() => {
+        if (assembles) {
+            console.log("重新计算碎片个数");
+            setassnum(assembles.length);
+            if (appendAssembleContentFlagToSort) {
+                for (var ass_index = 0; ass_index < assembles.length; ass_index++) {
+                    if (assembles[ass_index].assembleContent == appendAssembleContent) {
+                        const assemble_temp = assembles[ass_index];
+                        assembles.splice(ass_index, 1);
+                        assembles.unshift(assemble_temp);
+                        console.log("置顶成功");
+                        console.log(assembles[0]);
+                        break;
+                    }
+                }
+            }
+        }
+    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
+
+
+    /*碎片部分增删操作*/
 
     //根据domainName,topicName获取分面信息
-    useEffect(()=>{
-        async function fetchFacetData(){
-            await YottaAPI.getFacetsInTopic(currentSubjectDomain.domain,currentTopic).then(res=>{
+    useEffect(() => {
+        async function fetchFacetData() {
+            await YottaAPI.getFacetsInTopic(currentSubjectDomain.domain, currentTopic).then(res => {
                 setfacet(res)
             })
         }
+
         fetchFacetData();
-    },[appendAssembleContent, deleteAssemble, currentTopic])
+    }, [appendAssembleContent, deleteAssemble, currentTopic])
 
     //增加碎片
     const onAppendAssemble = () => {
         let facetId = '';
-        const onSelectChange = (id) => { 
-            facetId =  id;
+        const onSelectChange = (id) => {
+            facetId = id;
         }
         confirm({
             title: '请输入要添加的碎片内容',
@@ -361,11 +736,11 @@ function KnowledgeForest() {
                 </span>
                     <Select onSelect={onSelectChange}>
                         {
-                            facet.map((facet1)=>(
-                            <option value={facet1.facetId} >{facet1.facetName}</option> 
+                            facet.map((facet1) => (
+                                <option value={facet1.facetId}>{facet1.facetName}</option>
                             ))
                         }
-                    </Select> 
+                    </Select>
                 </div>
                 <div>
                     <span>
@@ -381,51 +756,54 @@ function KnowledgeForest() {
                 textareaValueRef.current = '';
                 setappendAssembleContent(newAssemble);
                 setcurrentFacetId(facetId);
-                console.log(currentFacetId); 
-                console.log('newAssemble',newAssemble);
-                
+                console.log(currentFacetId);
+                console.log('newAssemble', newAssemble);
+
             },
             onCancel() {
-                
+
             }
         })
-    }; 
+    };
 
     //新增和渲染完成后获取碎片列表
-    useEffect(()=>{
-        async function fetchAssembleData(){         
-            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
-            if(res){
+    useEffect(() => {
+        async function fetchAssembleData() {
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
+            if (res) {
                 setassembles(res);
                 console.log("获取碎片");
                 setappendAssembleContentFlagToSort(appendAssembleContentFlagToFetch);
             }
         }
+
         fetchAssembleData();
-    },[appendAssembleContentFlagToFetch])
+    }, [appendAssembleContentFlagToFetch])
 
 
     //新增碎片
-    useEffect(() => {                  
-        async function append(){
-            console.log("新增碎片",appendAssembleContent);
-            await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
+    useEffect(() => {
+        async function append() {
+            console.log("新增碎片", appendAssembleContent);
+            await YottaAPI.appendAssemble("人工", currentSubjectDomain.domain, currentFacetId, appendAssembleContent, "null");
             infoInsert();
             setappendAssembleContentFlagToFetch(appendAssembleContent);
         }
-        if(appendAssembleContent){
-            append(); 
+
+        if (appendAssembleContent) {
+            append();
         }
     }, [appendAssembleContent])
 
     //删除碎片
-    useEffect(() => {                  
-        async function deleteAss(){
+    useEffect(() => {
+        async function deleteAss() {
             console.log(deleteAssemble);
             await YottaAPI.deleteAssemble(deleteAssemble);
             infoDelete();
         }
-        if(deleteAssemble){
+
+        if (deleteAssemble) {
             deleteAss();
             setdeleteAssembleToFetch(deleteAssemble);
         }
@@ -439,26 +817,27 @@ function KnowledgeForest() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setdeleteAssemble(assembleId1); 
+                setdeleteAssemble(assembleId1);
             },
             onCancel() {
-                
+
             }
         })
     };
 
     //删除碎片后，获取碎片列表
-    useEffect(()=>{
-        async function fetchAssembleData(){         
-            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
-            if(res){
+    useEffect(() => {
+        async function fetchAssembleData() {
+            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
+            if (res) {
                 setassembles(res);
                 console.log("获取碎片");
                 setdeleteAssembleToSort(res);
             }
         }
+
         fetchAssembleData();
-    },[deleteAssembleToFetch])
+    }, [deleteAssembleToFetch])
 
 
     // 重新计算碎片
@@ -467,10 +846,10 @@ function KnowledgeForest() {
             console.log("重新计算碎片个数");
             setassnum(assembles.length);
             if (appendAssembleContentFlagToSort) {
-                for(var ass_index=0; ass_index<assembles.length; ass_index++){
-                    if(assembles[ass_index].assembleContent==appendAssembleContent){
+                for (var ass_index = 0; ass_index < assembles.length; ass_index++) {
+                    if (assembles[ass_index].assembleContent == appendAssembleContent) {
                         const assemble_temp = assembles[ass_index];
-                        assembles.splice(ass_index,1);
+                        assembles.splice(ass_index, 1);
                         assembles.unshift(assemble_temp);
                         console.log("置顶成功");
                         console.log(assembles[0]);
@@ -487,15 +866,15 @@ function KnowledgeForest() {
         message.success('碎片构建成功，已全部展示！')
     };
     const infoDelete = () => {
-        message.config({duration: 1,  maxCount: 3})
+        message.config({duration: 1, maxCount: 3})
         message.info('碎片删除成功，正在重新构建，请稍后！')
     };
     const infoInsert = () => {
-        message.config({duration: 1,  maxCount: 3})
+        message.config({duration: 1, maxCount: 3})
         message.info('碎片插入成功，正在重新构建，请稍后！')
     };
     const infoConstructing = () => {
-        message.config({duration: 1,  maxCount: 3})
+        message.config({duration: 1, maxCount: 3})
         message.info('正在构建碎片，请稍后！')
     };
 
@@ -516,22 +895,25 @@ function KnowledgeForest() {
                 </div>
             </Card>
 
-            <Card title="碎片" style={assembleStyle} extra={<PlusOutlined style={{top:'50px'}} onClick={onAppendAssemble}/>}>
-                <div style={{height:"54px",marginTop:"25px"}}>
-                <Badge color="purple" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
-                <Badge color="purple" text={'分面:' + facetName}/> &nbsp;&nbsp;&nbsp;
-                <Badge color="purple" text={'碎片数量:' + assnum}/> &nbsp;&nbsp; &nbsp;
+            <Card title="碎片" style={assembleStyle}
+                  extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
+                <div style={{height: "54px", marginTop: "25px"}}>
+                    <Badge color="purple" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
+                    <Badge color="purple" text={'分面:' + facetName}/> &nbsp;&nbsp;&nbsp;
+                    <Badge color="purple" text={'碎片数量:' + assnum}/> &nbsp;&nbsp; &nbsp;
                 </div>
 
-                
+
                 {
                     assembles ? (
                             assembles.map(
                                 (assemble, index) =>
                                     (
-                                        <Card.Grid style={{width:"100%"}}>
-                                            <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteAssemble.bind(null,assemble.assembleId)} style={{ position:"absolute",right:'3%'}}>
-                                                <DeleteOutlined />
+                                        <Card.Grid style={{width: "100%"}}>
+                                            <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm"
+                                                    onClick={onDeleteAssemble.bind(null, assemble.assembleId)}
+                                                    style={{position: "absolute", right: '3%'}}>
+                                                <DeleteOutlined/>
                                             </button>
                                             <Leaf assemble={assemble} key={index}></Leaf>
                                         </Card.Grid>

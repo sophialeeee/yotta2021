@@ -78,6 +78,15 @@ function App() {
             if (localStorage.getItem("visitedTopic")){
                     localStorage.removeItem("visitedTopic");
                 }
+            if (localStorage.getItem("finishedData")){
+                    localStorage.removeItem("finishedData");
+                }
+            if (localStorage.getItem("batchData")){
+                    localStorage.removeItem("batchData");
+                }
+            if (localStorage.getItem("visitedBatch")){
+                    localStorage.removeItem("visitedBatch");
+                }
             if (localStorage.getItem("visitedStep1")){
                     localStorage.removeItem("visitedStep1");
                 }
@@ -89,8 +98,8 @@ function App() {
     },[currentSubjectDomain])
     function onAutoConstructClick(){
         
-        let subject = '法律经济学';
-        let domain = '经济学';
+        let subject = '';
+        let domain = '';
         const onTextSubjectChange = (e) => {
             subject = e.target.value;
         };
