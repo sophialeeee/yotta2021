@@ -48,6 +48,9 @@ const {TextArea} = Input;
 const {confirm} = Modal;
 
 function BatchConstruct() {
+    message.config({
+        duration: 2,
+    });
     console.log('程序处于批量更新页面')
     const { currentSubjectDomain } = useCurrentSubjectDomainModel();
     const [topics, settopics] = useState([]);
@@ -326,7 +329,7 @@ function BatchConstruct() {
                     if(result){
                         setTimeout(()=>{
 
-                            drawTree(treeRef.current,result,d => { },d => { },d => { },'facet-tree',300);
+                            drawTree(treeRef.current,result,d => { },d => { },d => { },'none',300);
                             emptyChildren(treeRef.current);
                             setTimeout(()=>{
                                 
