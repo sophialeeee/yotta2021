@@ -162,6 +162,8 @@ function ConstructPage() {
         //     });
         //     return;
         // }
+        
+        localStorage.removeItem('state');//刷新清空状态量
         setStep(current);
     };
 

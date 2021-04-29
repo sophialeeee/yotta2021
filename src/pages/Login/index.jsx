@@ -8,17 +8,18 @@ import cookie from 'react-cookies';
 function Login(){
     const [userName,setuserName] = useState();
     const [password,setpassword] = useState();
-    const [login,setlogin] = useState(false);
+    const [login, setlogin] = useState(false);
+    const [errText, seterrText] = useState(false);
     const img = require('./bgNow.jpg');
     const history = useHistory();
     const {setUserName} = useUserNameModel();
     const handleUsernameChange = (e)=>{
         setuserName(e.target.value);
-    
+        seterrText(0);
     };
     const handlePasswdChange = (e)=>{
         setpassword(e.target.value);
-    
+        seterrText(0);
     };
     const handleLogin = ()=>{
       setlogin(true);
@@ -30,10 +31,10 @@ function Login(){
             {
               const res = await YottaAPI.Login(userName,password); 
               setUserName(userName);
-              let intenMinutes = new Date(new Date().getTime() +  600* 1000);
-              cookie.save('userInfo',userName,{expires: intenMinutes});
+              //let intenMinutes = new Date(new Date().getTime() +  600 * 1000);
+              cookie.save('userInfo',userName);
 
-              cookie.save('userType',res.data,{expires: intenMinutes});//safe?
+              cookie.save('userType',res.data);//safe?
 
               cookie.remove("c-type")
               history.push({pathname:'/nav',state:{login:true,userName:userName}});
@@ -44,6 +45,7 @@ function Login(){
             {
               console.log("error",err);
               setlogin(false);
+              seterrText(1);
             }
           // finally
           //   {console.log('res.code',res.status);
@@ -78,8 +80,8 @@ function Login(){
             placeholder="密码"
             value={password}
             onChange={handlePasswdChange}
-          
-          />  
+          />
+          <h4 id="errText" style={{ position: 'absolute', top: '400px', left: '800px', fontSize: '13px', color: '#FF0000', display: errText ? 'block' : 'none'}}>用户名或密码错误，请重试</h4>      
           <Button type="primary" onClick={handleLogin} style={{position:'absolute',top:'430px',left:'930px'}}>
             登录
          </Button>

@@ -108,6 +108,7 @@ function DisplayPage() {
         
 
 
+        localStorage.removeItem('state');//刷新清空状态量
         
         if(subject&&domain)
             {
@@ -118,6 +119,7 @@ function DisplayPage() {
                 cookie.remove("c-type")
                 cookie.save('c-type','1')
                 console.log(cookie.loadAll(),'======================================')
+
             // ({pathname:'/construct-page',state:{login:true}});
                 setTimeout(()=>{history.push('/construct-page');},50)
                 
