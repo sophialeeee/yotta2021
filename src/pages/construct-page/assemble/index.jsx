@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTree,drawTreeNumber} from '../../../modules/facetTree1';
-import {drawMap} from '../../../modules/topicDependenceVisualization1';
+import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
 import cookie from 'react-cookies';
