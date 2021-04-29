@@ -92,6 +92,9 @@ function App() {
                 }
             if (localStorage.getItem("visitedAssemble")){
                     localStorage.removeItem("visitedAssemble");
+                }
+            if (localStorage.getItem("visitedClick")){
+                    localStorage.removeItem("visitedClick");
                 }    
         }
         fetch();

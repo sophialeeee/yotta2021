@@ -67,6 +67,7 @@ function SingleConstruct() {
     
     var [topicData, settopicData] = useState();
     var [batchConstruct, setbatchConstruct] = useState();
+    var [clickedTopic,setclickedTopic] = useState()
 
     var [data, setdata] = useState([]);
     var [dataTemp,setdataTemp] = useState();
@@ -92,16 +93,18 @@ function SingleConstruct() {
 
 
     const onClickTopic = (topicName,e) => {
-        if(window.lock===false)
-        {
-            window.flag = true;
-            emptyChildren(treeRef.current);
-            console.log('topicName',topicName);
-            setcurrentTopic(topicName);
-        }
-        else {
-            alert("请等待当前主题树构建完成！");
-        }
+        // if(window.lock===false)
+        // {
+        //     window.flag = true;
+        //     emptyChildren(treeRef.current);
+        //     console.log('topicName',topicName);
+        //     setcurrentTopic(topicName);
+        // }
+        // else {
+        //     alert("请等待当前主题树构建完成！");
+        // }
+        console.log('topicName',topicName);
+        setclickedTopic(topicName);
         
         
         
@@ -113,6 +116,36 @@ function SingleConstruct() {
         //     e.target.style.color = 'red';     
         // }, 500);
     };
+
+    useEffect(()=>{
+        if(clickedTopic){
+            if(localStorage.getItem('visitedClick')){
+                console.log('not first time')
+                if(window.lock===false)
+                {
+                    window.flag = true;
+                    emptyChildren(treeRef.current);
+                    // console.log('topicName',topicName);
+                    setcurrentTopic(clickedTopic);
+                }
+                else {
+                    alert("请等待当前主题树构建完成！");
+                }
+            }else{
+                localStorage.setItem('visitedClick','yes')
+                if(window.lock===false)
+                {
+                    window.flag = true;
+                    emptyChildren(treeRef.current);
+                    // console.log('topicName',topicName);
+                    setcurrentTopic(clickedTopic);
+                }
+                else {
+                    alert("请等待当前主题树构建完成！");
+                }
+            }
+        }
+    },[clickedTopic])
 
     useEffect(() => {  
         if (window.lock === false){
