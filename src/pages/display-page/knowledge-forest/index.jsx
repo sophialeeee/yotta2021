@@ -8,7 +8,7 @@ import { drawMap } from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {ExclamationCircleOutlined, ArrowRightOutlined, SwapRightOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
   const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
@@ -78,9 +78,9 @@ function KnowledgeForest () {
     await YottaAPI.getMap(currentSubjectDomain.domain).then(
         (res) => {
           // setmapdata(res.data);
-          if (res.data && mapRef&&mapRef.current) {
+          if (res.data && mapRef.current&&mapRef.current) {
 
-             drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
+            drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
             //drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{},'no','no','no');
             // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'no','no','no');
           } else {
@@ -314,10 +314,12 @@ function KnowledgeForest () {
       </Card>
 
       <Card title="碎片" style={assembleStyle}>
-      <div style={{height: "50px", marginTop: "23px"}}>
-        <Badge color="purple" text={'主题:' + currentTopic} /> &nbsp;&nbsp;&nbsp;
-        <Badge color="purple" text={'分面:' + facetName} /> &nbsp;&nbsp;&nbsp;
-        <Badge color="purple" text={'碎片数量:' + assnum} /> &nbsp;&nbsp; &nbsp;
+      <div style={{height: "70px", marginTop: "15px"}}>
+        <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
+        <span style={{fontSize:"25px"}}>→</span>
+        <Badge color="white" text={'分面:' + facetName} /> &nbsp;&nbsp;&nbsp;
+        <span style={{fontSize:"25px"}}>→</span>
+        <Badge color="white" text={'碎片数量:' + assnum} /> &nbsp;&nbsp; &nbsp;
       </div>
         {
           assembles ? (
