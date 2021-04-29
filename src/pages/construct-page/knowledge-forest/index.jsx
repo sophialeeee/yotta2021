@@ -134,8 +134,8 @@ function KnowledgeForest() {
                     console.log("这里是构建3")
                     drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
                         learningPath,
-                        clickTopic,
-                        clickFacet,
+                        clickTopic_construct,
+                        clickFacet_construct,
                         onDeleteTopic,
                         assembleTopic,
                         select,
@@ -145,8 +145,8 @@ function KnowledgeForest() {
                             console.log("deleting");
                         },
                        'knowledge-forest',
-                        onClickBranch,
-                        clickBranchAdd.bind(null, currentTopic));
+                        onClickBranch_construct,
+                        clickBranchAdd_construct.bind(null, currentTopic));
                     console.log("这里是构建4")
                 } else {
                     if (res.data) {
@@ -436,7 +436,7 @@ function KnowledgeForest() {
 
 
 
-    async function clickFacet(facetId) {
+    async function clickFacet_construct(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);
         setassembles(res);
         const res1 = await YottaAPI.getFacetName1(facetId);
@@ -445,7 +445,8 @@ function KnowledgeForest() {
         }
     }
 
-    async function clickTopic(topicId, topicName) {
+    async function clickTopic_construct(topicId, topicName) {
+        console.log("构建树")
         setcurrentTopic(topicName);
         setfacetName("未选择")
         await YottaAPI.getAssembleByName(currentSubjectDomain.domain, topicName).then(res => {
@@ -492,7 +493,7 @@ function KnowledgeForest() {
 
 
     //插入分面
-    const clickBranchAdd = (topicName2) => {
+    const clickBranchAdd_construct = (topicName2) => {
         confirm({
             title: '请输入分面名称',
             icon: <ExclamationCircleOutlined/>,
@@ -536,8 +537,8 @@ function KnowledgeForest() {
 
   //删除分面调用接口
   let clickflag = true;
-  const onClickBranch = (facetId) => {
-        console.log("click分面删除",facetId)
+  const onClickBranch_construct = (facetId) => {
+        console.log("构建click分面删除",facetId)
       if(!clickflag){
           clickflag=true;
           console.log("return flag");
@@ -570,18 +571,24 @@ function KnowledgeForest() {
   
 
   async function ClickBranch(facetId){
-      
+      console.log("构建删除树")
       if (facetId > 0){
       const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-      console.log("传入删除id", facetId,res);
+      console.log("传入删除id", facetId,res.data);
       //setassembles(res); res是提示信息... 这咋能set的
-        if (res.code == 200) {
+        // if (res.code == 200) {
+        //       console.log("删除成功")
+        //       message.info(res.msg)
+        //       fetchMap();
+
+        //   } else {
+        //       message.warn(res.msg)
+        //   }
+        if(res){
+            console.log("删除成功")
               message.info(res.msg)
               fetchMap();
-
-          } else {
-              message.warn(res.msg)
-          }
+        }
       }
   
       console.log("currentTopic clickbranch",currentTopic);
@@ -656,8 +663,8 @@ function KnowledgeForest() {
 
                         drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
                             learningPath,
-                            clickTopic,
-                            clickFacet,
+                            clickTopic_construct,
+                            clickFacet_construct,
                             onDeleteTopic,
                             assembleTopic,
                             select,
@@ -667,8 +674,8 @@ function KnowledgeForest() {
                                 console.log("deleting");
                             },
                             'knowledge-forest',
-                            onClickBranch,
-                            clickBranchAdd.bind(null, currentTopic));
+                            onClickBranch_construct,
+                            clickBranchAdd_construct.bind(null, currentTopic));
                         console.log("这里是构建4");
                     }
                 }
