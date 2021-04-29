@@ -81,6 +81,7 @@ function BatchConstruct() {
     var [continueIndex, setcontinueIndex] = useState();
     var [dataTemp,setdataTemp] = useState();
     var [onstop,setonstop] = useState();
+    var [finishedTopic, setfinishedTopic] = useState();
 
     var [topicData, settopicData] = useState();
     var [batchConstruct, setbatchConstruct] = useState();
@@ -183,6 +184,7 @@ function BatchConstruct() {
                     onOk(){
                         setinsertTopic1(Topic1); 
                         console.log('Topic1',Topic1);
+                        message.info('新添加主题时，暂无分面信息,可在单个构建页面人工添加主题分面。')
                     },
                     onCancel(){}
                 })
@@ -201,6 +203,7 @@ function BatchConstruct() {
             const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
             const topicsData = res.data.data;
             settopicData(topicsData);
+            console.log('更新主题列表',topicData);
             var notInsert = false;
             setnotInsert(notInsert)
         }
@@ -213,6 +216,7 @@ function BatchConstruct() {
     //插入置顶
     useEffect(()=>{
         if(topicData){
+            console.log("我要插入主题")
             console.log('topicData', topicData);
             console.log('batchData', batchData);
             const index = topics.indexOf(currentTopic);
@@ -226,6 +230,7 @@ function BatchConstruct() {
             if(dataTemp[index] == insertTopic1){
                 console.log("Nothing");
             }else{
+                console.log("重新排序")
                 for (var i=1; i < topicData.length; i++){
                     if (dataTemp[i]=== insertTopic1 ){
                         var dataChange = dataTemp[index];
@@ -322,7 +327,8 @@ function BatchConstruct() {
                 }, 500);
                 setTimeout(()=>{
                     clearInterval(my);
-                    topicNode.style.color = 'green';  
+                    topicNode.style.color = 'green';
+                    topicNode.style.opacity = 1;  
                 },6000)
                 async function fetchTreeData(){
                     const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
@@ -369,11 +375,19 @@ function BatchConstruct() {
                 var getbatchData = JSON.parse(localStorage.getItem('batchData'))
                 var getfinishedData = JSON.parse(localStorage.getItem('finishedData'))
                 console.log('getfinishedData',getfinishedData)
-                for(var i=0; i<getbatchData.length;i++){
-                    var finishedTopic = getfinishedData[i];
-                    console.log('finshedTopic',finishedTopic);
-                    // var topicNode = document.getElementById(`topicitem-${finishedTopic}`);
-                    // topicNode.style.color = 'green';
+                console.log('getbatchData',getbatchData)
+                setcurrentTopic(getbatchData[1]);
+                const index = topics.indexOf(getbatchData[1]);
+                console.log('indexxx', index);
+                var finishhhh = topics.slice(0,index);
+                for(var i=0; i<finishhhh.length;i++){
+                    console.log(finishhhh[i]);
+                    var finishedTopic = finishhhh[i];
+                    setfinishedTopic(finishedTopic);
+                    console.log('finishedTopic',finishedTopic)
+                    const topicNode = document.getElementById(`topicitem-${finishedTopic}`);
+                    console.log('topicNode',topicNode);
+                    topicNode.style.color = 'green';
                 }
                 console.log('getbatchData',getbatchData)
                 setcurrentTopic(getbatchData[1]);
@@ -426,7 +440,7 @@ function BatchConstruct() {
 
                 }
             </Card>
-        <Card extra={<PlusOutlined style={{ top: '50px' }} />} title="主题分面树" style={treeStyle}>
+        <Card  title="主题分面树" style={treeStyle}>
         <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
