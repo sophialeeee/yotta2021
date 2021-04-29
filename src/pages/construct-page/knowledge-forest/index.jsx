@@ -239,7 +239,7 @@ function KnowledgeForest() {
             } else {
             message.loading({content:resStartSpider.msg,key});
         }
-
+    }
 
     }
 

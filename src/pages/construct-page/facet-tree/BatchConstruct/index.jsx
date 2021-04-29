@@ -423,7 +423,7 @@ function BatchConstruct() {
                 }
             </Card>
         <Card extra={<PlusOutlined style={{ top: '50px' }} />} title="主题分面树" style={treeStyle}>
-        <Card.Grid style={{ width: '100%', height: '850px' }} >
+        <Card.Grid style={{ width: '100%', height: '850px' }}  hoverable={false} >
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
                 </Card.Grid>
