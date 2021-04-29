@@ -113,12 +113,12 @@ function KnowledgeForest() {
         await YottaAPI.getMap(currentSubjectDomain.domain).then(
             (res) => {
                 // setmapdata(res.data);
-                if (res.data && mapRef && mapRef.current) {
-                    data_temp = res.data
+                if (res.data && mapRef&&mapRef.current) {
+                    data_temp=res.data
+                    console.log("这里是构建3")
                     // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, () => {
-                    }, select, onInsertTopic, () => {
-                    }, 'yes', 'yes', 'yes');
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    console.log("这里是构建4")
                 } else {
                     if (res.data) {
                     } else {
@@ -325,7 +325,7 @@ function KnowledgeForest() {
     }
 
     const select = async (par1, par2) => {
-        console.log(par1, par2)
+        console.log("构建",par1, par2)
         if (par1 == -1) {
             message.info("该主题不可选")
         }
@@ -483,80 +483,81 @@ function KnowledgeForest() {
         if (topicName2 && insertFacet1) {
             insertFacet(topicName2, insertFacet1);
         }
-    }, [topicName2])
+  },[topicName2])
 
-    //删除分面调用接口
-    let clickflag = true;
-    const onClickBranch = (facetId) => {
-        if (!clickflag) {
-            clickflag = true;
-            console.log("return flag");
-            return
-        }
-        if (facetId) {
-            confirm({
-                title: "确认删除该分面吗？",
-                okText: '确定',
-                cancelText: '取消',
-                async onOk() {
-                    ClickBranch(facetId)
+  //删除分面调用接口
+  let clickflag = true;
+  const onClickBranch = (facetId) => {
+        console.log("click分面删除",facetId)
+      if(!clickflag){
+          clickflag=true;
+          console.log("return flag");
+          return
+      }
+      if(facetId){
+      confirm({
+      title: "确认删除该分面吗？",
+      okText: '确定',
+      cancelText: '取消',
+      async onOk() {
+          ClickBranch(facetId)
 
-                    //   if (res.code == 200) {
-                    //       message.info(res.msg)
-                    //       fetchMap();
+        //   if (res.code == 200) {
+        //       message.info(res.msg)
+        //       fetchMap();
 
-                    //   } else {
-                    //       message.warn(res.msg)
-                    //   }
-                    clickflag = false;
-                },
-                onCancel() {
-                    //clickflag = false;
-                    console.log('cancel')
-                }
-            })
-        }
+        //   } else {
+        //       message.warn(res.msg)
+        //   }
+          clickflag = false;
+      },
+      onCancel() {
+          //clickflag = false;
+          console.log('cancel')
+      }
+  })
+    }
     };
+  
 
+  async function ClickBranch(facetId){
+      
+      if (facetId > 0){
+      const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+      console.log("传入删除id", facetId,res);
+      //setassembles(res); res是提示信息... 这咋能set的
+        if (res.code == 200) {
+              message.info(res.msg)
+              fetchMap();
 
-    async function ClickBranch(facetId) {
-
-        if (facetId > 0) {
-            const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-            console.log("传入删除id", facetId);
-            setassembles(res);
-            if (res.code == 200) {
-                message.info(res.msg)
-                fetchMap();
-
-            } else {
-                message.warn(res.msg)
-            }
-        }
-
-        console.log("currentTopic clickbranch", currentTopic);
-        // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-        // window.flag = false;
-        // console.log("shanchuhou",window.flag);
-        //     if(treeData){
-        //         console.log("新的画树数据",treeData);
-        //         emptyChildren(treeRef.current);
-        //         settreeData(treeData);
-        //     }
-        setcurrentTopic(topic => {
-            (async () => {
-                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
-                console.log('t-tt', topic);
-                window.flag = false;
-                console.log("shanchuhou", window.flag);
-                if (treeData) {
-                    console.log("新的画树数据", treeData);
-                    emptyChildren(treeRef.current);
-                    settreeData(treeData);
-                }
-            })();
-            return topic
-        })
+          } else {
+              message.warn(res.msg)
+          }
+      }
+  
+      console.log("currentTopic clickbranch",currentTopic);
+  // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+  // window.flag = false;
+  // console.log("shanchuhou",window.flag);
+  //     if(treeData){
+  //         console.log("新的画树数据",treeData);
+  //         emptyChildren(treeRef.current);
+  //         settreeData(treeData);
+  //     }
+      setcurrentTopic(topic => {
+          (async () => {
+              const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+              console.log('t-tt', topic);
+              window.flag = false;
+              console.log("shanchuhou", window.flag);
+              if (treeData) {
+                  console.log("新的画树数据", treeData);
+                  emptyChildren(treeRef.current);
+                  settreeData(treeData);
+              }
+          })();
+          return topic
+      })
     }
 
     //删除依赖
@@ -600,13 +601,14 @@ function KnowledgeForest() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
-                    if (res.data && mapRef) {
-                        // console.log('res.data',res.data);
-                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, assembleTopic, select, onInsertTopic, (a, b) => {
-                            onDeleteRelation(a, b)
-                            console.log("relationdata", a, b);
-                        }, 'yes', 'yes', 'yes', onClickBranch, clickBranchAdd.bind(null, currentTopic));
+                    if(res.data&&mapRef){
+                    // console.log('res.data',res.data);
+                    console.log("这里是构建1")
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
+                        onDeleteRelation(a, b)
+                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
                     }
+                    console.log("这里是构建2")
                 }
             )
             const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
