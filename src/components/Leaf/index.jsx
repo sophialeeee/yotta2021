@@ -35,10 +35,11 @@ class Leaf extends React.Component {
           {
             this.state.showMore ?
               (
-                <div style={{overflow:"hidden",maxHeight:"135px"}} dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
+                <div style={{overflow:"hidden",maxHeight:"135px",textAlign:"left"}} dangerouslySetInnerHTML={{__html: assemble.assembleContent}}></div>
               ) :
               (
                 <HTMLEllipsis
+                  style={{textAlign:"left"}}
                   unsafeHTML={assemble.assembleContent}
                   maxLine="99999"
                   ellipsisHTML="<a>...收起</a>"
