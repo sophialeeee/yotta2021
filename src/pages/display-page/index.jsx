@@ -140,9 +140,6 @@ function DisplayPage() {
                         <p>
                             当前课程: {currentSubjectDomain.domain || '未指定'}
                         </p>
-                        <p>
-                            构建模式: {constructType === 'auto' ? '自动构建' : '已有课程'}
-                        </p>
 
                     </div>
                     <Steps current={step} onChange={onStepChange} direction="vertical" className={classes.steps}>
