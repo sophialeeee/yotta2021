@@ -26,6 +26,7 @@ const IconFont = createFromIconfontCN({
 const {Step} = Steps;
 
 function DisplayPage() {
+
     const {setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const location = useLocation();
     const {confirm} = Modal;

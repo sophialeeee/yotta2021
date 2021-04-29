@@ -188,6 +188,95 @@ function Relation() {
         }
     },[relationData])
 
+    /***  addRelation   start ===============================================================================================================**/
+    let statu = 0
+
+    let firstSelect_Name = ''
+    let secSelect_Name = ''
+    let firstSelect_id = 0
+    let secSelect_id = 0
+    let hide = null
+    const selecting = function (content) {
+        hide = message.loading(content, 8, () => {
+            reSet()
+        });
+    };
+    const reSet = function () {
+        statu = 0
+        firstSelect_Name = ''
+        secSelect_Name = ''
+    };
+    let data_temp;
+
+    function checkExitRelation() {
+
+        let has = false;
+        for (var i = 0; i < dataTemp.length; i++) {
+            let relation = dataTemp[i]
+            if (relation['主题一'] == firstSelect_Name && relation['主题二'] == secSelect_Name) {
+                has = true
+            }
+
+        }
+        return has
+    }
+
+    const select = async (par1, par2) => {
+        console.log(par1, par2)
+        if (par1 == -1) {
+            message.info("该主题不可选")
+        }
+
+        if (statu == 0) {
+            firstSelect_Name = par2
+            firstSelect_id = par1
+            selecting("已经选定主题: " + par2 + ", 请选择另一主题")
+            statu = 1
+        } else {
+            secSelect_Name = par2
+            secSelect_id = par1
+            if (statu == 1) {
+
+                if (firstSelect_Name == secSelect_Name) {
+                    message.info("不可选相同主题")
+                    secSelect_Name = ''
+                    firstSelect_id = 0
+                    return
+                }
+                let has = checkExitRelation()
+                if (has) {
+                    message.info("关系已经存在")
+                    setTimeout(hide, 0);
+                    reSet()
+                    return
+                }
+
+                confirm({
+                    title: "确认添加关系：" + firstSelect_Name + "--> " + secSelect_Name + " 吗？",
+                    okText: '确定',
+                    cancelText: '取消',
+                    async onOk() {
+                        setTimeout(hide, 0);
+
+                        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
+                        if (res.code == 185) {
+                            message.warn(res.msg)
+                        } else {
+                            message.info(res.msg)
+                            // fetchMap();
+                        }
+                        reSet()
+                    },
+                    onCancel() {
+                        console.log('cancel')
+                    }
+                })
+            }
+        }
+    }
+    /***  addRelation end ===============================================================================================================**/
+
+
     useEffect(()=>{
         if(data1) {
             // console.log("firstTime", firstTime);
@@ -373,10 +462,10 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting");
-                    },'no','yes','no',()=>{},()=>{});}
+                    },'relation',()=>{},()=>{});}
                 }
             )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -401,12 +490,13 @@ function Relation() {
             await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     setmapdata(res.data);
-                    if(res.data && mapRef){
+                    if (res.data && mapRef && mapRef.current&&treeRef.current) {
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
-                        onDeleteRelation( a, b);
-                        console.log("deleting2");
-                    },'no','yes','no',()=>{},()=>{});}
+                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                            onDeleteRelation( a, b);
+                            console.log("deleting");
+                        },'relation',()=>{},()=>{});
+                    }
                 }
             ) 
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -433,11 +523,13 @@ function Relation() {
                     }
                     else if(res.data&&mapRef&&mapRef.current){
                     console.log('res.data',res.data);
-                    drawMap(res.data, mapRef.current, treeRef.current,currentSubjectDomain.domain,learningPath,
-                        () => {}, () => {},() => {},() => {},() => {},() => {},(a,b) => {
-                        onDeleteRelation(a, b);
-                        console.log("deleting3")
-                    },'no','yes','no',()=>{},()=>{});}
+                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                            onDeleteRelation( a, b);
+                            console.log("deleting");
+                        },'relation',()=>{},()=>{});
+
+
+                    }
                 }
             )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);

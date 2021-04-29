@@ -1,6 +1,6 @@
 import React from 'react';
-// import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
-import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modulebatch/facetTree';
+import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
+// import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modulebatch/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
 import { useState } from 'react';
@@ -325,7 +325,8 @@ function BatchConstruct() {
                     const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
                     if(result){
                         setTimeout(()=>{
-                            drawTree(treeRef.current,result,d => { },d => { },d => { },300);
+
+                            drawTree(treeRef.current,result,d => { },d => { },d => { },'facet-tree',300);
                             emptyChildren(treeRef.current);
                             setTimeout(()=>{
                                 
@@ -423,7 +424,7 @@ function BatchConstruct() {
                 }
             </Card>
         <Card extra={<PlusOutlined style={{ top: '50px' }} />} title="主题分面树" style={treeStyle}>
-        <Card.Grid style={{ width: '100%', height: '850px' }} >
+        <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
                 </Card.Grid>
