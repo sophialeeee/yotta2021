@@ -113,7 +113,7 @@ function KnowledgeForest() {
         await YottaAPI.getMap(currentSubjectDomain.domain).then(
             (res) => {
                 // setmapdata(res.data);
-                if (res.data && mapRef && mapRef.current) {
+                if (res.data && mapRef && mapRef.current&&treeRef.current) {
                     data_temp = res.data
                     // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
                     drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, () => {
@@ -143,7 +143,7 @@ function KnowledgeForest() {
         await sleep();
         await sleep();
         await sleep();
-        let getGenerateDependency_loading = message.loading('耗时操作，生成碎片关系...', 0, () => {
+        let getGenerateDependency_loading = message.loading('生成碎片关系...', 0, () => {
 
         })
 
@@ -169,7 +169,7 @@ function KnowledgeForest() {
         var timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
             if (resIncremental.code == 200) {
-                message.info('爬取结束，共有碎片' + caluNum(resIncremental.data) + '个')
+                message.info('爬取结束，共有' + resIncremental.data.childrenNumber + '个')
                 await sleep();
 
                 getGenerateDependency(topicName)
@@ -177,7 +177,7 @@ function KnowledgeForest() {
 
             } else if (resIncremental.code == 301) {
                 // message.info(resIncremental.msg)
-                message.info('已经爬取碎片' + caluNum(resIncremental.data) + '个')
+                message.info('已经爬取' +  resIncremental.data.childrenNumber + '个')
             } else if (resIncremental.code == 300) {
                 await sleep();
 
