@@ -12,9 +12,6 @@ import axios from "axios";
 import {getMap} from "echarts/lib/echarts";
 
 function KnowledgeForest() {
-
-
-
     const [appendAssembleContent, setappendAssembleContent] = useState();
     const [currentFacetId, setcurrentFacetId] = useState();
     const [facet, setfacet] = useState();
@@ -176,7 +173,7 @@ function KnowledgeForest() {
         await sleep();
         await sleep();
 
-        let getGenerateDependency_loading = message.loading({content: '生成碎片关系...', key}, 10, () => {
+        let getGenerateDependency_loading  = message.loading({content:'生成碎片关系...',key},10,()=>{
             fetchMap()
         });
 
@@ -187,12 +184,12 @@ function KnowledgeForest() {
         }
         if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
-                message.loading({content: resGetGenerateDependency.msg, key}, 3)
+                message.loading({content:resGetGenerateDependency.msg,key}, 3)
                 setTimeout(getGenerateDependency_loading, 2)
                 message.loading({content: '刷新知识森林概览',key}, 1)
                 fetchMap()
             } else {
-                message.loading({content: resGetGenerateDependency.msg, key}, 3)
+                message.loading({content:resGetGenerateDependency.msg,key}, 3)
                 setTimeout(getGenerateDependency_loading, 1)
                 message.loading({content: '刷新知识森林概览',key}, 1)
 
@@ -268,7 +265,7 @@ function KnowledgeForest() {
                 await sleep();
                 askIncremental(topicName)
             } else {
-                message.loading({content: resStartSpider.msg, key});
+            message.loading({content:resStartSpider.msg,key});
             }
 
 
@@ -436,7 +433,6 @@ function KnowledgeForest() {
         }
     }
     /***  addRelation end ===============================================================================================================**/
-
 
 
 
@@ -712,40 +708,40 @@ function KnowledgeForest() {
         })
     };
 
-    //删除碎片后，获取碎片列表
-    useEffect(() => {
-        async function fetchAssembleData() {
-            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
-            if (res) {
-                setassembles(res);
-                console.log("获取碎片");
-                setdeleteAssembleToSort(res);
-            }
-        }
+    // //删除碎片后，获取碎片列表
+    // useEffect(() => {
+    //     async function fetchAssembleData() {
+    //         const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain, currentTopic);
+    //         if (res) {
+    //             setassembles(res);
+    //             console.log("获取碎片");
+    //             setdeleteAssembleToSort(res);
+    //         }
+    //     }
 
-        fetchAssembleData();
-    }, [deleteAssembleToFetch])
+    //     fetchAssembleData();
+    // }, [deleteAssembleToFetch])
 
 
-    // 重新计算碎片
-    useEffect(() => {
-        if (assembles) {
-            console.log("重新计算碎片个数");
-            setassnum(assembles.length);
-            if (appendAssembleContentFlagToSort) {
-                for (var ass_index = 0; ass_index < assembles.length; ass_index++) {
-                    if (assembles[ass_index].assembleContent == appendAssembleContent) {
-                        const assemble_temp = assembles[ass_index];
-                        assembles.splice(ass_index, 1);
-                        assembles.unshift(assemble_temp);
-                        console.log("置顶成功");
-                        console.log(assembles[0]);
-                        break;
-                    }
-                }
-            }
-        }
-    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
+    // // 重新计算碎片
+    // useEffect(() => {
+    //     if (assembles) {
+    //         console.log("重新计算碎片个数");
+    //         setassnum(assembles.length);
+    //         if (appendAssembleContentFlagToSort) {
+    //             for (var ass_index = 0; ass_index < assembles.length; ass_index++) {
+    //                 if (assembles[ass_index].assembleContent == appendAssembleContent) {
+    //                     const assemble_temp = assembles[ass_index];
+    //                     assembles.splice(ass_index, 1);
+    //                     assembles.unshift(assemble_temp);
+    //                     console.log("置顶成功");
+    //                     console.log(assembles[0]);
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
 
 
     /*碎片部分增删操作*/
@@ -899,7 +895,7 @@ function KnowledgeForest() {
                 }
             }
         }
-    }, [appendAssembleContentFlagToSort, deleteAssembleToSort, currentTopic])
+    }, [appendAssembleContentFlagToSort, currentTopic])
 
 
     const infoFinish = () => {
@@ -939,9 +935,11 @@ function KnowledgeForest() {
             <Card title="碎片" style={assembleStyle}
                   extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
                 <div style={{height: "54px", marginTop: "25px"}}>
-                    <Badge color="purple" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
-                    <Badge color="purple" text={'分面:' + facetName}/> &nbsp;&nbsp;&nbsp;
-                    <Badge color="purple" text={'碎片数量:' + assnum}/> &nbsp;&nbsp; &nbsp;
+                    <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
+                    <span style={{fontSize:"25px"}}>→</span>
+                    <Badge color="white" text={'分面:' + facetName}/> &nbsp;&nbsp;&nbsp;
+                    <span style={{fontSize:"25px"}}>→</span>
+                    <Badge color="white" text={'碎片数量:' + assnum}/> &nbsp;&nbsp; &nbsp;
                 </div>
 
 
@@ -950,7 +948,7 @@ function KnowledgeForest() {
                             assembles.map(
                                 (assemble, index) =>
                                     (
-                                        <Card.Grid style={{width: "100%"}}>
+                                        <Card.Grid style={{width: "100%"}} key={index}>
                                             <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm"
                                                     onClick={onDeleteAssemble.bind(null, assemble.assembleId)}
                                                     style={{position: "absolute", right: '3%'}}>

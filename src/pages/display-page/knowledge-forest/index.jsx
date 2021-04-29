@@ -8,7 +8,7 @@ import { drawMap } from '../../../modules/topicDependenceVisualization';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {ExclamationCircleOutlined, ArrowRightOutlined, SwapRightOutlined} from "@ant-design/icons";
 function KnowledgeForest () {
   const {currentSubjectDomain,setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
   // const [mapdata,setmapdata] = useState();
@@ -107,9 +107,12 @@ function KnowledgeForest () {
     const res = await YottaAPI.getASsembleByFacetId(facetId);
     setassembles(res);
     const res1 = await YottaAPI.getFacetName1(facetId);
-    if (res1.facetName){
-    setfacetName(res1.facetName);
+    if(res1){
+        if (res1.facetName){
+        setfacetName(res1.facetName);
+      }
     }
+
   }
 
   async function clickTopic (topicId, topicName) {
@@ -190,10 +193,12 @@ function KnowledgeForest () {
       </Card>
 
       <Card title="碎片" style={assembleStyle}>
-      <div style={{height: "50px", marginTop: "23px"}}>
-        <Badge color="purple" text={'主题:' + currentTopic} /> &nbsp;&nbsp;&nbsp;
-        <Badge color="purple" text={'分面:' + facetName} /> &nbsp;&nbsp;&nbsp;
-        <Badge color="purple" text={'碎片数量:' + assnum} /> &nbsp;&nbsp; &nbsp;
+      <div style={{height: "70px", marginTop: "15px"}}>
+        <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
+        <span style={{fontSize:"25px"}}>→</span>
+        <Badge color="white" text={'分面:' + facetName} /> &nbsp;&nbsp;&nbsp;
+        <span style={{fontSize:"25px"}}>→</span>
+        <Badge color="white" text={'碎片数量:' + assnum} /> &nbsp;&nbsp; &nbsp;
       </div>
         {
           assembles ? (
