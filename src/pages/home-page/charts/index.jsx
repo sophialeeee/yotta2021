@@ -23,7 +23,7 @@ function Charts(props) {
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
     const [gephi, setGephi] = useState(undefined);
     const history = useHistory();
-    const [subjects,setSubjects]=useState()
+    const [subjects, setSubjects] = useState()
     useEffect(() => {
         async function fetchGephi() {
             if((currentSubjectDomain&&currentSubjectDomain.subject))
@@ -48,8 +48,7 @@ function Charts(props) {
         fetchGephi();
     }, []);
 
-    // console.log('subjects', subjects);
-
+   
     const subjectOptions = options.map(op => {
         return {
             value: op.value,
@@ -77,6 +76,8 @@ function Charts(props) {
     function onAutoConstructClick(){
         let subject = '';
         let domain = '';
+        subject = '计算机科学';
+        domain = '数据结构';
         const onTextSubjectChange = (e) => {
             subject = e.target.value;
         };
@@ -85,9 +86,8 @@ function Charts(props) {
         };
 
         const onSelectChange = (e) => { 
-            subject = e;  
+            subject = e;
         }
-        
         confirm({
             
             title: '请选择构建学科，并输入要构建的课程',
@@ -99,10 +99,10 @@ function Charts(props) {
                     学科：
                 </span>
                 {(subjects)?(
-                    <Select onSelect={onSelectChange}>
+                    <Select defaultValue='计算机科学' onSelect={onSelectChange}>
                         {
                             subjects.map((SubjectsName)=>(
-                            <option value={SubjectsName.subjectName} >{SubjectsName.subjectName}</option> 
+                            <option value={SubjectsName.subjectName} defaultValue='计算机科学'>{SubjectsName.subjectName}</option> 
                             ))
                         }
                     </Select>):                 
@@ -122,8 +122,11 @@ function Charts(props) {
                 <span>
                     课程：
                 </span>
-                    <Input placeholder={'请输入课程'} onChange={onTextDomainChange}/>
+                    <Input defaultValue={'数据结构'} placeholder={'请输入课程'} onChange={onTextDomainChange}/>
                 </div>
+                <span style={{ fontSize:'8px',height:'5px',display:'block'}}>
+                    你可以尝试构建数据结构、C语言课程
+                </span>
             </>,
             okText: '开始构建',
             cancelText: '取消',
