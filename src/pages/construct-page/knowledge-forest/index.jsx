@@ -643,7 +643,7 @@ function KnowledgeForest() {
             ;
             const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
             setrelationData(res);
-            fetchMap();
+            // fetchMap();
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
             await YottaAPI.getMap(currentSubjectDomain.domain).then(

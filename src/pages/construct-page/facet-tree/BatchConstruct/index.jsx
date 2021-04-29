@@ -1,6 +1,6 @@
 import React from 'react';
-import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
-// import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modulebatch/facetTree';
+// import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modulebatch/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
 import { useState } from 'react';
@@ -329,7 +329,7 @@ function BatchConstruct() {
                     if(result){
                         setTimeout(()=>{
 
-                            drawTree(treeRef.current,result,d => { },d => { },d => { },'none',300);
+                            drawTree(treeRef.current,result,d => { },d => { },d => { },300);
                             emptyChildren(treeRef.current);
                             setTimeout(()=>{
                                 
