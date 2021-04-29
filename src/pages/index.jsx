@@ -98,8 +98,8 @@ function App() {
     },[currentSubjectDomain])
     function onAutoConstructClick(){
         
-        let subject = '';
-        let domain = '';
+        let subject = '计算机科学';
+        let domain = '数据结构';
         const onTextSubjectChange = (e) => {
             subject = e.target.value;
         };
@@ -121,7 +121,7 @@ function App() {
                     学科：
                 </span>
                 {(subjects)?(
-                    <Select onSelect={onSelectChange}>
+                    <Select defaultValue='计算机科学' onSelect={onSelectChange}>
                         {
                             subjects.map((SubjectsName)=>(
                             <option value={SubjectsName.subjectName} >{SubjectsName.subjectName}</option> 
@@ -144,8 +144,11 @@ function App() {
                 <span>
                     课程：
                 </span>
-                    <Input placeholder={'请输入课程'} onChange={onTextDomainChange}/>
+                    <Input defaultValue={'数据结构'} placeholder={'请输入课程'} onChange={onTextDomainChange}/>
                 </div>
+                <span style={{ fontSize: '8px', height: '5px', display: 'block' }}>
+                    你可以尝试构建数据结构、C语言课程
+                </span>
             </>,
             okText: '开始构建',
             cancelText: '取消',
