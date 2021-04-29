@@ -103,22 +103,22 @@ function KnowledgeForest() {
     async function fetchMap() {
         emptyChildren(mapRef.current)
         emptyChildren(treeRef.current)
-        const res_de = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
-        if (res_de) {
-            res_de.map((relation, index) => {
+        const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+        if (res) {
+            res.map((relation, index) => {
                 dataTemp.push({'key': String(index + 1), '主题一': relation.startTopicName, '主题二': relation.endTopicName})
             })
-            dataTemp = dataTemp.slice(-res_de.length)
         }
-
+        dataTemp = dataTemp.slice(-res.length)
         await YottaAPI.getMap(currentSubjectDomain.domain).then(
             (res) => {
                 // setmapdata(res.data);
-                if (res.data && mapRef && mapRef.current&&treeRef.current) {
-                    data_temp=res.data
-                    console.log("这里是构建3")
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,()=>{},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
-                    console.log("这里是构建4")
+                if (res.data && mapRef && mapRef.current) {
+                    data_temp = res.data
+                    // drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,()=>{},()=>{},()=>{},()=>{},()=>{});
+                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, () => {
+                    }, select, onInsertTopic, () => {
+                    }, 'yes', 'yes', 'yes');
                 } else {
                     if (res.data) {
                     } else {
@@ -143,55 +143,46 @@ function KnowledgeForest() {
         await sleep();
         await sleep();
         await sleep();
+        let getGenerateDependency_loading = message.loading('耗时操作，生成碎片关系...', 0, () => {
 
-        let getGenerateDependency_loading  = message.loading({content:'生成碎片关系...',key},0,()=>{
-
-        });
-
+        })
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, topicName);
-        if (resGetGenerateDependency.code){
-            if (resGetGenerateDependency.code == 200) {
-                message.loading({content:resGetGenerateDependency.msg,key}, 3)
-                setTimeout(getGenerateDependency_loading, 2)
-                message.loading({content:'刷新知识森林概览'}, 3)
-                fetchMap()
-            } else {
-                message.loading({content:resGetGenerateDependency.msg,key}, 3)
-                setTimeout(getGenerateDependency_loading, 1)
-                message.loading({content:'刷新知识森林概览'}, 3)
-
-                fetchMap()
-            }
-        }else {
+        if (resGetGenerateDependency.code == 200) {
+            message.info(resGetGenerateDependency.msg, 3)
+            setTimeout(getGenerateDependency_loading, 2)
+            message.info('刷新知识森林概览')
             fetchMap()
+        } else {
+            message.info(resGetGenerateDependency.msg, 3)
+            setTimeout(getGenerateDependency_loading, 1)
+            message.info('刷新知识森林概览')
 
+            fetchMap()
         }
-
-
 
     }
 
 
     async function askIncremental(topicName) {
 
-        let pre_num=0
         var timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
-
             if (resIncremental.code == 200) {
-                message.loading({content:'爬取结束，共有' + caluNum( resIncremental.data) + '个',key});
+                message.info('爬取结束，共有碎片' + caluNum(resIncremental.data) + '个')
                 await sleep();
+
                 getGenerateDependency(topicName)
                 setTimeout(timer)
-            } else if (resIncremental.code == 301) {
-                let  now_num=caluNum( resIncremental.data)
-                if (now_num!=pre_num){
-                    message.loading({content:'已经爬取' +now_num + '个',key});
-                }
 
+            } else if (resIncremental.code == 301) {
+                // message.info(resIncremental.msg)
+                message.info('已经爬取碎片' + caluNum(resIncremental.data) + '个')
             } else if (resIncremental.code == 300) {
                 await sleep();
+
+
+                // startSpider(topicName)
             }
         }, 1800);
 
@@ -200,14 +191,10 @@ function KnowledgeForest() {
 
     function caluNum(res) {
         let total_num = 0
-        console.log(res.childrenNumber)
-
         for (let i = 0; i < res.childrenNumber; i++) {
             let child = res.children[i]
-            console.log(child.length)
-
-            for (let j = 0; j < child.children.length; j++) {
-                total_num += child.children[j].childrenNumber
+            for (let j = 0; j < child.length; j++) {
+                total_num += child[j].childrenNumber
             }
         }
         return total_num
@@ -225,8 +212,9 @@ function KnowledgeForest() {
         if (resStartSpider.code == 200) {
             await sleep();
             askIncremental(topicName)
+
         } else {
-            message.loading({content:resStartSpider.msg,key});
+            message.warn(resStartSpider.msg)
         }
 
 
@@ -235,30 +223,23 @@ function KnowledgeForest() {
     async function handleInsert() {
         const topicName = textareaValueRef.current;
         textareaValueRef.current = '';
-        message.loading({content:'插入主题：'+topicName,key});
 
+        message.info('插入主题：' + topicName)
         await sleep();
         const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
         if (resInsertTopic.code == 200) {
-            message.loading({content:resInsertTopic.msg,key});
-            message.loading({content:'开始启动爬虫,爬取主题' + topicName + '相关碎片',key});
 
+            message.info(resInsertTopic.msg)
+            message.info('开始启动爬虫,爬取主题' + topicName + '相关碎片')
             await sleep();
 
             startSpider(topicName)
 
         } else {
-            message.loading(resInsertTopic.msg,key)
+            message.warn(resInsertTopic.msg)
         }
     }
-    const key = 'updatable';
 
-    const openMessage = () => {
-        message.loading({ content: 'Loading...', key });
-        setTimeout(() => {
-            message.loading({ content: 'Loaded!', key});
-        }, 1000);
-    };
     const onInsertTopic = () => {
         setTimeout(hide, 0);
         reSet()
@@ -273,7 +254,6 @@ function KnowledgeForest() {
             cancelText: '取消',
             onOk() {
                 handleInsert()
-                // openMessage()
             },
             onCancel() {
             }
@@ -620,12 +600,12 @@ function KnowledgeForest() {
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
-                    if(res.data&&mapRef){
-                    // console.log('res.data',res.data);
-                    console.log("这里是构建1")
-                    drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet,onDeleteTopic,()=>{},select,onInsertTopic,(a,b) => {
-                        onDeleteRelation(a, b)
-                        console.log("relationdata",a,b);},'yes','yes','yes',onClickBranch,clickBranchAdd.bind(null, currentTopic));
+                    if (res.data && mapRef) {
+                        // console.log('res.data',res.data);
+                        drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, onDeleteTopic, assembleTopic, select, onInsertTopic, (a, b) => {
+                            onDeleteRelation(a, b)
+                            console.log("relationdata", a, b);
+                        }, 'yes', 'yes', 'yes', onClickBranch, clickBranchAdd.bind(null, currentTopic));
                     }
                 }
             )
