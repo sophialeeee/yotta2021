@@ -60,6 +60,9 @@ function KnowledgeForest() {
     }
     const mapRef = useRef();
     const treeRef = useRef();
+
+    const [insertINfo, setinsertINfo] = useState('');
+
     // localStorage.removeItem('state');//刷新清空状态量
     function emptyChildren(dom) {
         if (dom) {
@@ -169,34 +172,42 @@ function KnowledgeForest() {
 
 
     async function getGenerateDependency(topicName) {
-        await sleep();
-        await sleep();
-        await sleep();
 
-        let getGenerateDependency_loading  = message.loading({content:'生成碎片关系...',key},10,()=>{
-            fetchMap()
-        });
+        setinsertINfo('生成碎片关系...')
+
+
 
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, topicName);
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 11; i++) {
             await sleep();
         }
         if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
-                message.loading({content:resGetGenerateDependency.msg,key}, 3)
-                setTimeout(getGenerateDependency_loading, 2)
+                // message.loading({content:resGetGenerateDependency.msg,key}, 3)
+                setinsertINfo(resGetGenerateDependency.msg)
+                for (let i = 0; i < 2; i++) {
+                    await sleep();
+                }
+                setinsertINfo('')
+
                 message.loading({content: '刷新知识森林概览',key}, 1)
                 fetchMap()
             } else {
-                message.loading({content:resGetGenerateDependency.msg,key}, 3)
-                setTimeout(getGenerateDependency_loading, 1)
+                setinsertINfo(resGetGenerateDependency.msg)
+                for (let i = 0; i < 2; i++) {
+                    await sleep();
+                }
+                setinsertINfo('')
+
                 message.loading({content: '刷新知识森林概览',key}, 1)
 
                 fetchMap()
             }
         } else {
             fetchMap()
+            setinsertINfo('')
+
 
         }
     }
@@ -207,22 +218,28 @@ function KnowledgeForest() {
 
         let pre_num=0
 
-        let spy_data = message.loading({content: '爬取碎片中...', key}, 0);
+        // let spy_data = message.loading({content: '爬取碎片中...', key}, 0);
+        setinsertINfo('爬取碎片中...')
+
         var timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
             if (resIncremental) {
 
             if (resIncremental.code == 200) {
-                message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个碎片', key},0);
+                setinsertINfo( '爬取结束，共有' + caluNum(resIncremental.data) + '个碎片')
+
+                // message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个碎片', key},3);
                 await sleep();
-                setTimeout(spy_data)
+                // setTimeout(spy_data)
                 getGenerateDependency(topicName)
                 setTimeout(timer)
             } else if (resIncremental.code == 301) {
                     let now_num = caluNum(resIncremental.data)
                     if (now_num != pre_num) {
-                        setTimeout(spy_data)
-                        message.loading({content: '已经爬取' + now_num + '个碎片', key},0);
+                        // setTimeout(spy_data)
+                        setinsertINfo( '已经爬取' + now_num + '个碎片...')
+
+                        // message.loading({content: '已经爬取' + now_num + '个碎片', key},3);
                         pre_num=now_num
                     }
 
@@ -280,8 +297,11 @@ function KnowledgeForest() {
         await sleep();
         const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
         if (resInsertTopic.code == 200) {
-            message.loading({content:resInsertTopic.msg,key},0);
-            message.loading({content:'启动爬虫，爬取主题：' + topicName + '相关的碎片',key},0);
+            setinsertINfo(resInsertTopic.msg)
+            setinsertINfo('启动爬虫，爬取主题：' + topicName + '相关的碎片')
+
+            // message.loading({content:resInsertTopic.msg,key},0);
+            // message.loading({content:'启动爬虫，爬取主题：' + topicName + '相关的碎片',key},0);
 
             await sleep();
 
@@ -915,11 +935,14 @@ function KnowledgeForest() {
         message.info('正在构建碎片，请稍后！')
     };
 
-
     return (
         <>
             <Card title="主题间认知路径图" style={mapStyle}>
-                <div style={{width: '100%', height: '700px'}}>
+                <Card.Grid style={{width:'100%',height:'12px'}} >
+                    <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
+                </Card.Grid>
+
+                <div style={{width: '100%', height: '700px',paddingTop:'20px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{
                         position: 'absolute', left: '0',
