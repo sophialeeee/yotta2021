@@ -206,6 +206,9 @@ function KnowledgeForest() {
             }
         } else {
             fetchMap()
+            for (let i = 0; i < 2; i++) {
+                await sleep();
+            }
             setinsertINfo('')
 
 
@@ -235,7 +238,7 @@ function KnowledgeForest() {
                 setTimeout(timer)
             } else if (resIncremental.code == 301) {
                     let now_num = caluNum(resIncremental.data)
-                    if (now_num >= pre_num) {
+                    if (now_num > pre_num) {
                         // setTimeout(spy_data)
                         setinsertINfo( '已经爬取' + now_num + '个碎片...')
 
@@ -245,6 +248,7 @@ function KnowledgeForest() {
 
                 } else if (resIncremental.code == 300) {
                     await sleep();
+                    setinsertINfo('')
                     setTimeout(timer)
 
             }

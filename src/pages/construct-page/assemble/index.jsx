@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
 import {drawTree,drawTreeNumber} from '../../../modules/facetTree1';
-import {drawMap} from '../../../modules/topicDependenceVisualization1';
+import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {Card, Alert, Input, message} from 'antd';
 import Leaf from '../../../components/Leaf'
 import cookie from 'react-cookies';
@@ -362,7 +362,7 @@ function Assemble() {
                 (res) => {
                     // setmapdata(res.data);
                     if(res.data&&mapRef.current&&treeRef1.current){
-                        drawMap(res.data, mapRef.current, treeRef1.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{}, ()=>{}, ()=>{}, 'yes','yes','yes');
+                        drawMap(res.data, mapRef.current, treeRef1.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{}, ()=>{}, ()=>{}, 'assemble',()=>{},()=>{});
                         //drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             }
