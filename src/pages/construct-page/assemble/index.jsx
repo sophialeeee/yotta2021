@@ -459,7 +459,7 @@ function Assemble() {
         if (currentTopic) {
             fetchAssembleData2();
         }
-    }, [staticRenderAss]);
+    }, [staticRenderAss, currentTopic]);
 
 
     // 右键点击装配，调用动态爬虫
