@@ -86,7 +86,7 @@ function KnowledgeForest () {
                  ()=>{},
                  ()=>{},
                  ()=>{},
-                 ()=>{},'none',()=>{},()=>{});
+                 ()=>{},'none',false,false);
 
           } else {
             if (res.data){
@@ -108,6 +108,7 @@ function KnowledgeForest () {
     setassembles(res);
     const res1 = await YottaAPI.getFacetName1(facetId);
     if(res1){
+        console.log("这里这里",res1)
         if (res1.facetName){
         setfacetName(res1.facetName);
       }

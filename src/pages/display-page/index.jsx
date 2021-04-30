@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {notification, Steps, Row, Col, Modal} from 'antd';
 import {useHistory} from 'react-router-dom';
 import {Cascader, Input,Button,Tooltip} from "antd";
-import {ExclamationCircleOutlined} from '@ant-design/icons'
+import {ExclamationCircleOutlined, ArrowRightOutlined,HomeOutlined,} from "@ant-design/icons";
 
 import classes from './index.module.css';
 
@@ -145,7 +145,7 @@ function DisplayPage() {
                     <Steps current={step} onChange={onStepChange} direction="vertical" className={classes.steps}>
                         {
                             stepList.map((s, i) => (
-                                <Step key={`step_${s.title}`} title={s.title} description={s.description} status={stepStatus[i]} icon={<IconFont type="icon-tree" />}>
+                                <Step key={`step_${s.title}`} title={s.title} description={s.description} status={stepStatus[i]} icon={<HomeOutlined/>}>
                                 </Step>
                             ))
                         }
