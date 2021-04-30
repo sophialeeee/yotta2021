@@ -86,7 +86,7 @@ function KnowledgeForest () {
                  ()=>{},
                  ()=>{},
                  ()=>{},
-                 ()=>{},'none',()=>{},()=>{});
+                 ()=>{},'none',false,false);
 
           } else {
             if (res.data){
@@ -108,6 +108,7 @@ function KnowledgeForest () {
     setassembles(res);
     const res1 = await YottaAPI.getFacetName1(facetId);
     if(res1){
+        console.log("这里这里",res1)
         if (res1.facetName){
         setfacetName(res1.facetName);
       }
@@ -195,9 +196,9 @@ function KnowledgeForest () {
       <Card title="碎片" style={assembleStyle}>
       <div style={{height: "70px", marginTop: "15px"}}>
         <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
-        <span style={{fontSize:"25px"}}>→</span>
+        <Badge color="white" text={"----->"}/> &nbsp;&nbsp;&nbsp;
         <Badge color="white" text={'分面:' + facetName} /> &nbsp;&nbsp;&nbsp;
-        <span style={{fontSize:"25px"}}>→</span>
+        <Badge color="white" text={"----->"}/> &nbsp;&nbsp;&nbsp;
         <Badge color="white" text={'碎片数量:' + assnum} /> &nbsp;&nbsp; &nbsp;
       </div>
         {

@@ -362,7 +362,7 @@ function Assemble() {
                 (res) => {
                     // setmapdata(res.data);
                     if(res.data&&mapRef.current&&treeRef1.current){
-                        drawMap(res.data, mapRef.current, treeRef1.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{}, ()=>{}, ()=>{}, 'yes','yes','yes');
+                        drawMap(res.data, mapRef.current, treeRef1.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{}, ()=>{}, ()=>{}, 'assemble',()=>{},()=>{});
                         //drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
                 }
             }
@@ -459,7 +459,7 @@ function Assemble() {
         if (currentTopic) {
             fetchAssembleData2();
         }
-    }, [staticRenderAss]);
+    }, [staticRenderAss, currentTopic]);
 
 
     // 右键点击装配，调用动态爬虫
