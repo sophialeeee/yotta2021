@@ -978,10 +978,15 @@ function KnowledgeForest() {
         <>
             <Card extra={
 
-                <Dropdown overlay={menu}>
-                    <PlusOutlined style={{top: '50px'}}  />
+                <div>
+                    <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
+                    <Dropdown overlay={menu}>
 
-            </Dropdown>
+                        <PlusOutlined style={{top: '50px'}}  />
+
+                    </Dropdown>
+                </div>
+
             } title="主题间认知路径图" style={mapStyle}>
 
                 <div style={{width: '100%', height: '700px'}}>
@@ -1000,7 +1005,6 @@ function KnowledgeForest() {
             <Card title="碎片" style={assembleStyle}
                   extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
                 <Card.Grid style={{width:'100%',height:'12px'}} >
-                    <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
                 </Card.Grid>
                 <div style={{height: "54px", marginTop: "25px"}}>
                     <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
