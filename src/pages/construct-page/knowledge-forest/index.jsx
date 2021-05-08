@@ -1,5 +1,8 @@
 import React from 'react';
 import {Card, Badge, Divider, Modal, Alert, Input, message, Select} from 'antd';
+import { Menu, Dropdown, Button, Space, Tooltip } from 'antd';
+import { DownOutlined, StopOutlined,EditOutlined } from '@ant-design/icons';
+
 import {useState} from 'react';
 import {useEffect} from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -216,7 +219,7 @@ function KnowledgeForest() {
     }
 
 
-
+    var timer=null
     async function askIncremental(topicName) {
 
         let pre_num=0
@@ -224,7 +227,7 @@ function KnowledgeForest() {
         // let spy_data = message.loading({content: '爬取碎片中...', key}, 0);
         setinsertINfo('爬取碎片中...')
 
-        var timer = setInterval(async function () {
+        timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
             if (resIncremental) {
 
@@ -323,7 +326,7 @@ function KnowledgeForest() {
         reSet()
 
         confirm({
-            title: '请输入主题名称',
+            title: '添加主题，请输入主题名称',
             icon: <ExclamationCircleOutlined/>,
             content: <>
                 <TextArea maxLength={100} onChange={handleTextareaChange}/>
@@ -947,14 +950,46 @@ function KnowledgeForest() {
         message.info('正在构建碎片，请稍后！')
     };
 
+    async function handleMenuClick(e) {
+        console.log('click', e);
+        if (e.key == 'input') {
+            onInsertTopic()
+        } else if (e.key == 'suspended') {
+            await sleep();
+            setinsertINfo('')
+            setTimeout(timer)
+        }
+    }
+    const menu = (
+        <Menu onClick={handleMenuClick}>
+            <Menu.Item key="input" icon={<EditOutlined />}>
+
+                输入主题
+            </Menu.Item>
+            <Menu.Item key="suspended" icon={<StopOutlined />}>
+                暂停爬取
+            </Menu.Item>
+            {/*<Menu.Item key="3" icon={<UserOutlined />}>*/}
+            {/*    3rd menu item*/}
+            {/*</Menu.Item>*/}
+        </Menu>
+    );
     return (
         <>
-            <Card title="主题间认知路径图" style={mapStyle}>
-                <Card.Grid style={{width:'100%',height:'12px'}} >
-                    <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
-                </Card.Grid>
+            <Card extra={
 
-                <div style={{width: '100%', height: '700px',paddingTop:'20px'}}>
+                <div>
+                    <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
+                    <Dropdown overlay={menu}>
+
+                        <PlusOutlined style={{top: '50px'}}  />
+
+                    </Dropdown>
+                </div>
+
+            } title="主题间认知路径图" style={mapStyle}>
+
+                <div style={{width: '100%', height: '700px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{
                         position: 'absolute', left: '0',
@@ -969,6 +1004,8 @@ function KnowledgeForest() {
 
             <Card title="碎片" style={assembleStyle}
                   extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
+                <Card.Grid style={{width:'100%',height:'12px'}} >
+                </Card.Grid>
                 <div style={{height: "54px", marginTop: "25px"}}>
                     <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
                     <Badge color="white" text={"----->"}/> &nbsp;&nbsp;&nbsp;
