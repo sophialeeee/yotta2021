@@ -83,6 +83,12 @@ const YottaAPI = {
     async getCompleteTopicByTopicName(topicName){
         return await posts(`topic/getCompleteTopicByTopicName?topicName=${encodeURI(topicName)}&hasFragment=emptyAssembleContent`);
     },
+
+    // 根据主题名获取画分面树的数据 new
+    async getCompleteTopicByNameAndDomainName(domainName,topicName){
+        return await gets(`topic/getCompleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+
     // 根据主题名获取画分面树的数据（动态）
     async getDynamicTreeData(domainName,topicName,flag){
         let result = undefined;

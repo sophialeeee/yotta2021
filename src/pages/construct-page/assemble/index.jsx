@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './index.module.css';
 import { Modal, Select} from "antd";
-import {ExclamationCircleOutlined,PlusOutlined, MinusOutlined, EditOutlined, CloseOutlined,DeleteOutlined} from '@ant-design/icons'
+import {ExclamationCircleOutlined,PlusOutlined, CaretRightOutlined,PauseOutlined,MinusOutlined, EditOutlined, CloseOutlined,DeleteOutlined} from '@ant-design/icons'
 import YottaAPI from '../../../apis/yotta-api';
 import { useState } from 'react';
 import { useEffect, useRef } from 'react';
@@ -27,7 +27,7 @@ function Assemble() {
     const [assnum,setassnum] = useState(0);
     const [renderFinish,setrenderFinish] = useState(0);
     const [topicConfirm,settopicConfirm] = useState();   //临时加的 存增量爬虫结果
-    const [autoCons, setautoCons] = useState(0);
+    const [autoCons, setautoCons] = useState();
     const [autocurrentTopic, setautocurrentTopic] = useState();
     const [autotreeData, setautotreeData] = useState();
     const [dynamicSpider, setdynamicSpider] = useState(0);  //动态爬虫标志位
@@ -52,6 +52,10 @@ function Assemble() {
     const [spiderAss,setspiderAss] = useState();
     const [spiderText,setspiderText] = useState("");
     const [updateTree, setupdateTree] = useState(0);     //动态爬虫过程中更新树
+    const [quitSpider, setquitSpider] = useState(1);
+    const [topicConfirmFlag, settopicConfirmFlag] = useState(0);   //0表示取消，1表示点击主题，2表示确定爬取该主题
+
+
     const {TextArea} = Input;
     
 
@@ -63,6 +67,23 @@ function Assemble() {
         textareaValueRef.current = e.target.value;
     }
     
+    const spiderState = {
+        borderColor:'grey',
+        borderWidth: '1.5px',
+        borderRadius: '12px',
+        borderStyle:"solid",
+        // backgroundColor:'white',
+        color: 'black',
+        height: '40px',
+        width: '110px',
+        textAlign: 'left',
+        // display: 'inline-block',
+        right: "3%",
+        // outline:"none",
+        position:'absolute',
+        zIndex:"999"
+    };
+
     const treeStyle = {
         width:'50%',
         height:'300px',
@@ -116,14 +137,15 @@ function Assemble() {
                 cancelText: '取消',
                 onOk() {
                     setdynamicSpider(topicConfirm);    //动态爬虫
-                    setcurrentTopic(topicConfirm); 
+                    setcurrentTopic(topicConfirm);
+                    settopicConfirmFlag(2); 
                 },
                 onCancel() {
-                    
+                    settopicConfirmFlag(0);
                 }
             })
         }
-        if(topicConfirm)
+        if(topicConfirm&&topicConfirmFlag===1)
             ontopicConfirm();
 
     },[topicConfirm])
@@ -177,6 +199,32 @@ function Assemble() {
     //         }
     //     })
     // };
+
+    const onPlaySpider = () => {
+        Modal.info({
+            title: '碎片爬取操作提示',
+            content: (
+              <div>
+                请右键选择圆形布局图中的主题并装配
+              </div>
+            ),
+            okText: '确定',
+            onOk() {},
+          });
+    };
+
+    const onQuitSpider = () => {
+        Modal.info({
+            title: '后端接口没好',
+            content: (
+              <div>
+                后端快点啊
+              </div>
+            ),
+            okText: '确定',
+            onOk() {},
+          });
+    };
 
 
     const onAppendAssemble = () => {
@@ -332,7 +380,7 @@ function Assemble() {
     useEffect(() => {
         console.log(currentTopic);
         async function fetchTreeData() {
-            const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+            const treeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,currentTopic);
             settreeData(treeData);
             console.log(treeData);
         }
@@ -360,12 +408,15 @@ function Assemble() {
             const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
             if(topicsData){
                 settopics(topicsData.map((topic) => topic.topicName));
-                //setcurrentTopic(topicsData[0].topicName);    //默认碎片
+                if (topicsData[0].topicName)
+                    setcurrentTopic(topicsData[0].topicName);    //默认碎片
+                else
+                    setcurrentTopic('树状数组');
             }
         }
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
-            setcurrentTopic('树状数组');
+            // setcurrentTopic('树状数组');
         }
     }, [currentSubjectDomain.domain])
 
@@ -412,6 +463,7 @@ function Assemble() {
         console.log("成功啦成功啦");
         console.log("此时的主题名为",topicName);
         settopicConfirm(topicName);
+        settopicConfirmFlag(1);
     }
 
     //新增和渲染完成后获取碎片列表
@@ -486,6 +538,7 @@ function Assemble() {
             const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
             console.log("状态值:",r.status);
             setspiderText(" （准备爬取碎片...）");
+            setquitSpider(0);
             var myvar1 = setInterval(
                 async function GDM() {
                     if(currentSubjectDomain.domain && currentTopic) {
@@ -502,7 +555,9 @@ function Assemble() {
                                     // console.log("res:",result.data.children[0].children[0]);
                                     setdynamicRenderAss(result);
                                     setspiderText("");
+                                    setquitSpider(1);
                                     clearInterval(myvar1);
+
                                 }
                                 else {
                                     setspiderAss(result);
@@ -517,10 +572,10 @@ function Assemble() {
                     }
                 },5000);
         }
-        if (currentTopic) {
+        if (currentTopic&&topicConfirmFlag===2) {
             fetchAssembleData2();
         }
-    }, [dynamicSpider]);
+    }, [topicConfirmFlag]);
 
 
     // 动态爬虫结果碎片 渲染
@@ -589,7 +644,7 @@ function Assemble() {
     useEffect(() => {
         console.log(autocurrentTopic);
         async function autofetchTreeData() {
-            const autotreeData = await YottaAPI.getCompleteTopicByTopicName(autocurrentTopic);
+            const autotreeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,autocurrentTopic);
             console.log("fetch tree data:",autotreeData);
             if (autotreeData)
                 setautotreeData(autotreeData);
@@ -656,7 +711,8 @@ function Assemble() {
                 },500);
             }
         }
-        if (currentSubjectDomain.domain&&autoCons==1){
+        if (currentSubjectDomain.domain&&autoCons===0){
+            console.log("现在的autoCons为",autoCons);
             fetchAutoConstruct();
         }
     }, [autoCons])   
@@ -664,9 +720,9 @@ function Assemble() {
 
     useEffect(()=>{
       if (localStorage.getItem("visitedAssemble")) {
-                setautoCons(0)
+                setautoCons(0);
             }else{
-                setautoCons(1)            
+                setautoCons(1);            
         }
     },[])  
 
@@ -702,6 +758,24 @@ function Assemble() {
                  <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'200px'}}></svg> 
             </Card>
             <Card title="圆形布局图" style={chartStyle}>
+                {
+                    !quitSpider ? (
+                        <div style={spiderState}>
+                            <div style={{fontSize:"15px", fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"#979693",}}>碎片爬取</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <PauseOutlined />
+                            </button>
+                        </div>
+                    ):
+                    (
+                        <div style={spiderState}>
+                            <div style={{fontSize:"15px",fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"grey",}}>碎片爬取</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <CaretRightOutlined />
+                            </button>
+                        </div>
+                    )
+                }
                  <div style={{ width: '100%', height: '670px' }} >
                     <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%' }}></svg>
                     <svg ref={ref => treeRef1.current = ref} style={{position:'absolute',left:'0',marginLeft:"125px",visibility: 'hidden',top:"20px", marginTop:"80px"}}></svg>

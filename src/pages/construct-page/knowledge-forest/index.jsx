@@ -10,7 +10,7 @@ import useCurrentSubjectDomainModel from '../../../models/current-subject-domain
 import {drawMap} from '../../../modules/topicDependenceVisualization';
 import {useRef} from 'react';
 import Leaf from '../../../components/Leaf'
-import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, CaretRightOutlined,PauseOutlined} from "@ant-design/icons";
 import axios from "axios";
 import {getMap} from "echarts/lib/echarts";
 
@@ -42,7 +42,67 @@ function KnowledgeForest() {
     const [assnum, setassnum] = useState(0);
     // const [facetId,setfacetId] = useState();
     const [facetName, setfacetName] = useState('摘要');
+
+    const [quitAssSpider, setquitAssSpider] = useState(1);
+    const [quitTopicSpider, setquitTopicSpider] = useState(1);
+    const [staticRenderAss, setstaticRenderAss] = useState();
+    const [dynamicRenderAss, setdynamicRenderAss] = useState();
+    const [dynamicSpider, setdynamicSpider] = useState(0);  //动态爬虫标志位
+    const [spiderAss,setspiderAss] = useState();
+    const [spiderText,setspiderText] = useState("");
+    const [topicConfirmFlag, settopicConfirmFlag] = useState(0);   //0表示取消，1表示点击主题，2表示确定爬取该主题
+
     const {confirm} = Modal;
+
+    const spiderState = {
+        borderColor:'grey',
+        borderWidth: '1.5px',
+        borderRadius: '12px',
+        borderStyle:"solid",
+        color: 'black',
+        height: '70px',
+        width: '110px',
+        textAlign: 'left',
+        right: "3%",
+        position:'absolute',
+        zIndex:"999"
+    };
+
+    const spiderAssState = {
+        // borderColor:'grey',
+        // borderWidth: '1.5px',
+        // borderRadius: '12px',
+        // borderStyle:"solid",
+        // backgroundColor:'white',
+        // color: 'black',
+        height: '40px',
+        width: '110px',
+        textAlign: 'left',
+        // display: 'inline-block',
+        right: "1%",
+        // outline:"none",
+        position:'absolute',
+        zIndex:"999"
+    };
+
+    const spiderTopicState = {
+        marginTop:"32px",
+        // borderColor:'grey',
+        // borderWidth: '1.5px',
+        // borderRadius: '12px',
+        // borderStyle:"solid",
+        // backgroundColor:'white',
+        // color: 'black',
+        height: '40px',
+        width: '110px',
+        textAlign: 'left',
+        // display: 'inline-block',
+        right: "1%",
+        // outline:"none",
+        position:'absolute',
+        zIndex:"999"
+    };
+
     const mapStyle = {
         width: '56%',
         position: 'absolute',
@@ -77,6 +137,58 @@ function KnowledgeForest() {
 
     };
 
+    const onPlaySpiderAss = () => {
+        Modal.info({
+            title: '碎片爬取操作提示',
+            content: (
+              <div>
+                请右键选择圆形布局图中的主题并装配
+              </div>
+            ),
+            okText: '确定',
+            onOk() {},
+          });
+    };
+
+    const onQuitSpiderAss = () => {
+        Modal.info({
+            title: '后端接口没好',
+            content: (
+              <div>
+                后端快点啊
+              </div>
+            ),
+            okText: '确定',
+            onOk() {},
+          });
+    };
+
+    
+    const onPlaySpiderTopic = () => {
+        Modal.info({
+            title: '新增主题爬取操作提示',
+            content: (
+              <div>
+                请点击上方"+"进行新增主题
+              </div>
+            ),
+            okText: '确定',
+            onOk() {},
+          });
+    };
+
+    const onQuitSpiderTopic = () => {
+        Modal.info({
+            title: '后端接口没好',
+            content: (
+              <div>
+                后端快点啊
+              </div>
+            ),
+            okText: '确定',
+            onOk() {},
+          });
+    };
 
     useEffect(() => {
         fetchMap()
@@ -95,26 +207,114 @@ function KnowledgeForest() {
                 okText: '确定',
                 cancelText: '取消',
                 onOk() {
-                    // setdynamicSpider(topicConfirm);    //动态爬虫
+                    setdynamicSpider(topicConfirm);    //动态爬虫
                     setcurrentTopic(topicConfirm);
+                    settopicConfirmFlag(2);
                 },
                 onCancel() {
-
+                    settopicConfirmFlag(0);
                 }
             })
         }
-        if(topicConfirm)
+        if(topicConfirm&&topicConfirmFlag===1)
             ontopicConfirm();
 
-    },[topicConfirm])
+    },[topicConfirmFlag])
 
     async function assembleTopic(topicId,topicName){
         console.log("成功啦成功啦");
         console.log("此时的主题名为",topicName);
         settopicConfirm(topicName);
+        // console.log("topicConfirmFlag",topicConfirmFlag);
+        settopicConfirmFlag(1);
     }
 
+    // 右键点击装配，调用动态爬虫
+    useEffect(() => {
+        async function fetchAssembleData2() {
+            console.log("开始动态渲染");
+            const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
+            console.log("状态值:",r.status);
+            setspiderText(" （准备爬取碎片...）");
+            setquitAssSpider(0);
+            var myvar1 = setInterval(
+                async function GDM() {
+                    if(currentSubjectDomain.domain && currentTopic) {
+                        const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
+                            if(result){
+                                setspiderText(" （正在爬取碎片...）");
+                                console.log('result.code',result.code);
+                                if(result.code == 200 ){
+                                    console.log("========================");
+                                    setspiderAss(result);
+                                    // console.log("res:",result.data.children.length);
+                                    // console.log("res:",result.data.children[0]);
+                                    // console.log("res:",result.data.children[0].children.length);
+                                    // console.log("res:",result.data.children[0].children[0]);
+                                    setdynamicRenderAss(result);
+                                    setspiderText("");
+                                    setquitAssSpider(1);
+                                    clearInterval(myvar1);
 
+                                }
+                                else {
+                                    setspiderAss(result);
+                                    setdynamicRenderAss(result);
+                                    console.log("+++++++++++++++++++");
+                                    //setassembles(result);
+                                }
+                            }
+                    }
+                    else{
+                        clearInterval(myvar1);
+                    }
+                },5000);
+        }
+        if (currentTopic&&topicConfirmFlag===2) {
+            fetchAssembleData2();
+        }
+    }, [topicConfirmFlag]);
+
+
+    // 动态爬虫结果碎片 渲染
+    useEffect(() => {
+        async function fetchAssembleData3() {
+            console.log("开始动态渲染");
+            if(spiderAss){
+                infoConstructing();
+                var i=0;
+                console.log("----------------");
+                for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
+                    for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
+                        asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
+                    }
+                }
+
+                 //console.log(asslist);
+                setassembles(asslist);
+            //     var myvar = setInterval(()=>{
+            //     if(i==asslist.length){
+            //         setassembles(asslist);
+            //         clearInterval(myvar);
+
+            //     }else
+            //     {
+            //         arr1.push(asslist[i]);
+            //         setassembles(arr1);
+            //         setassnum(arr1.length);
+            //         i++;
+            //     }
+
+            // },100);
+
+            }
+        }
+        if (currentTopic) {
+            var asslist=new Array();
+            var arr1=new Array();
+            fetchAssembleData3();
+        }
+    }, [dynamicRenderAss]);
 
     /***  assembleTopic end ===============================================================================================================**/
 
@@ -977,18 +1177,53 @@ function KnowledgeForest() {
     return (
         <>
             <Card extra={
-
                 <div>
                     <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
                     <Dropdown overlay={menu}>
-
                         <PlusOutlined style={{top: '50px'}}  />
-
                     </Dropdown>
                 </div>
-
             } title="主题间认知路径图" style={mapStyle}>
 
+                <div style={spiderState}>
+                {
+                    !quitAssSpider ? (
+                        <div style={spiderAssState}>
+                            <div style={{fontSize:"15px",fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"grey"}}>碎片爬取</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpiderAss} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <PauseOutlined />
+                            </button>
+                        </div>
+                    ):
+                    (
+                        <div style={spiderAssState}>
+                            <div style={{fontSize:"15px",fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"grey"}}>碎片爬取</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpiderAss} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <CaretRightOutlined />
+                            </button>
+                        </div>
+                    )
+                
+                }
+                {
+                    !quitTopicSpider ? (
+                        <div style={spiderTopicState}>
+                            <div style={{fontSize:"15px",fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"grey"}}>主题爬取</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpiderTopic} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <PauseOutlined />
+                            </button>
+                        </div>
+                    ):
+                    (
+                        <div style={spiderTopicState}>
+                            <div style={{fontSize:"15px",fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"grey"}}>主题爬取</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpiderTopic} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <CaretRightOutlined />
+                            </button>
+                        </div>
+                    )
+                }
+                </div>
                 <div style={{width: '100%', height: '700px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{
@@ -1002,10 +1237,7 @@ function KnowledgeForest() {
                 </div>
             </Card>
 
-            <Card title="碎片" style={assembleStyle}
-                  extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
-                <Card.Grid style={{width:'100%',height:'12px'}} >
-                </Card.Grid>
+            <Card title={"碎片"+spiderText} style={assembleStyle} extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
                 <div style={{height: "54px", marginTop: "25px"}}>
                     <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
                     <Badge color="white" text={"----->"}/> &nbsp;&nbsp;&nbsp;
@@ -1041,6 +1273,3 @@ function KnowledgeForest() {
 };
 
 export default KnowledgeForest;
-
-
-
