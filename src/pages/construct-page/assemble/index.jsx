@@ -127,7 +127,23 @@ function Assemble() {
             ontopicConfirm();
 
     },[topicConfirm])
-
+    
+    function nameCheck(originName) {
+        var tempName = originName;
+        if (originName.search('\\+') != -1){
+            console.log("tempName", tempName);
+            tempName = originName.replace("+", "jiahao");
+            console.log("tempName", tempName);
+        };
+        var english_name = /^[a-zA-Z]+$/.test(originName);
+        // if (topicName.search('\\(') != -1){
+        //     tempName = topicName.replace("(", " (");
+        // };
+        return {
+            checkedName: tempName,
+            isEnglish: english_name
+        }
+    }
     // const onAutoConstructClick = () => {
     //     let currentTopic1 = '';
     //     const onSelectChange = (e) => { 
@@ -356,9 +372,9 @@ function Assemble() {
     //画圆形图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            const result = await YottaAPI.getMap(currentSubjectDomain.domain);
+            const result = await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
             console.log("结果是：",result);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     // setmapdata(res.data);
                     if(res.data&&mapRef.current&&treeRef1.current){
