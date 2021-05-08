@@ -332,7 +332,7 @@ function KnowledgeForest() {
             dataTemp = dataTemp.slice(-res_de.length)
         }
 
-        await YottaAPI.getMap(currentSubjectDomain.domain).then(
+        await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
             (res) => {
                 // setmapdata(res.data);
                 if (res.data && mapRef && mapRef.current&&treeRef.current) {
@@ -881,7 +881,7 @@ function KnowledgeForest() {
             // fetchMap();
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef){

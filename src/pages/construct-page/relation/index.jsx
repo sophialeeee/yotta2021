@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Input, Modal, message, Select} from 'antd';
+import {Card, Input, Modal, message, Select, Button} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -101,7 +101,8 @@ function Relation() {
     const listStyle = {
         width: '100%', 
         height: '80%',
-        opacity:1
+        opacity:1,
+        visibility: 'visible',
     }
     const mapStyle = {
         width:'56%',
@@ -472,7 +473,9 @@ function Relation() {
             // setGephi(result);
         }
         if(insertTopic1){
-            insertRelation(insertTopic1, insertTopic2);
+            if (insertTopic1 !== '***'){
+                insertRelation(insertTopic1, insertTopic2);
+            }
         }
     },[insertTopic1, insertTopic2]) 
 
@@ -490,13 +493,12 @@ function Relation() {
             await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     setmapdata(res.data);
-                    if (res.data && mapRef && mapRef.current&&treeRef.current) {
+                    if(res.data&&mapRef&&mapRef.current){
                     // console.log('res.data',res.data);
-                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
-                            onDeleteRelation( a, b);
-                            console.log("deleting");
-                        },'relation',()=>{},()=>{});
-                    }
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                        onDeleteRelation( a, b);
+                        console.log("deleting");
+                    },'relation',()=>{},()=>{});}
                 }
             ) 
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
@@ -547,7 +549,7 @@ function Relation() {
             </Card.Grid>
         </Card>
 
-        <Card extra={<PlusOutlined style={{top: '50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
+        <Card extra={<Button type="link" onClick={onInsertRelation} style={{right:'4%'}}>添加</Button>} title="认知关系挖掘" style={relationStyle}>
             {
                 data.map(
                     (relation, index) =>
@@ -555,9 +557,10 @@ function Relation() {
                             <Card.Grid  style={listStyle} key={index}>
                                 {/* <Popconfirm title="Are you sure？" okText="Yes" cancelText="No" onConfirm={onDeleteRelation(relation)}> */}
                                     {relation['主题一']}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{relation['主题二']}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteRelation.bind(null, relation['主题一'], relation['主题二'])} style={{position: 'absolute', right:'5%'}}>
+                                    {/* <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteRelation.bind(null, relation['主题一'], relation['主题二'])} style={{position: 'absolute', visibility:'visible', right:'5%'}}>
                                         <DeleteOutlined />
-                                    </button>
+                                    </button> */}
+                                    <Button type="link" onClick={onDeleteRelation.bind(null, relation['主题一'], relation['主题二'])} style={{position: 'absolute', color:'#BEBEBE',right:'4%'}}>删除</Button>
                                     {/* </Popconfirm> */}
                             </Card.Grid>
                         )
@@ -577,7 +580,8 @@ function Relation() {
         <Card title="知识森林概览" style={mapStyle}>
             <div style={{ width: '100%', height: '680px' }} >
                 <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-                <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0',marginLeft: 22,marginTop: 65}}></svg>
+                <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0', visibility: 'hidden', marginLeft: 22,marginTop: 65}}></svg>
+                
                 {/* <div className={classes.chart}>
                     {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
                 </div> */}

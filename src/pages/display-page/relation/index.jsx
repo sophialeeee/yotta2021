@@ -137,7 +137,7 @@ function Relation() {
                 <div style={{width: '100%', height: '680px'}}>
                     <svg ref={ref => mapRef.current = ref} id='map' style={{width: '100%', height: '100%'}}></svg>
                     <svg ref={ref => treeRef.current = ref} id='tree'
-                         style={{position: 'absolute', left: '-0', marginLeft: 0, marginTop: 56}}></svg>
+                         style={{position: 'absolute', left: '-0', visibility: 'hidden', marginLeft: 0, marginTop: 56}}></svg>
 
                 </div>
             </Card>
