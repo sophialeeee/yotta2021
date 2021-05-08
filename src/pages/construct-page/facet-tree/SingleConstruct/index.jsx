@@ -56,7 +56,7 @@ function SingleConstruct() {
     const {TextArea} = Input;
     const resultTree = useRef();
     const [assembles,setassembles] = useState();
-    const [topiclength, settopiclength] = useState();  //判断topic列表长度
+    // const [topiclength, settopiclength] = useState();  //判断topic列表长度
     const [deleteTopic1,setdeleteTopic1] = useState();
     const [deleteTopic2,setdeleteTopic2] = useState();
     const {constructType} = useConstructTypeModel();
@@ -184,7 +184,7 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200);
+                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,true);
                     
                     
                         }
@@ -409,6 +409,7 @@ function SingleConstruct() {
     //     }
         setcurrentTopic(topic => {
             (async () => {
+                console.log("testing");
                 const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
                 console.log('t-tt', topic);
                 window.flag = false;
@@ -492,8 +493,8 @@ function SingleConstruct() {
                         window.flag = false;                      
                         if(treeRef)
                         {emptyChildren(treeRef.current);}
-                        console.log('[[[[[[[',data1[num-1])
-                        setcurrentTopic(data1[num-1]);
+                        // console.log('[[[[[[[',data1[num-1])
+                        // setcurrentTopic(data1[num-1]);
                         console.log("This is the first time!");
                         setdata0(1)
 

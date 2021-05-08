@@ -1,6 +1,6 @@
 import React from 'react';
 // import { drawTree,drawTreeNumber } from '../../../../modules/facetTree';
-import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modulebatch/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modules/facetTree';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
 import { useState } from 'react';
@@ -334,8 +334,10 @@ function BatchConstruct() {
                     const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
                     if(result){
                         setTimeout(()=>{
-
-                            drawTree(treeRef.current,result,d => { },d => { },d => { },300);
+                            if(treeRef.current)
+                            {
+                            drawTree(treeRef.current,result,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
+                            }
                             emptyChildren(treeRef.current);
                             setTimeout(()=>{
                                 
@@ -409,6 +411,113 @@ function BatchConstruct() {
                     setStep(1)
                 }}
     },[data0])
+
+    //删除分面调用接口
+    let clickflag = true;
+    const onClickBranch = (facetId) => {
+        if(!clickflag){
+            clickflag=true;
+            console.log("return flag");
+            return
+        }
+        if(facetId){
+        confirm({
+        title: "确认删除该分面吗？",
+        okText: '确定',
+        cancelText: '取消',
+        async onOk() {
+            ClickBranch(facetId)
+
+            // if (res.code == 200) {
+            //     message.info(res.msg)
+            //     fetchMap();
+
+            // } else {
+            //     message.warn(res.msg)
+            // }
+            clickflag = false;
+        },
+        onCancel() {
+            //clickflag = false;
+            console.log('cancel')
+        }
+    })
+}
+};
+    
+
+    async function ClickBranch(facetId){
+        
+        if (facetId > 0){
+        const res = await YottaAPI.deleteAssembleByFacetId(facetId);
+        console.log("传入删除id", facetId);
+        //setassembles(res);
+        }
+    
+        console.log("currentTopic clickbranch",currentTopic);
+    // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+    // window.flag = false;
+    // console.log("shanchuhou",window.flag);
+    //     if(treeData){
+    //         console.log("新的画树数据",treeData);
+    //         emptyChildren(treeRef.current);
+    //         settreeData(treeData);
+    //     }
+        setcurrentTopic(topic => {
+            (async () => {
+                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+                console.log('t-tt', topic);
+                window.flag = false;
+                console.log("shanchuhou", window.flag);
+                if (treeData) {
+                    console.log("新的画树数据", treeData);
+                    emptyChildren(treeRef.current);
+                    settreeData(treeData);
+                }
+            })();
+            return topic
+        })
+    }
+
+      // 插入分面
+
+      const clickBranchAdd = (topicName2) => {
+        confirm({
+            title: '请输入分面名称',
+            icon: <ExclamationCircleOutlined/>,
+            content: <>
+                <TextArea showCount maxLength={100} onChange={handleTextareaChange}/>
+            </>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                settopicName2(topicName2);
+                const insertFacet1 = textareaValueRef.current;
+                textareaValueRef.current = '';
+                setinsertFacet1(insertFacet1);
+            },
+            onCancel() {
+
+            }
+        })
+    };
+
+    useEffect(()=>{
+        async function insertFacet(){
+            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+    //   window.flag = false;
+    //   console.log("shanchuhou", window.flag);
+      if (treeData) {
+        console.log("新的画树数据", treeData2);
+        emptyChildren(treeRef.current);
+        settreeData(treeData2);
+      }
+        }
+        if(topicName2 && insertFacet1){
+            insertFacet(topicName2, insertFacet1);
+        }
+  },[topicName2])
    
     return (
         <>
