@@ -56,7 +56,7 @@ function SingleConstruct() {
     const {TextArea} = Input;
     const resultTree = useRef();
     const [assembles,setassembles] = useState();
-    const [topiclength, settopiclength] = useState();  //判断topic列表长度
+    // const [topiclength, settopiclength] = useState();  //判断topic列表长度
     const [deleteTopic1,setdeleteTopic1] = useState();
     const [deleteTopic2,setdeleteTopic2] = useState();
     const {constructType} = useConstructTypeModel();
@@ -184,7 +184,7 @@ function SingleConstruct() {
                         window.lock = true;
                         console.log("lockindrawtree",window.lock);
                         console.log('动态树treeRef',treeRef.current.childNodes);
-                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200);
+                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,true);
                     
                     
                         }
@@ -409,6 +409,7 @@ function SingleConstruct() {
     //     }
         setcurrentTopic(topic => {
             (async () => {
+                console.log("testing");
                 const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
                 console.log('t-tt', topic);
                 window.flag = false;
@@ -454,63 +455,76 @@ function SingleConstruct() {
         }
   }, [insertTopic1, deleteTopic2])
   
-    useEffect(()=>{
-        if(data1) {
-            // console.log("firstTime", firstTime);
-        if (localStorage.getItem("visitedTopic")) {
-                setdata(data1);
-                console.log("This is not the first time!")
-            }else{
-                var num = 1;
-                var maxlength = data1.length;
-                // setdata(data1.slice(-relationData.length));
-                const timer = setInterval(() => {
-                    setdata(data1.slice(0, num));
-                    
-                    // async function fetchTreeData() {
-                    //     const result = await YottaAPI.getCompleteTopicByTopicName(data[num]);
-                    //     console.log("画树用",result);
-                    //     settreeData(result);          
-                    //     console.log(data[num]);
-                    // }
-                    // if(data[num]){
-                    //     fetchTreeData();
-                    // }
-                    // window.lock = false
-                    // window.flag = false;
-                    // if(treeRef)
-                    // {emptyChildren(treeRef.current);}
-                    // setcurrentTopic(data1[num]);
-                    num = num + 1;
-                    if (num === maxlength + 1) {
-                        infoFinish();
-                        localStorage.setItem("visitedTopic", "yes")
-                        clearInterval(timer);
-                        setfirstTime(1);     
-                        num=num-1                     
-                        window.lock = false
-                        window.flag = false;                      
-                        if(treeRef)
-                        {emptyChildren(treeRef.current);}
-                        console.log('[[[[[[[',data1[num-1])
-                        setcurrentTopic(data1[num-1]);
-                        console.log("This is the first time!");
-                        setdata0(1)
+    // useEffect(()=>{
+    //     if(data1) {
+    //         // console.log("firstTime", firstTime);
+    //     if (localStorage.getItem("visitedTopic")) {
+    //             setdata(data1);
+    //             console.log("This is not the first time!")
+    //         }else{
+    //             var num = 1;
+    //             var maxlength = data1.length;
+    //             // setdata(data1.slice(-relationData.length));
+    //             const timer = setInterval(() => {
+    //                 setdata(data1.slice(0, num));
+    //                 num = num + 1;
+    //                 if (num === maxlength + 1) {
+    //                     infoFinish();
+    //                     localStorage.setItem("visitedTopic", "yes")
+    //                     clearInterval(timer);
+    //                     setfirstTime(1);     
+    //                     num=num-1                     
+    //                     window.lock = false
+    //                     window.flag = false;                      
+    //                     if(treeRef)
+    //                     {emptyChildren(treeRef.current);}
+    //                     // console.log('[[[[[[[',data1[num-1])
+    //                     // setcurrentTopic(data1[num-1]);
+    //                     console.log("This is the first time!");
+    //                     setdata0(1)
 
 
-                        // if(constructType==='cool')
-                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
-                        //     setStep(2)
-                        //     }else{
-                        //         setStep(1)
-                        //     }}
+    //                     // if(constructType==='cool')
+    //                     // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
+    //                     //     setStep(2)
+    //                     //     }else{
+    //                     //         setStep(1)
+    //                     //     }}
                        
-            // console.log("firstTime", firstTime);
-                    }
-                }, 200);
-            }
-        }
-    },[data1])
+    //         // console.log("firstTime", firstTime);
+    //                 }
+    //             }, 200);
+    //         }
+    //     }
+    // },[data1])
+
+    useEffect(() => {
+            if (data1) {
+              // console.log("firstTime", firstTime);
+              if (localStorage.getItem("visitedTopic")) {
+                setdata(data1);
+                console.log("This is not the first time!")
+              } else {
+                localStorage.setItem("visitedTopic", "yes")
+                var num = 1;
+                var maxlength = data1.length;
+                // setdata(data1.slice(-relationData.length));
+                const timer = setInterval(() => {
+                  setdata(data1.slice(0, num));
+                  num = num + 1;
+                  if (num === maxlength + 1) {
+                    infoFinish();
+                    clearInterval(timer);
+                    setfirstTime(data1);
+                    localStorage.setItem("visitedTopic", "yes")
+                    console.log("This is the first time!");
+                    // console.log("firstTime", firstTime);
+                  }
+                }, 100);
+              }
+            }
+          }, [data1])
+
     useEffect(()=>{
         if(constructType==='cool'&&firstTime===1)
             {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
