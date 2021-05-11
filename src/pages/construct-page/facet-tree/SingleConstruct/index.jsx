@@ -499,7 +499,7 @@ function SingleConstruct() {
     // },[data1])
 
     useEffect(() => {
-            if (data1) {
+              if (data1) {
               // console.log("firstTime", firstTime);
               if (localStorage.getItem("visitedTopic")) {
                 setdata(data1);
@@ -523,7 +523,7 @@ function SingleConstruct() {
                 }, 100);
               }
             }
-          }, [data1])
+    }, [data1])
 
     useEffect(()=>{
         if(constructType==='cool'&&firstTime===1)

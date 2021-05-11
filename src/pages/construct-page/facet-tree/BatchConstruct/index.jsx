@@ -54,6 +54,7 @@ function BatchConstruct() {
     console.log('程序处于批量更新页面')
     const { currentSubjectDomain } = useCurrentSubjectDomainModel();
     const [topics, settopics] = useState([]);
+    const [topicss, settopicss] = useState([]);
     const [topicsData,settopicsData] = useState();
     const [currentTopic, setcurrentTopic] = useState();
     const [treeData, settreeData] = useState();
@@ -291,6 +292,7 @@ function BatchConstruct() {
         console.log('stopCommand',stopCommand);
     },[topics,notInsert])
     
+    // 获取一个课程下所有的主题数据
     useEffect(() => {
         async function fetchTopicsData() {
             const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
@@ -300,11 +302,13 @@ function BatchConstruct() {
                 let topics = topicsData.map((topic) => topic.topicName);
                 topics = topics.filter((topic)=>topic!='B+树')
                 console.log('主题列表',topics)
+                settopicss(topics)
                 settopics(topics)
                 // setcurrentTopic(topics[0])
                 setbatchData(topics)
             }
             setdata1(topics.slice(-topics.length));
+            console.log('data1',data1)
             if(deleteTopic1){
                 setcurrentTopic(batchData[0]);
             }
@@ -334,11 +338,12 @@ function BatchConstruct() {
                     const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
                     if(result){
                         setTimeout(()=>{
-                            if(treeRef.current)
-                            {
-                            drawTree(treeRef.current,result,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
-                            }
-                            emptyChildren(treeRef.current);
+                            // if(treeRef.current)
+                            // {
+                            // drawTree(treeRef.current,result,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
+                            // }
+                            // emptyChildren(treeRef.current);
+                            settreeData(result)
                             setTimeout(()=>{
                                 
                                 const index = topics.indexOf(currentTopic);
@@ -369,6 +374,22 @@ function BatchConstruct() {
             }
         }
     }, [currentTopic,stopCommand]);
+
+    //画分面树
+    useEffect(()=>{
+        if (treeRef && treeData) {
+            if(treeData.childrenNumber === 0){
+                emptyChildren(treeRef.current); 
+            }else{
+                if(treeRef.current){
+                    drawTree(treeRef.current,treeData,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
+                }
+                emptyChildren(treeRef.current);
+            }
+        }
+        
+        
+    },[treeData])
 
     useEffect(()=>{
         if(data1) {
@@ -411,6 +432,35 @@ function BatchConstruct() {
                     setStep(1)
                 }}
     },[data0])
+
+    useEffect(() => {
+        console.log('data1',data1)
+        console.log('topics',topics)
+        console.log('topicss',topicss)
+        if (data1) {
+          // console.log("firstTime", firstTime);
+          if (localStorage.getItem("visitedTopic")) {
+            // setdata(data1);
+            console.log("This is not the first time!")
+          } else {
+            localStorage.setItem("visitedTopic", "yes")
+            var num = 1;
+            var maxlength = topicss.length;
+            const timer = setInterval(() => {
+              settopics(topicss.slice(0, num));
+              num = num + 1;
+              if (num === maxlength + 1) {
+                infoFinish();
+                clearInterval(timer);
+                setfirstTime(data1);
+                localStorage.setItem("visitedTopic", "yes")
+                console.log("This is the first time!");
+                // console.log("firstTime", firstTime);
+              }
+            }, 100);
+          }
+        }
+      }, [data1])
 
     //删除分面调用接口
     let clickflag = true;
@@ -531,7 +581,7 @@ function BatchConstruct() {
         </Card>
       <Card title='已构建主题数量统计' style={countStyle1}>
         <Card.Grid style={{ width: '100%', height: '50px' }}>
-          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{topics.length-batchData.length}</span>
+          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{topicss.length-batchData.length}</span>
         </Card.Grid>
       </Card>
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
