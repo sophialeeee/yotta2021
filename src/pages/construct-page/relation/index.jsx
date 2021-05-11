@@ -57,7 +57,7 @@ function Relation() {
             dataIndex:'主题一',
             key:'主题一',
             align:'center',
-           
+
         },
         {
             title:'主题二',
@@ -99,7 +99,7 @@ function Relation() {
         textAlign: 'center',
     }
     const listStyle = {
-        width: '100%', 
+        width: '100%',
         height: '80%',
         opacity:1,
         visibility: 'visible',
@@ -117,7 +117,7 @@ function Relation() {
     // var [relationPart,setrelationPart] = useState();
     // var [maxShow,setmaxShow] = useState();
     // 设置依赖列表的格式
-    const tableStyle = { 
+    const tableStyle = {
         width:'100%',
         // height:'700px',
     }
@@ -156,7 +156,7 @@ function Relation() {
         }
         fetchrelationData();
     },[currentSubjectDomain.domain])
-    
+
     useEffect(()=>{
         if(relationData){
             // setmaxShow(1);
@@ -191,7 +191,6 @@ function Relation() {
 
     /***  addRelation   start ===============================================================================================================**/
     let statu = 0
-
     let firstSelect_Name = ''
     let secSelect_Name = ''
     let firstSelect_id = 0
@@ -207,7 +206,7 @@ function Relation() {
         firstSelect_Name = ''
         secSelect_Name = ''
     };
-    let data_temp;
+    let data_temp_zyl;
 
     function checkExitRelation() {
 
@@ -258,14 +257,10 @@ function Relation() {
                     cancelText: '取消',
                     async onOk() {
                         setTimeout(hide, 0);
+                        setinsertTopic1(firstSelect_Name);
+                        setinsertTopic2(secSelect_Name);
 
-                        const res = await YottaAPI.insertRelation_zyl(currentSubjectDomain.domain, firstSelect_Name, secSelect_Name)
-                        if (res.code == 185) {
-                            message.warn(res.msg)
-                        } else {
-                            message.info(res.msg)
-                            // fetchMap();
-                        }
+
                         reSet()
                     },
                     onCancel() {
@@ -285,7 +280,7 @@ function Relation() {
                 setdata(data1);
                 console.log("This is not the first time!")
             }else{
-                
+
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
@@ -341,15 +336,15 @@ function Relation() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setDeleteTopic1(relationOne); 
+                setDeleteTopic1(relationOne);
                 console.log('relationOne',deleteTopicStart);
-                setDeleteTopic2(relationTwo); 
+                setDeleteTopic2(relationTwo);
                 console.log('relationTwo',deleteTopicEnd);
             },
             onCancel() {
             }
         })
-    }; 
+    };
 
     // console.log("currentSubjectDomainTopics", topicsData);
     const onInsertRelation = (relationOne, relationTwo, e) => {
@@ -358,43 +353,43 @@ function Relation() {
             icon: <ExclamationCircleOutlined/>,
             content: <>
             {(topicsData)?(
-                    <Select 
-                        showSearch 
-                        placeholder="请选择头主题(可搜索)" 
-                        optionFilterProp="children"   
+                    <Select
+                        showSearch
+                        placeholder="请选择头主题(可搜索)"
+                        optionFilterProp="children"
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
                         filterSort={(optionA, optionB) =>
                             optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
-                        } 
-                        onSelect={onSelectTopic1} 
+                        }
+                        onSelect={onSelectTopic1}
                         style={{width: 280, marginBottom: 10}}
                     >
                         {
                             topicsData.map((topic)=>(
-                            <option value={topic.topicName} >{topic.topicName}</option> 
+                            <option value={topic.topicName} >{topic.topicName}</option>
                             ))
                         }
                     </Select>):
                 <Input placeholder="头主题 若有括号请使用英文括号并在括号前加上空格" onChange={handleTextareaChange1} style={{marginBottom: 10}}/>}
             {(topicsData)?(
-                    <Select 
-                        showSearch 
-                        placeholder="请选择尾主题(可搜索)" 
-                        optionFilterProp="children"   
+                    <Select
+                        showSearch
+                        placeholder="请选择尾主题(可搜索)"
+                        optionFilterProp="children"
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
                         filterSort={(optionA, optionB) =>
                             optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
-                        } 
-                        onSelect={onSelectTopic2} 
+                        }
+                        onSelect={onSelectTopic2}
                         style={{width: 280}}
                     >
                     {
                         topicsData.map((topic)=>(
-                        <option value={topic.topicName} >{topic.topicName}</option> 
+                        <option value={topic.topicName} >{topic.topicName}</option>
                         ))
                     }
                 </Select>):
@@ -410,23 +405,23 @@ function Relation() {
                 const Topic2 = topicInsertRef2.current;
                 handleTextareaChange2.current = '';
                 if (insertTopic1 === Topic1 && insertTopic2 === Topic2){
-                    setinsertTopic1("###"); 
+                    setinsertTopic1("###");
                 }else{
-                    setinsertTopic1(Topic1); 
+                    setinsertTopic1(Topic1);
                     console.log('Topic1',Topic1);
-                    setinsertTopic2(Topic2); 
+                    setinsertTopic2(Topic2);
                     console.log('Topic2',Topic2);
                 }
             },
             onCancel() {
-                
+
             }
         })
-    }; 
-    const onSelectTopic1 = (e) => { 
+    };
+    const onSelectTopic1 = (e) => {
         topicInsertRef1.current = e
     }
-    const onSelectTopic2 = (e) => { 
+    const onSelectTopic2 = (e) => {
         topicInsertRef2.current = e
     }
     function emptyChildren(dom) {
@@ -477,7 +472,7 @@ function Relation() {
                 insertRelation(insertTopic1, insertTopic2);
             }
         }
-    },[insertTopic1, insertTopic2]) 
+    },[insertTopic1, insertTopic2])
 
     useEffect(()=>{
         async function deleteRelation(){
@@ -500,7 +495,7 @@ function Relation() {
                         console.log("deleting");
                     },'relation',()=>{},()=>{});}
                 }
-            ) 
+            )
             // const result = await YottaAPI.getDomainGraph(currentSubjectDomain.domain);
             // setGephi(result);
         }
@@ -508,11 +503,11 @@ function Relation() {
             console.log('useEffect:', deleteTopicStart, deleteTopicEnd)
             deleteRelation(deleteTopicStart, deleteTopicEnd);
             if (insertTopic1 === deleteTopicStart && insertTopic2 === deleteTopicEnd){
-                setinsertTopic1("***"); 
+                setinsertTopic1("***");
             };
             setDeleteTopic1();
         }
-    },[deleteTopicStart, deleteTopicEnd]) 
+    },[deleteTopicStart, deleteTopicEnd])
 
     // 画认知关系图
     useEffect(()=>{
@@ -538,9 +533,11 @@ function Relation() {
             // setGephi(result);
         }
         fetchDependencesMap();
-        
+
     },[currentSubjectDomain.domain])
-    
+
+
+
     return (
         <>
         <Card title="主题关系数量统计" style={countStyle1}>
@@ -581,7 +578,7 @@ function Relation() {
             <div style={{ width: '100%', height: '680px' }} >
                 <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
                 <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0', visibility: 'hidden', marginLeft: 22,marginTop: 65}}></svg>
-                
+
                 {/* <div className={classes.chart}>
                     {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
                 </div> */}

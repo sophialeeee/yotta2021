@@ -163,33 +163,47 @@ function KnowledgeForest() {
           });
     };
 
-    
-    const onPlaySpiderTopic = () => {
-        Modal.info({
-            title: '新增主题爬取操作提示',
-            content: (
-              <div>
-                请点击上方"+"进行新增主题
-              </div>
-            ),
-            okText: '确定',
-            onOk() {},
-          });
+    const [currInsertTopic, setCurrInsertTopic] = useState('');
+
+    const onPlaySpiderTopic = async () => {
+        if (currInsertTopic == '') {
+            Modal.info({
+                title: '新增主题爬取操作提示',
+                content: (
+                    <div>
+                        请点击上方"+"进行新增主题
+                    </div>
+                ),
+                okText: '确定',
+                onOk() {},
+            });
+            return
+        }
+        setquitTopicSpider(0)
+        setinsertINfo('启动爬虫，爬取主题：' + currInsertTopic + '相关的碎片')
+        startSpider(currInsertTopic)
     };
 
-    const onQuitSpiderTopic = () => {
-        Modal.info({
-            title: '后端接口没好',
-            content: (
-              <div>
-                后端快点啊
-              </div>
-            ),
-            okText: '确定',
-            onOk() {},
-          });
-    };
+    const onQuitSpiderTopic = async () => {
+        if (currInsertTopic == '') {
+            message.warn('当前并无正在爬取主题！')
+        }
 
+
+        const resStop = await YottaAPI.stopSpider_zyl(currentSubjectDomain.domain, currInsertTopic);
+        if (resStop) {
+            if (resStop.code == 200) {
+                message.info('暂停爬取主题:'+currInsertTopic+'相关碎片！')
+            }else {
+                message.warn('暂停出错!')
+            }
+            setquitTopicSpider(1)
+        }
+        setquitTopicSpider(1)
+        setinsertINfo('')
+
+
+    }
     useEffect(() => {
         fetchMap()
     }, [currentSubjectDomain.domain]);
@@ -376,15 +390,14 @@ function KnowledgeForest() {
 
     async function getGenerateDependency(topicName) {
 
+        setCurrInsertTopic('')
         setinsertINfo('生成碎片关系...')
-
-
-
+        setquitTopicSpider(1)
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, topicName);
-        for (let i = 0; i < 11; i++) {
-            await sleep();
-        }
+        // for (let i = 0; i < 11; i++) {
+        //     await sleep();
+        // }
         if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
                 // message.loading({content:resGetGenerateDependency.msg,key}, 3)
@@ -424,15 +437,17 @@ function KnowledgeForest() {
 
         let pre_num=0
 
+
         // let spy_data = message.loading({content: '爬取碎片中...', key}, 0);
         setinsertINfo('爬取碎片中...')
-
+        setquitTopicSpider(0)
         timer = setInterval(async function () {
             const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
             if (resIncremental) {
 
             if (resIncremental.code == 200) {
                 setinsertINfo( '爬取结束，共有' + caluNum(resIncremental.data) + '个碎片')
+                setquitTopicSpider(1)
 
                 // message.loading({content: '爬取结束，共有' + caluNum(resIncremental.data) + '个碎片', key},3);
                 await sleep();
@@ -452,6 +467,7 @@ function KnowledgeForest() {
                 } else if (resIncremental.code == 300) {
                     await sleep();
                     setinsertINfo('')
+                    setquitTopicSpider(1)
                     setTimeout(timer)
 
             }
@@ -483,6 +499,11 @@ function KnowledgeForest() {
     }
 
     async function startSpider(topicName) {
+
+        setquitTopicSpider(0)
+        setinsertINfo('启动爬虫，爬取主题：' + topicName + '相关的碎片')
+        await sleep();
+
         const resStartSpider = await YottaAPI.startSpider_zyl(currentSubjectDomain.domain, topicName);
         if(resStartSpider) {
             if (resStartSpider.code == 200) {
@@ -497,21 +518,21 @@ function KnowledgeForest() {
     }
 
     async function handleInsert() {
+
+        if (!quitTopicSpider){
+            message.info('请先暂停当前主题爬取')
+            return
+        }
         const topicName = textareaValueRef.current;
+        setCurrInsertTopic(topicName)
         textareaValueRef.current = '';
+
         message.loading({content:'插入主题：'+topicName,key});
 
         await sleep();
         const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
         if (resInsertTopic.code == 200) {
             setinsertINfo(resInsertTopic.msg)
-            setinsertINfo('启动爬虫，爬取主题：' + topicName + '相关的碎片')
-
-            // message.loading({content:resInsertTopic.msg,key},0);
-            // message.loading({content:'启动爬虫，爬取主题：' + topicName + '相关的碎片',key},0);
-
-            await sleep();
-
             startSpider(topicName)
 
         } else {
@@ -663,6 +684,8 @@ function KnowledgeForest() {
 
 
 
+
+
     async function clickFacet_construct(facetId) {
         const res = await YottaAPI.getASsembleByFacetId(facetId);
         setassembles(res);
@@ -687,16 +710,7 @@ function KnowledgeForest() {
             setassnum(assembles.length);
         }
     }, [assembles])
-    //  if(!assembles){
-    //     YottaAPI.getASsembleByFacetId(2).then(
-    //         res=>
-    //         {
-    //             console.log('res11111111111111111111111',res);
-    //             setassembles(res);
-    //         }
-    //     );
 
-    // }
     async function init(domain) {
         if ((!assembles) && domain) {
 
@@ -795,7 +809,7 @@ function KnowledgeForest() {
   })
     }
     };
-  
+
 
   async function ClickBranch(facetId){
       console.log("构建删除树")
@@ -817,7 +831,7 @@ function KnowledgeForest() {
               fetchMap();
         }
       }
-  
+
       console.log("currentTopic clickbranch",currentTopic);
   // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
   // window.flag = false;
@@ -1125,6 +1139,7 @@ function KnowledgeForest() {
                         assembles.unshift(assemble_temp);
                         console.log("置顶成功");
                         console.log(assembles[0]);
+                        setassembles(assembles.slice(0,assnum));
                         break;
                     }
                 }
@@ -1154,31 +1169,19 @@ function KnowledgeForest() {
         console.log('click', e);
         if (e.key == 'input') {
             onInsertTopic()
-        } else if (e.key == 'suspended') {
-            await sleep();
-            setinsertINfo('')
-            setTimeout(timer)
         }
     }
     const menu = (
         <Menu onClick={handleMenuClick}>
             <Menu.Item key="input" icon={<EditOutlined />}>
-
                 输入主题
             </Menu.Item>
-            <Menu.Item key="suspended" icon={<StopOutlined />}>
-                暂停爬取
-            </Menu.Item>
-            {/*<Menu.Item key="3" icon={<UserOutlined />}>*/}
-            {/*    3rd menu item*/}
-            {/*</Menu.Item>*/}
         </Menu>
     );
     return (
         <>
             <Card extra={
                 <div>
-                    <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
                     <Dropdown overlay={menu}>
                         <PlusOutlined style={{top: '50px'}}  />
                     </Dropdown>
@@ -1203,7 +1206,7 @@ function KnowledgeForest() {
                             </button>
                         </div>
                     )
-                
+
                 }
                 {
                     !quitTopicSpider ? (
@@ -1238,6 +1241,8 @@ function KnowledgeForest() {
             </Card>
 
             <Card title={"碎片"+spiderText} style={assembleStyle} extra={<PlusOutlined style={{top: '50px'}} onClick={onAppendAssemble}/>}>
+                <span style={{color:'red',fontWeight:'bolder'}}>{insertINfo}</span>
+
                 <div style={{height: "54px", marginTop: "25px"}}>
                     <Badge color="white" text={'主题:' + currentTopic}/> &nbsp;&nbsp;&nbsp;
                     <Badge color="white" text={"----->"}/> &nbsp;&nbsp;&nbsp;
