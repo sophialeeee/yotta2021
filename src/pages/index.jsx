@@ -171,6 +171,7 @@ function App() {
     //functions
     const onMenuItemClick = (e) => {
         console.log('e.key',e.key);
+        localStorage.removeItem('state');//刷新清空状态量
         if(e.key!='/construct-page'){
             if(e.key=='/display-page'){
                 history.push({pathname:e.key,state:{login:true}});
