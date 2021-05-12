@@ -32,8 +32,8 @@ async function gets_8083(apiName){
 const YottaAPI = {
     // 根据用户名和密码登录系统
     Login(userName,password){
-
-
+       
+        
         // let result =  axios.post(`http://47.95.145.72:8083/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
         let result = axios.post(`http://zscl.xjtudlc.com:8083/user/login?userName=${encodeURI(userName)}&password=${encodeURI(password)}&ip=ha&place=ha&date=ha`);
         return result;
@@ -65,7 +65,7 @@ const YottaAPI = {
         return await posts(`dependency/getDependenciesByDomainNameSaveAsGexf?domainName=${encodeURI(domain)}`);
         // return await gets_8083('dependency/getDependenciesByDomainNameSaveAsGexf?domainName=${encodeURI(domain)}')
     },
-
+    
     // 根据分面id获取碎片内容
     async getASsembleByFacetId(facetId){
         return await gets(`assemble/getAssemblesByFacetId?facetId=${encodeURI(facetId)}`);
@@ -77,7 +77,7 @@ const YottaAPI = {
     // 根据课程名+主题名获取碎片内容
     async getAssembleByName(domainName,topicName){
         return await gets(`assemble/getAssemblesInTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
-
+       
     },
     // 根据主题名获取画分面树的数据
     async getCompleteTopicByTopicName(topicName){
@@ -104,9 +104,9 @@ const YottaAPI = {
                 if(error.response){
                     result = error.response.data;
                 }
-
+                
             }
-
+            
         }
         return result;
     },
@@ -114,7 +114,7 @@ const YottaAPI = {
     async getDynamicSingle(domainName,topicName,flag){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/spiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -125,9 +125,9 @@ const YottaAPI = {
                 if(error.response){
                     result = error.response.data;
                 }
-
+                
             }
-
+            
         }
         return result;
     },
@@ -148,15 +148,29 @@ const YottaAPI = {
                 if(error.response){
                     result = error.response.data;
                 }
-
+                
             }
-
+            
         }
         return result;
     },
 
     async startSpider(domainName,topicName){
-        return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startIncrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+
+    
+    async stopSpider(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/stopSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+
+
+    async pauseSpider(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/pauseSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+
+    async continueSpider(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8083/continueSpiderDynamicOutput/pauseSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
 
     // 根据课程名获取所有的主题名
@@ -191,11 +205,11 @@ const YottaAPI = {
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
 
-    async generateMap(domainName, isEnglish){
-        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
+    async generateMap(domainName){
+        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
-
+    
     // 根据分面id获取碎片信息
     async getFacetName(facetId){
         return await axios.get((`assemble/getAssemblesByFacetId/?facetId=${encodeURI(facetId)}`))
@@ -233,24 +247,6 @@ const YottaAPI = {
         let result = undefined;
         try{
             result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
-            result = result.data;
-        }
-        catch(error){
-            if(error){
-                if(error.response){
-                    result = error.response.data;
-                }
-            }
-        }
-        return result;
-    },
-
-
-
-    async stopSpider_zyl(domainName,topicName){
-        let result = undefined;
-        try{
-            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/stopSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
             result = result.data;
         }
         catch(error){
