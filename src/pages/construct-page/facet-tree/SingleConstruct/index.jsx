@@ -190,7 +190,7 @@ function SingleConstruct() {
                         }
                     if(treeRef.current.childNodes.length === 0&&window.flag===false ){
                         console.log('静态树treeRef',treeRef.current.childNodes);
-                        drawTreeNumber(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree');
+                        drawTree(treeRef.current,treeData,clickFacet,onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',0,false);
                     
                         }
                     }
@@ -325,14 +325,14 @@ function SingleConstruct() {
     useEffect(()=>{
         async function insertFacet(){
             await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
-      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+             const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
     //   window.flag = false;
     //   console.log("shanchuhou", window.flag);
-      if (treeData) {
+         if (treeData) {
         console.log("新的画树数据", treeData2);
         emptyChildren(treeRef.current);
         settreeData(treeData2);
-      }
+         }
         }
         if(topicName2 && insertFacet1){
             insertFacet(topicName2, insertFacet1);
