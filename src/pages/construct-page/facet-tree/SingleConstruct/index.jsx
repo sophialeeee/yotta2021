@@ -443,6 +443,7 @@ function SingleConstruct() {
             if(topicsData){
                 dataTemp = (topicsData.map((topic) =>topic.topicName
                ));
+               dataTemp = dataTemp.filter((topic)=>topic!='B+树')
             window.flag = false;
             setcurrentTopic(topicsData[0].topicName);  // 默认topic
             console.log("默认topic",currentTopic);

@@ -102,7 +102,7 @@ function BatchConstruct() {
     const statusCode = useRef();
     const [data0,setdata0]=useState(0);
     const infoFinish = () => {
-    message.success('主题构建成功，已全部展示！')
+    message.success('主题已全部获取，开始自动构建主题分面树！')
     };
     const infoDelete = () => {
     message.success('主题删除成功！')
@@ -110,6 +110,10 @@ function BatchConstruct() {
     const infoInsert = () => {
     message.success('主题插入成功！')
     };
+
+    const infoPrepare=()=>{
+        message.info('请耐心等待获取当前课程的主题，获取完成后将进行主题分面树的自动构建！',5)
+    }
 
     // useEffect(() => { // 就这样改得了
     //     console.log(document.querySelector(`#topicitem-${topics[0]}`));
@@ -430,6 +434,7 @@ function BatchConstruct() {
                 localStorage.setItem("visitedBatch", "yes")
                 console.log("This is the first time!")
                 // setcurrentTopic(topics[0])
+                infoPrepare();
                 var notInsert1 = true;
                 setnotInsert(notInsert1);
             }
@@ -600,7 +605,7 @@ function BatchConstruct() {
         </Card>
       <Card title='已构建主题数量统计' style={countStyle1}>
         <Card.Grid style={{ width: '100%', height: '50px' }}>
-          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{finishedNum}</span>
+          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{finishedNum}{'/'}{topics.length}</span>
         </Card.Grid>
       </Card>
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>

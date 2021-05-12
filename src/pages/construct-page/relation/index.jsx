@@ -546,7 +546,7 @@ function Relation() {
             </Card.Grid>
         </Card>
 
-        <Card extra={<Button type="link" onClick={onInsertRelation} style={{right:'4%'}}>添加</Button>} title="认知关系挖掘" style={relationStyle}>
+        <Card extra={<PlusOutlined style={{top: '50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
             {
                 data.map(
                     (relation, index) =>
@@ -554,10 +554,9 @@ function Relation() {
                             <Card.Grid  style={listStyle} key={index}>
                                 {/* <Popconfirm title="Are you sure？" okText="Yes" cancelText="No" onConfirm={onDeleteRelation(relation)}> */}
                                     {relation['主题一']}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{relation['主题二']}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {/* <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteRelation.bind(null, relation['主题一'], relation['主题二'])} style={{position: 'absolute', visibility:'visible', right:'5%'}}>
+                                    <button class="ant-btn ant-btn-ghost ant-btn-circle-outline ant-btn-sm" onClick={onDeleteRelation.bind(null, relation['主题一'], relation['主题二'])} style={{position: 'absolute', right:'5%'}}>
                                         <DeleteOutlined />
-                                    </button> */}
-                                    <Button type="link" onClick={onDeleteRelation.bind(null, relation['主题一'], relation['主题二'])} style={{position: 'absolute', color:'#BEBEBE',right:'4%'}}>删除</Button>
+                                    </button>
                                     {/* </Popconfirm> */}
                             </Card.Grid>
                         )

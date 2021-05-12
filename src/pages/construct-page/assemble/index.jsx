@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './index.module.css';
-import { Modal, Select} from "antd";
-import {ExclamationCircleOutlined,PlusOutlined, CaretRightOutlined,PauseOutlined,MinusOutlined, EditOutlined, CloseOutlined,DeleteOutlined} from '@ant-design/icons'
+import { Modal, Select, Drawer, Switch} from "antd";
+import {ExclamationCircleOutlined,PlusOutlined, CaretRightOutlined,PauseOutlined,MinusOutlined, EditOutlined, CloseOutlined,DeleteOutlined, StopOutlined} from '@ant-design/icons'
 import YottaAPI from '../../../apis/yotta-api';
 import { useState } from 'react';
 import { useEffect, useRef } from 'react';
@@ -15,6 +15,8 @@ import useConstructTypeModel from '../../../models/construct-type';
 import useStepModel from '../../../models/construct-step';
 const {confirm} = Modal;
 
+let pause = 0;
+let quit = 0;
 
 
 function Assemble() {
@@ -52,9 +54,13 @@ function Assemble() {
     const [spiderAss,setspiderAss] = useState();
     const [spiderText,setspiderText] = useState("");
     const [updateTree, setupdateTree] = useState(0);     //动态爬虫过程中更新树
-    const [quitSpider, setquitSpider] = useState(1);
+    const [quitSpider, setquitSpider] = useState(0);
+    const [pauseSpider, setpauseSpider] = useState(0);
+    const [spidernum, setspidernum] = useState(0);
+    const [visibleDrawer, setvisibleDrawer] = useState(true);
+    const [showSpiderState, setshowSpiderState] = useState(0);
+    const [spiderFinish, setspiderFinish] = useState(1);
     const [topicConfirmFlag, settopicConfirmFlag] = useState(0);   //0表示取消，1表示点击主题，2表示确定爬取该主题
-
 
     const {TextArea} = Input;
     
@@ -66,7 +72,12 @@ function Assemble() {
     const handleTextareaChange= (e)=>{
         textareaValueRef.current = e.target.value;
     }
-    
+
+  
+    const onCloseDrawer = () => {
+        setvisibleDrawer(!visibleDrawer);
+    };
+
     const spiderState = {
         borderColor:'grey',
         borderWidth: '1.5px',
@@ -74,8 +85,8 @@ function Assemble() {
         borderStyle:"solid",
         // backgroundColor:'white',
         color: 'black',
-        height: '40px',
-        width: '110px',
+        height: '120px',
+        width: '124px',
         textAlign: 'left',
         // display: 'inline-block',
         right: "3%",
@@ -101,6 +112,7 @@ function Assemble() {
         left: '0%',
         textAlign: 'center',
         top:'310px',
+        overflow:"hidden"
     };
     const countStyle = {
         width:'25%',
@@ -148,24 +160,8 @@ function Assemble() {
         if(topicConfirm&&topicConfirmFlag===1)
             ontopicConfirm();
 
-    },[topicConfirm])
-    
-    function nameCheck(originName) {
-        var tempName = originName;
-        if (originName.search('\\+') != -1){
-            console.log("tempName", tempName);
-            tempName = originName.replace("+", "jiahao");
-            console.log("tempName", tempName);
-        };
-        var english_name = /^[a-zA-Z]+$/.test(originName);
-        // if (topicName.search('\\(') != -1){
-        //     tempName = topicName.replace("(", " (");
-        // };
-        return {
-            checkedName: tempName,
-            isEnglish: english_name
-        }
-    }
+    },[topicConfirmFlag])
+
     // const onAutoConstructClick = () => {
     //     let currentTopic1 = '';
     //     const onSelectChange = (e) => { 
@@ -201,31 +197,61 @@ function Assemble() {
     // };
 
     const onPlaySpider = () => {
-        Modal.info({
-            title: '碎片爬取操作提示',
-            content: (
-              <div>
-                请右键选择圆形布局图中的主题并装配
-              </div>
-            ),
+        confirm({
+            title: '是否想要继续碎片爬取？',
+            icon: <ExclamationCircleOutlined/>,
             okText: '确定',
-            onOk() {},
-          });
+            cancelText: '取消',
+            onOk() {
+                setpauseSpider(0);
+                pause = 0;
+                if (spiderText != "") 
+                    setspiderText(" （正在爬取碎片...）");
+                YottaAPI.continueSpider(currentSubjectDomain.domain,currentTopic);
+            },
+            onCancel() {
+                
+            }
+        })
     };
+
+    const onPauseSpider = () => {
+        confirm({
+            title: '是否想要停止碎片爬取？',
+            icon: <ExclamationCircleOutlined/>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                setpauseSpider(1);
+                pause = 1;
+                if (spiderText != "")
+                    setspiderText(" （爬取碎片暂停中...）");
+                YottaAPI.pauseSpider(currentSubjectDomain.domain,currentTopic);
+            },
+            onCancel() {
+                
+            }
+        })
+    };
+
+
 
     const onQuitSpider = () => {
-        Modal.info({
-            title: '后端接口没好',
-            content: (
-              <div>
-                后端快点啊
-              </div>
-            ),
+        confirm({
+            title: '是否想要停止碎片爬取？',
+            icon: <ExclamationCircleOutlined/>,
             okText: '确定',
-            onOk() {},
-          });
+            cancelText: '取消',
+            onOk() {
+                setquitSpider(1); 
+                quit = 1;
+                setspiderText("");
+                setshowSpiderState(0);
+            },
+            onCancel() {
+            }
+        })
     };
-
 
     const onAppendAssemble = () => {
         let facetId = '';
@@ -423,9 +449,9 @@ function Assemble() {
     //画圆形图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            const result = await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+            const result = await YottaAPI.getMap(currentSubjectDomain.domain);
             console.log("结果是：",result);
-            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
+            await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
                     // setmapdata(res.data);
                     if(res.data&&mapRef.current&&treeRef1.current){
@@ -473,7 +499,13 @@ function Assemble() {
             if(res){
                 setassembles(res);
                 console.log("获取碎片");
-                infoFinish();
+                if (!spiderFinish){
+                    infoSpiderFinish();
+                }
+                else{
+                    infoFinish();
+                }
+               
                 setappendAssembleContentFlagToSort(appendAssembleContentFlagToFetch);
             }
         }
@@ -538,34 +570,49 @@ function Assemble() {
             const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
             console.log("状态值:",r.status);
             setspiderText(" （准备爬取碎片...）");
-            setquitSpider(0);
+            setquitSpider(1);
+            pause = 0;
+            quit = 0;
+            setshowSpiderState(1);
+            setpauseSpider(0);
+            setspiderText(" （正在爬取碎片...）");
+            setspidernum(0);
+            setspiderFinish(0);
             var myvar1 = setInterval(
                 async function GDM() {
                     if(currentSubjectDomain.domain && currentTopic) {
-                        const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
-                            if(result){
-                                setspiderText(" （正在爬取碎片...）");
-                                console.log('result.code',result.code);
-                                if(result.code == 200 ){
-                                    console.log("========================");
-                                    setspiderAss(result);
-                                    // console.log("res:",result.data.children.length);
-                                    // console.log("res:",result.data.children[0]);
-                                    // console.log("res:",result.data.children[0].children.length);
-                                    // console.log("res:",result.data.children[0].children[0]);
-                                    setdynamicRenderAss(result);
-                                    setspiderText("");
-                                    setquitSpider(1);
-                                    clearInterval(myvar1);
-
-                                }
-                                else {
-                                    setspiderAss(result);
-                                    setdynamicRenderAss(result);
-                                    console.log("+++++++++++++++++++");
-                                    //setassembles(result);
-                                }
+                        console.log("pause2",pause);
+                        if (pause==1){ 
+                            if(quit===1){
+                                setshowSpiderState(0);
+                                YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                setrenderFinish(1);
+                                clearInterval(myvar1);
                             }
+                        }
+                        else{
+                            const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
+                            console.log('result.code',result.code);
+                            if(result.code == 200 || quit===1){
+                                console.log("========================");
+                                setspiderAss(result);
+                                setdynamicRenderAss(result);
+                                setrenderFinish(1);
+                                setspiderText("");
+                                setshowSpiderState(0);
+                                setspiderFinish(1);
+                                YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                clearInterval(myvar1);
+
+                            }
+                            else {
+                                setspiderAss(result);
+                                setdynamicRenderAss(result);
+                                setspiderFinish(0);
+                                console.log("+++++++++++++++++++");
+                                //setassembles(result);
+                            }
+                        }
                     }
                     else{
                         clearInterval(myvar1);
@@ -596,21 +643,6 @@ function Assemble() {
                  //console.log(asslist);
                 setassembles(asslist);
                 setrenderFinish(1);
-            //     var myvar = setInterval(()=>{
-            //     if(i==asslist.length){
-            //         setassembles(asslist);
-            //         setrenderFinish(1);
-            //         clearInterval(myvar);
-
-            //     }else
-            //     {
-            //         arr1.push(asslist[i]);
-            //         setassembles(arr1);
-            //         setassnum(arr1.length);
-            //         i++;
-            //     }
-
-            // },100);
 
             }
         }
@@ -739,6 +771,10 @@ function Assemble() {
         //message.config({duration: 1,  maxCount: 3})
         message.success('碎片构建成功，已全部展示！')
     };
+    const infoSpiderFinish = () => {
+        //message.config({duration: 1,  maxCount: 3})
+        message.success('爬虫进行中，已展示当前爬取的全部碎片！')
+    };
     const infoDelete = () => {
         message.config({duration: 1,  maxCount: 3})
         message.info('碎片删除成功，正在重新构建，请稍后！')
@@ -752,6 +788,12 @@ function Assemble() {
         message.info('正在构建碎片，请稍后！')
     };
 
+
+    const showDrawer = () => {
+        setvisibleDrawer(!visibleDrawer);
+      };
+
+      
     return (
         <>
              <Card title="主题分面树" style={treeStyle}>
@@ -759,22 +801,67 @@ function Assemble() {
             </Card>
             <Card title="圆形布局图" style={chartStyle}>
                 {
-                    !quitSpider ? (
-                        <div style={spiderState}>
-                            <div style={{fontSize:"15px", fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"#979693",}}>碎片爬取</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                    showSpiderState ? (
+                        !pauseSpider ? (
+                            <>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={showDrawer} style={{ position:"absolute",right:'5%', top:"15%", width:"120px",height:"28px",}}>
+                            展开爬虫小组件
+                            </button>
+                            <Drawer
+                            title={"爬虫控制小组件"}
+                            placement="right"
+                            closable={false}
+                            onClose={showDrawer}
+                            visible={visibleDrawer}
+                            getContainer={false}
+                            style={{ position: 'absolute' }}
+                          >
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>进行中</span></div>
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>暂停爬取按钮</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPauseSpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
                             <PauseOutlined />
                             </button>
-                        </div>
-                    ):
-                    (
-                        <div style={spiderState}>
-                            <div style={{fontSize:"15px",fontWeight:"bold", marginLeft:"8%", marginTop:"6%"}}><span style={{color:"grey",}}>碎片爬取</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'4%', top:"15%", width:"30px",height:"22px",}}>
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"6%", textAlign: 'left'}}><span style={{color:"#979693",}}>停止爬取按钮</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"44%", width:"30px",height:"22px",}}>
+                            <StopOutlined />
+                            </button>
+                            </Drawer>
+                            </>
+                        ):
+                        (
+                            <>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={showDrawer} style={{ position:"absolute",right:'5%', top:"15%", width:"120px",height:"28px",}}>
+                            展开爬虫小组件
+                            </button>
+                            <Drawer
+                            title={"爬虫控制小组件"}
+                            placement="right"
+                            closable={false}
+                            onClose={showDrawer}
+                            visible={visibleDrawer}
+                            getContainer={false}
+                            style={{ position: 'absolute' }}
+                          >
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>暂停中</span></div>
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>继续爬取按钮</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
                             <CaretRightOutlined />
                             </button>
-                        </div>
+                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"6%", textAlign: 'left'}}><span style={{color:"#979693",}}>停止爬取按钮</span></div>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"44%", width:"30px",height:"22px",}}>
+                            <StopOutlined />
+                            </button>
+                            </Drawer>
+                            </>
+                        )
+                        
+                    ):
+                    (
+                        <></>
                     )
+                    
                 }
                  <div style={{ width: '100%', height: '670px' }} >
                     <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%' }}></svg>
