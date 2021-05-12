@@ -84,6 +84,8 @@ function BatchConstruct() {
     var [onstop,setonstop] = useState();
     var [finishedTopic, setfinishedTopic] = useState();
 
+    var [finishedNum,setfinishedNum] = useState();
+
     var [topicData, settopicData] = useState();
     var [batchConstruct, setbatchConstruct] = useState();
     var [stop,setstop] = useState();
@@ -280,7 +282,7 @@ function BatchConstruct() {
         console.log('insertTopic', insertTopic1);
         console.log('notInsert',notInsert);
         if(notInsert){
-            setcurrentTopic(topics[0]);
+            // setcurrentTopic(topics[0]);
             console.log('currentTopic',currentTopic);
         }else{
             console.log('insertTopic', insertTopic1);
@@ -347,6 +349,7 @@ function BatchConstruct() {
                             setTimeout(()=>{
                                 
                                 const index = topics.indexOf(currentTopic);
+                                setfinishedNum(index+1);
                                 console.log('index',index,topics.length)
                                 setbatchData(topics.slice(index+1));
                                 (index < topics.length) && (setcurrentTopic(topics[index+1])); 
@@ -400,6 +403,7 @@ function BatchConstruct() {
                 console.log('getfinishedData',getfinishedData)
                 console.log('getbatchData',getbatchData)
                 setcurrentTopic(getbatchData[1]);
+                console.log('currentTopic',currentTopic)
                 const index = topics.indexOf(getbatchData[1]);
                 console.log('indexxx', index);
                 var finishhhh = topics.slice(0,index);
@@ -417,7 +421,7 @@ function BatchConstruct() {
             }else{
                 localStorage.setItem("visitedBatch", "yes")
                 console.log("This is the first time!")
-                setcurrentTopic(topics[0])
+                // setcurrentTopic(topics[0])
                 var notInsert1 = true;
                 setnotInsert(notInsert1);
             }
@@ -450,6 +454,8 @@ function BatchConstruct() {
               settopics(topicss.slice(0, num));
               num = num + 1;
               if (num === maxlength + 1) {
+                setcurrentTopic(topics[0]);
+                console.log('开始主题',currentTopic)
                 infoFinish();
                 clearInterval(timer);
                 setfirstTime(data1);
@@ -581,7 +587,7 @@ function BatchConstruct() {
         </Card>
       <Card title='已构建主题数量统计' style={countStyle1}>
         <Card.Grid style={{ width: '100%', height: '50px' }}>
-          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{topicss.length-batchData.length}</span>
+          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{finishedNum}</span>
         </Card.Grid>
       </Card>
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
