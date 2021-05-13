@@ -85,6 +85,7 @@ function BatchConstruct() {
     var [finishedTopic, setfinishedTopic] = useState();
 
     var [finishedNum,setfinishedNum] = useState();
+    var [finishedPrepare,setfinishedPrepare] = useState();
 
     var [topicData, settopicData] = useState();
     var [batchConstruct, setbatchConstruct] = useState();
@@ -142,8 +143,11 @@ function BatchConstruct() {
                 console.log('已构建主题',finishedData);
                 var stopCommand1 = false;
                 setstopCommand(stopCommand1);
+                setTimeout(() => {
+                    window.flag = false;
+                }, 6000);
                 console.log(stopCommand);
-                message.info("待当前主题分面树构建完成后将暂停批量构建！")
+                message.info("待当前主题分面树构建完成后将暂停批量构建,暂停后可对当前分面树进行操作。",3)
                 var onstop = true;
                 setonstop(onstop);
             }
@@ -328,6 +332,7 @@ function BatchConstruct() {
         const topicNode = document.getElementById(`topicitem-${currentTopic}`);
         console.log('topicNode',topicNode);
         if(stopCommand){
+            window.flag = true;
             if(topicNode){
                 setdone(1);
                 let my = setInterval(() => {
@@ -388,8 +393,12 @@ function BatchConstruct() {
             if(treeData.childrenNumber === 0){
                 emptyChildren(treeRef.current); 
             }else{
-                if(treeRef.current){
+                if(treeRef.current&&window.flag === true){
                     drawTree(treeRef.current,treeData,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
+                }
+                if (treeRef.current&&window.flag===false )
+                {
+                    drawTree(treeRef.current,treeData,d=>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',0,false);
                 }
                 emptyChildren(treeRef.current);
             }
@@ -402,10 +411,13 @@ function BatchConstruct() {
         if(data1) {
             if (localStorage.getItem("visitedBatch")) {
                 console.log("This is not the first time!")
+                var finishedPrepare = true
+                setfinishedPrepare(finishedPrepare)
                 var getbatchData = JSON.parse(localStorage.getItem('batchData'))
                 var getfinishedData = JSON.parse(localStorage.getItem('finishedData'))
                 console.log('getfinishedData',getfinishedData)
                 console.log('getbatchData',getbatchData)
+                setfinishedNum(getfinishedData.length);
                 setcurrentTopic(getbatchData[1]);
                 console.log('currentTopic',currentTopic)
                 const index = topics.indexOf(getbatchData[1]);
@@ -458,6 +470,10 @@ function BatchConstruct() {
             const timer = setInterval(() => {
               settopics(topicss.slice(0, num));
               num = num + 1;
+              var finishedPrepare1 = false
+              setfinishedPrepare(finishedPrepare1)
+              var topicdone = 0;
+              setfinishedNum(topicdone);
               if (num === maxlength + 1) {
                 setcurrentTopic(topics[0]);
                 console.log('开始主题',currentTopic)
@@ -466,7 +482,8 @@ function BatchConstruct() {
                 setfirstTime(data1);
                 localStorage.setItem("visitedTopic", "yes")
                 console.log("This is the first time!");
-                // console.log("firstTime", firstTime);
+                var finishedPrepare = true
+                setfinishedPrepare(finishedPrepare)
               }
             }, 100);
           }
@@ -516,28 +533,31 @@ function BatchConstruct() {
         }
     
         console.log("currentTopic clickbranch",currentTopic);
-    // const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
-    // window.flag = false;
-    // console.log("shanchuhou",window.flag);
-    //     if(treeData){
-    //         console.log("新的画树数据",treeData);
-    //         emptyChildren(treeRef.current);
-    //         settreeData(treeData);
-    //     }
-        setcurrentTopic(topic => {
-            (async () => {
-                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
-                console.log('t-tt', topic);
-                window.flag = false;
-                console.log("shanchuhou", window.flag);
-                if (treeData) {
-                    console.log("新的画树数据", treeData);
-                    emptyChildren(treeRef.current);
-                    settreeData(treeData);
-                }
-            })();
-            return topic
-        })
+         var topiccc = finishedData.slice(-1)
+    
+        const treeData = await YottaAPI.getCompleteTopicByTopicName(topiccc);
+    window.flag = false;
+    console.log("shanchuhou",window.flag);
+        if(treeData){
+            console.log("新的画树数据",treeData);
+            emptyChildren(treeRef.current);
+            settreeData(treeData);
+        }
+    
+        // setcurrentTopic(topic => {
+        //     (async () => {
+        //         const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+        //         console.log('t-tt', topic);
+        //         window.flag = false;
+        //         console.log("shanchuhou", window.flag);
+        //         if (treeData) {
+        //             console.log("新的画树数据", treeData);
+        //             emptyChildren(treeRef.current);
+        //             settreeData(treeData);s
+        //         }
+        //     })();
+        //     // return topic
+        // })
     }
 
       // 插入分面
@@ -565,8 +585,8 @@ function BatchConstruct() {
 
     useEffect(()=>{
         async function insertFacet(){
-            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
-      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topiccc, insertFacet1);
+      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topiccc);
     //   window.flag = false;
     //   console.log("shanchuhou", window.flag);
       if (treeData) {
@@ -575,8 +595,10 @@ function BatchConstruct() {
         settreeData(treeData2);
       }
         }
-        if(topicName2 && insertFacet1){
-            insertFacet(topicName2, insertFacet1);
+        var topiccc = finishedData.slice(-1)
+    
+        if(topiccc && insertFacet1){
+            insertFacet(topiccc, insertFacet1);
         }
   },[topicName2])
    
@@ -611,10 +633,23 @@ function BatchConstruct() {
                 }
             </Card>
         <Card  title="主题分面树" style={treeStyle}>
-        <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
+        {
+                finishedPrepare?(
+                    <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
+                        <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
+                        </svg>
+                    </Card.Grid>
+                ):
+                (
+                    <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
+                        <Alert style={{fontSize:'20px'}}message="请等待主题列表构建完成, 待主题列表获取成功后将自动进行主题分面树的构建！" type="info" />
+                    </Card.Grid>
+                )
+            }
+        {/* <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>            
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
-                </Card.Grid>
+                </Card.Grid> */}
             </Card>
 
 

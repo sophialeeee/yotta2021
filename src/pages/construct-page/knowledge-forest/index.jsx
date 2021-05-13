@@ -245,9 +245,16 @@ function KnowledgeForest() {
 
 
     }
-    useEffect(() => {
-        fetchMap()
-    }, [currentSubjectDomain.domain]);
+    let willmounted=false
+  useEffect(() => {
+    willmounted=true
+    fetchMap();
+    return function cleanup() {
+      willmounted = false
+      emptyChildren(mapRef.current)
+      emptyChildren(treeRef.current)
+  }
+  }, [currentSubjectDomain.domain]);
     let dataTemp = []
 
     /***  assembleTopic start ===============================================================================================================**/
@@ -378,7 +385,7 @@ function KnowledgeForest() {
 
     /***  insert  ===============================================================================================================**/
     async function fetchMap() {
-        emptyChildren(mapRef.current)
+        if(willmounted){emptyChildren(mapRef.current)
         emptyChildren(treeRef.current)
         const res_de = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
         if (res_de) {
@@ -419,7 +426,7 @@ function KnowledgeForest() {
                     // history({pathname:'/nav',state:{login:true}})
                 }
             }
-        )
+        )}
 
     }
 
