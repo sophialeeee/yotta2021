@@ -499,10 +499,7 @@ function Assemble() {
             if(res){
                 setassembles(res);
                 console.log("获取碎片");
-                if (!spiderFinish){
-                    infoSpiderFinish();
-                }
-                else{
+                if (spiderFinish){
                     infoFinish();
                 }
                
@@ -536,7 +533,7 @@ function Assemble() {
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
 
             if(res){
-                infoConstructing();
+                //infoConstructing();
                 var i=0;
                 var myvar = setInterval(()=>{
                 if(i==res.length){
@@ -601,6 +598,7 @@ function Assemble() {
                                 setspiderText("");
                                 setshowSpiderState(0);
                                 setspiderFinish(1);
+                                infoSpiderFinish();
                                 YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
                                 clearInterval(myvar1);
 
@@ -631,7 +629,7 @@ function Assemble() {
             console.log("开始动态渲染");
             setrenderFinish(0);
             if(spiderAss&&!renderFinish){
-                infoConstructing();
+                //infoConstructing();
                 var i=0;
                 console.log("----------------");
                 for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
@@ -773,7 +771,7 @@ function Assemble() {
     };
     const infoSpiderFinish = () => {
         //message.config({duration: 1,  maxCount: 3})
-        message.success('爬虫进行中，已展示当前爬取的全部碎片！')
+        message.success('已展示当前爬取的全部碎片！')
     };
     const infoDelete = () => {
         message.config({duration: 1,  maxCount: 3})
@@ -814,7 +812,7 @@ function Assemble() {
                             onClose={showDrawer}
                             visible={visibleDrawer}
                             getContainer={false}
-                            style={{ position: 'absolute' }}
+                            style={{ position: 'absolute'}}
                           >
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>进行中</span></div>
@@ -843,8 +841,8 @@ function Assemble() {
                             getContainer={false}
                             style={{ position: 'absolute' }}
                           >
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>暂停中</span></div>
+                            <div style={{fontSize:"16px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
+                            <div style={{fontSize:"16px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>暂停中</span></div>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>继续爬取按钮</span></div>
                             <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
                             <CaretRightOutlined />
