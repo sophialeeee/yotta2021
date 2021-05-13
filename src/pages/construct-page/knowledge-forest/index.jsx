@@ -627,6 +627,7 @@ function KnowledgeForest() {
 
                 if (res.code == 200) {
                     message.info(res.msg)
+                    willmounted=true
                     fetchMap();
 
                 } else {
@@ -806,24 +807,26 @@ function KnowledgeForest() {
 
     useEffect(() => {
         async function insertFacet() {
-            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
+            await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, currentTopic, insertFacet1);
+            willmounted = true;
             fetchMap();
-            const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+            // const treeData2 = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
 
-            //   window.flag = false;
-            //   console.log("shanchuhou", window.flag);
-            if (treeData) {
-                console.log("新的画树数据", treeData2);
-                emptyChildren(treeRef.current);
-                settreeData(treeData2);
-                fetchMap();
-            }
+            // //   window.flag = false;
+            // //   console.log("shanchuhou", window.flag);
+            // if (treeData) {
+            //     console.log("新的画树数据", treeData2);
+            //     emptyChildren(treeRef.current);
+            //     settreeData(treeData2);
+            //     fetchMap();
+            // }
         }
 
-        if (topicName2 && insertFacet1) {
-            insertFacet(topicName2, insertFacet1);
+        if (currentTopic && insertFacet1) {
+            insertFacet(currentTopic, insertFacet1);
+            message.info("分面增加成功！")
         }
-    }, [topicName2])
+  },[insertFacet1])
 
     //删除分面调用接口
     let clickflag = true;
@@ -876,7 +879,8 @@ function KnowledgeForest() {
             //   }
             if (res) {
                 console.log("删除成功")
-                message.info(res.msg)
+               message.info("分面删除成功！")
+                willmounted=true
                 fetchMap();
             }
         }
