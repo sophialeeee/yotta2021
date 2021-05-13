@@ -72,7 +72,7 @@ function BatchConstruct() {
     const [topicName2,settopicName2] = useState();
     const [firstTime,setfirstTime] = useState();
     const [batchData,setbatchData] = useState([]);
-    const {step,setStep} = useStepModel(); 
+    const {step,setStep} = useStepModel();
     const {constructType} = useConstructTypeModel();
     const [done,setdone]=useState(0)
 
@@ -119,7 +119,7 @@ function BatchConstruct() {
     // useEffect(() => { // 就这样改得了
     //     console.log(document.querySelector(`#topicitem-${topics[0]}`));
     // }, [topics])
-    
+
     function emptyChildren(dom) {
         if(dom)
         {const children = dom.childNodes;
@@ -127,7 +127,7 @@ function BatchConstruct() {
             dom.removeChild(children[0]);
         }}
     };
- 
+
 
     const onBatchStop = () =>{
         confirm({
@@ -193,16 +193,16 @@ function BatchConstruct() {
                     okText:'确定',
                     cancelText:'取消',
                     onOk(){
-                        setinsertTopic1(Topic1); 
+                        setinsertTopic1(Topic1);
                         console.log('Topic1',Topic1);
                         message.info('新添加主题时，暂无分面信息,可在单个构建页面人工添加主题分面。')
                     },
                     onCancel(){}
                 })
-                
+
             },
             onCancel() {
-        
+
             }
         })
     };
@@ -221,9 +221,9 @@ function BatchConstruct() {
         if(insertTopic1){
             insert(insertTopic1);
         }
-    },[insertTopic1]) 
+    },[insertTopic1])
     const treeRef = useRef();
-    
+
     //插入置顶
     useEffect(()=>{
         if(topicData){
@@ -301,7 +301,7 @@ function BatchConstruct() {
         setstopCommand(stopCommand3);
         console.log('stopCommand',stopCommand);
     },[topics,notInsert])
-    
+
     // 获取一个课程下所有的主题数据
     useEffect(() => {
         async function fetchTopicsData() {
@@ -328,7 +328,7 @@ function BatchConstruct() {
         }
     }, [deleteTopic1])
 
-    useEffect(() => {  
+    useEffect(() => {
         const topicNode = document.getElementById(`topicitem-${currentTopic}`);
         console.log('topicNode',topicNode);
         if(stopCommand){
@@ -338,12 +338,12 @@ function BatchConstruct() {
                 let my = setInterval(() => {
                 let opacity = topicNode.style.opacity;
                 topicNode.style.opacity = 1-(+opacity||0)
-                topicNode.style.color = 'red';     
+                topicNode.style.color = 'red';
                 }, 500);
                 setTimeout(()=>{
                     clearInterval(my);
                     topicNode.style.color = 'green';
-                    topicNode.style.opacity = 1;  
+                    topicNode.style.opacity = 1;
                 },6000)
                 async function fetchTreeData(){
                     const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
@@ -356,12 +356,12 @@ function BatchConstruct() {
                             // emptyChildren(treeRef.current);
                             settreeData(result)
                             setTimeout(()=>{
-                                
+
                                 const index = topics.indexOf(currentTopic);
                                 setfinishedNum(index+1);
                                 console.log('index',index,topics.length)
                                 setbatchData(topics.slice(index+1));
-                                (index < topics.length) && (setcurrentTopic(topics[index+1])); 
+                                (index < topics.length) && (setcurrentTopic(topics[index+1]));
                                 console.log('未构建主题',batchData);
                                 finishedData.push(topics[index]);
                                 setfinishedData(finishedData);
@@ -370,7 +370,7 @@ function BatchConstruct() {
                                 localStorage.setItem("batchData", JSON.stringify(batchData));
                                 (index < topics.length) && (setcurrentTopic(topics[index+1]));
                             },3000)
-                            
+
                         },3000)
                     }
                     console.log('result',result)
@@ -391,7 +391,7 @@ function BatchConstruct() {
     useEffect(()=>{
         if (treeRef && treeData) {
             if(treeData.childrenNumber === 0){
-                emptyChildren(treeRef.current); 
+                emptyChildren(treeRef.current);
             }else{
                 if(treeRef.current&&window.flag === true){
                     drawTree(treeRef.current,treeData,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
@@ -403,8 +403,8 @@ function BatchConstruct() {
                 emptyChildren(treeRef.current);
             }
         }
-        
-        
+
+
     },[treeData])
 
     useEffect(()=>{
@@ -444,7 +444,7 @@ function BatchConstruct() {
             }
         }
     },[data1])
-  
+
     useEffect(()=>{
         if(constructType==='cool'&&data0===1)
             {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
@@ -522,19 +522,19 @@ function BatchConstruct() {
     })
 }
 };
-    
+
 
     async function ClickBranch(facetId){
-        
+
         if (facetId > 0){
         const res = await YottaAPI.deleteAssembleByFacetId(facetId);
         console.log("传入删除id", facetId);
         //setassembles(res);
         }
-    
+
         console.log("currentTopic clickbranch",currentTopic);
          var topiccc = finishedData.slice(-1)
-    
+
         const treeData = await YottaAPI.getCompleteTopicByTopicName(topiccc);
     window.flag = false;
     console.log("shanchuhou",window.flag);
@@ -543,7 +543,7 @@ function BatchConstruct() {
             emptyChildren(treeRef.current);
             settreeData(treeData);
         }
-    
+
         // setcurrentTopic(topic => {
         //     (async () => {
         //         const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
@@ -596,12 +596,12 @@ function BatchConstruct() {
       }
         }
         var topiccc = finishedData.slice(-1)
-    
+
         if(topiccc && insertFacet1){
             insertFacet(topiccc, insertFacet1);
         }
   },[topicName2])
-   
+
     return (
         <>
         <Card style={stopStyle}>
@@ -632,7 +632,7 @@ function BatchConstruct() {
 
                 }
             </Card>
-        <Card  title="主题分面树" style={treeStyle}>
+            <Card  extra={<PlusOutlined style={{ top: '50px' }} onClick={clickBranchAdd.bind(null, currentTopic)}/>}title="主题分面树" style={treeStyle}>
         {
                 finishedPrepare?(
                     <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
@@ -646,7 +646,7 @@ function BatchConstruct() {
                     </Card.Grid>
                 )
             }
-        {/* <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>            
+        {/* <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
                     <svg ref={ref => treeRef.current = ref} id='tree' style={{ width: '100%', height: '700px' }}>
                     </svg>
                 </Card.Grid> */}

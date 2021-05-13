@@ -363,7 +363,6 @@ function KnowledgeForest() {
             )
         }
         willmounted=false
-
     }
 
     const textareaValueRef = useRef('');
