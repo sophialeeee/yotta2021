@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactEchartsCore from 'echarts-for-react/lib/core';
 import dataTool from '../../lib/dataTool';
 import echarts from 'echarts/lib/echarts';
@@ -7,24 +7,46 @@ import 'echarts/lib/component/title'
 import 'echarts/lib/component/legend';
 import {useHistory} from 'react-router-dom';
 import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
+import confirm from 'antd/lib/modal/confirm';
+import YottaAPI from '../../apis/yotta-api';
+import Charts from '../../pages/home-page/charts';
 
 function Gephi(props) {
-    const {gephi, subjectName} = props;
+    const { gephi, subjectName } = props;
     let graph = dataTool.gexf.parse(gephi);
-    console.log('graph',graph)
+    console.log('graph', graph)
     let categories = [];
     let communityCount = 0;
     const history = useHistory();
-    const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
+    const { currentSubjectDomain, setCurrentSubjectDomain } = useCurrentSubjectDomainModel();
+    document.oncontextmenu = function () { return false; }; 
     const onEvents = {
-        'click':(data)=>{
-           
-        if (data.dataType === 'node'){
-            let currentDomainName = data.data.name;
-            console.log(currentSubjectDomain.subject,currentDomainName)
-            setCurrentSubjectDomain(currentSubjectDomain.subject, currentDomainName);
-            history.push('/display-page');
-        }
+        'click': (data) => {
+
+            if (data.dataType === 'node') {
+                let currentDomainName = data.data.name;
+                console.log(currentSubjectDomain.subject, currentDomainName)
+                setCurrentSubjectDomain(currentSubjectDomain.subject, currentDomainName);
+                history.push('/display-page');
+            }
+        },
+        'contextmenu': (data) => {
+            if (data.dataType == 'node') {
+                let currentDomainName = data.data.id;
+                confirm({
+                    title: '确定删除课程吗？',
+                    okText: '确定',
+                    cancelText: '取消',
+                    onOk() {
+                        YottaAPI.removeClass(currentSubjectDomain.subject, currentDomainName);
+                        console.log(currentSubjectDomain.subject, currentDomainName)
+                        document.location.reload()
+                    },
+                    onCancel() {
+
+                    }
+                })
+            }
         }
     }
 
@@ -38,14 +60,15 @@ function Gephi(props) {
         node.symbolOffset = [0, '-100%'];
         node.label = {
             normal: {
-                show: node.symbolSize > 0
+                //show: node.symbolSize > 0
+                show: 1
             }
         };
         node.symbolSize = node.symbolSize / 3 + 6;
     });
     let communitySize = [];
     for (var i = 0; i <= communityCount; i++) {
-        categories[i] = {name: '社团' + (i + 1)};
+        categories[i] = { name: '社团' + (i + 1) };
         communitySize[i] = 0;
     }
     graph.nodes.forEach(function (node) {
@@ -54,13 +77,13 @@ function Gephi(props) {
         for (let i = 0; i <= communityCount; i++) {
             if (community === i) {
                 if (size > communitySize[i]) {
-                    categories[i] = {name: node.name};
+                    categories[i] = { name: node.name };
 
                 }
             }
         }
     });
-    console.log('categories',categories)
+    console.log('categories', categories)
     let option = {
         title: {
             text: subjectName,
@@ -118,10 +141,9 @@ function Gephi(props) {
 
     return (
         <ReactEchartsCore echarts={echarts} option={option} onEvents={onEvents}
-                          style={{height: 800, width: 1100, margin: 'auto auto'}}/>
-    );
-
-
+            style={{ height: 800, width: 1100, margin: 'auto auto' }} />
+    )
+    
 }
 
 export default Gephi;
