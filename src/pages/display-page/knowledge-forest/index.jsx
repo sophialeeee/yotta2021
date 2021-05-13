@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
 import useCurrentSubjectDomainModel from '../../../models/current-subject-domain';
-import { drawMap } from '../../../modules/topicDependenceVisualization';
+import { drawMap } from '../../../modules/topicDependenceVisualization_display';
 import { useRef } from 'react';
 import Leaf from '../../../components/Leaf'
 import {useHistory} from 'react-router-dom';
@@ -66,14 +66,21 @@ function KnowledgeForest () {
     }
 
   };
-  useEffect(() => {
-    fetchMap();
-  }, [currentSubjectDomain.domain]);
+  let willmounted=false
+  useEffect(() => {
+    willmounted=true
+    fetchMap();
+    return function cleanup() {
+      willmounted = false
+      emptyChildren(mapRef.current)
+      emptyChildren(treeRef.current)
+  }
+  }, [currentSubjectDomain.domain]);
 
   let data;
   /***  insert  ===============================================================================================================**/
   async function fetchMap() {
-    emptyChildren(mapRef.current)
+    if(willmounted){emptyChildren(mapRef.current)
     emptyChildren(treeRef.current)
     await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
         (res) => {
@@ -97,7 +104,7 @@ function KnowledgeForest () {
             // history({pathname:'/nav',state:{login:true}})
           }
         }
-    )
+    )}
 
   }
 
