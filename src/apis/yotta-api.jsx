@@ -294,7 +294,7 @@ const YottaAPI = {
     async getGenerateDependency_zyl(domainName,topicName){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8083/dependency/getGenerateDependencyWithNewTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:10000});
+            result = await axios.post(`http://47.95.145.72:8083/dependency/getGenerateDependencyWithNewTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:20000});
             result = result.data;
         }
         catch(error){

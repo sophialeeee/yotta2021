@@ -1,7 +1,7 @@
 import React from 'react';
 import {Card, Badge, Divider, Modal, Alert, Input, message, Select, Drawer, Row, Col, Popconfirm,Spin} from 'antd';
 import {Menu, Dropdown, Button, Space, Tooltip} from 'antd';
-import {DownOutlined, StopOutlined, EditOutlined, BlockOutlined} from '@ant-design/icons';
+import {DownOutlined, StopOutlined, EditOutlined, BlockOutlined,ApartmentOutlined} from '@ant-design/icons';
 
 import {useState} from 'react';
 import {useEffect} from 'react';
@@ -374,7 +374,7 @@ function KnowledgeForest() {
 
     const [currInsertTopic, setCurrInsertTopic] = useState('');
 
-    const onPlaySpiderTopic = async () => {
+    async  function onPlaySpiderTopic (){
         if (currInsertTopic == '') {
             Modal.info({
                 title: '新增主题爬取操作提示',
@@ -395,7 +395,7 @@ function KnowledgeForest() {
         startSpider(currInsertTopic)
     };
 
-    const onQuitSpiderTopic = async () => {
+    async function onQuitSpiderTopic()  {
         if (currInsertTopic == '') {
             message.warn('当前并无正在爬取主题！')
         }
@@ -433,40 +433,21 @@ function KnowledgeForest() {
         setTimeout(gen_F, 1);
         if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
-                for (let i = 0; i < 2; i++) {
-                    await sleep();
-                }
-
-                message.loading({content: '刷新知识森林概览', key}, 1)
-                willmounted=true
-                fetchMap()
-                setCurrInsertTopic('')
-                setDoTopicSpider(0)
-                setSpiderTopicSpinning(0)
             } else {
                 message.info(resGetGenerateDependency.msg)
-                willmounted=true
-                message.loading({content: '刷新知识森林概览', key}, 1)
-
-                fetchMap()
-                setCurrInsertTopic('')
-                setDoTopicSpider(0)
-                setSpiderTopicSpinning(0)
             }
-        } else {
-            willmounted=true
-            message.loading({content: '刷新知识森林概览', key}, 1)
-
-            fetchMap()
-            setCurrInsertTopic('')
-            setDoTopicSpider(0)
-            setSpiderTopicSpinning(0)
-
         }
+        message.loading({content: '刷新知识森林概览', key}, 1)
+        willmounted=true
+        fetchMap()
+        setCurrInsertTopic('')
+        setDoTopicSpider(0)
+        setCurrTopicFNum(0)
+        setSpiderTopicSpinning(0)
     }
 
 
-    var askSpiderTopicTimer = null
+    let  askSpiderTopicTimer = null
     const [currTopicFNum, setCurrTopicFNum] = useState(0);
 
 
@@ -522,7 +503,7 @@ function KnowledgeForest() {
 
                 }
             }
-        }, 1000);
+        }, 2000);
 
 
     }
@@ -736,7 +717,8 @@ function KnowledgeForest() {
                             message.warn(res.msg)
                         } else {
                             message.info(res.msg)
-                            fetchMap();
+                            willmounted=true
+                            fetchMap()
                         }
                         reSet()
                     },
@@ -1369,7 +1351,7 @@ function KnowledgeForest() {
                 {
                     !doTopicSpider ? (<div></div>) : (
                         <Card size="small" title="新增主题" style={{
-                            width: '200px',
+                            width: '300px',
                             // height:'80px',
                             textAlign: 'left',
                             right: "3%",
@@ -1389,57 +1371,38 @@ function KnowledgeForest() {
                                     <Col span={9}>{currTopicFNum}个碎片</Col>
                                 </Row>
                                 <Row>
-                                    <Col span={10}>操作</Col>
-                                    <Col span={7}>
+                                    <Col span={4}>操作</Col>
+                                    <Col span={8}>
 
                                         {
                                             !quitTopicSpider ? (<Popconfirm placement="top" title={'确定继续当前主题爬取吗？'}
                                                                             onConfirm={onPlaySpiderTopic} okText="是"
                                                                             cancelText="否">
-                                                <button className="ant-btn ant-btn-ghost ant-btn-sm"
-                                                        style={{
-                                                            position: "absolute",
-                                                            right: '4%',
-                                                            top: "15%",
-                                                            width: "30px",
-                                                            height: "22px",
-                                                        }}>
+                                                <Button type="dashed"  size='small'icon={<CaretRightOutlined/>} >
+                                                    继续
+                                                </Button>
 
-                                                    <CaretRightOutlined/>
-
-                                                </button>
                                             </Popconfirm>) : (
                                                 <Popconfirm placement="top" title={'确定暂停当前主题爬取吗？'}
                                                             onConfirm={onQuitSpiderTopic} okText="是" cancelText="否">
-                                                    <button className="ant-btn ant-btn-ghost ant-btn-sm"
-                                                            style={{
-                                                                position: "absolute",
-                                                                right: '4%',
-                                                                top: "15%",
-                                                                width: "30px",
-                                                                height: "22px",
-                                                            }}>
-                                                        <PauseOutlined/>
-                                                    </button>
+                                                    <Button size='small' type="dashed" icon={ <PauseOutlined/>} >
+                                                        暂停
+                                                    </Button>
+
                                                 </Popconfirm>)
 
                                         }
 
                                     </Col>
 
-                                    <Col span={7}>
+                                    <Col span={12}>
                                         <Popconfirm placement="top" title={'确定对已经爬取碎片确定生成关系？'} onConfirm={getGenerateDependency}
                                                     okText="是" cancelText="否">
-                                            <button className="ant-btn ant-btn-ghost ant-btn-sm"
-                                                    style={{
-                                                        position: "absolute",
-                                                        right: '4%',
-                                                        top: "15%",
-                                                        width: "30px",
-                                                        height: "22px",
-                                                    }}>
-                                                <BlockOutlined/>
-                                            </button>
+                                            <Button type="dashed"  size='small' icon={<ApartmentOutlined />} >
+
+                                                构建碎片关系
+                                            </Button>
+
                                         </Popconfirm>
                                     </Col>
                                 </Row>
