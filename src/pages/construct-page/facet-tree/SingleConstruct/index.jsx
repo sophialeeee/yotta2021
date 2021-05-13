@@ -1,5 +1,5 @@
 import React from 'react';
-import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modules/facetTree';
+import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modules/facetTree_single';
 import { useEffect, useRef } from 'react';
 import useCurrentSubjectDomainModel from '../../../../models/current-subject-domain';
 import useStepModel from '../../../../models/construct-step';
