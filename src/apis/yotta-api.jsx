@@ -376,6 +376,14 @@ const YottaAPI = {
         // return await gets((`topic/deleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`))
     },
 
+    //删除课程
+    async removeClass(subjectName, removeDomainName) {
+        return await axios.get(`http://47.95.145.72:8083/subject/getSubjectGraphByName/removeClass?subjectName=${encodeURI(subjectName)}&removeDomainName=${encodeURI(removeDomainName)}`);
+    },
+    //添加课程
+    async addClass(subjectName, addDomainName) {
+        return await axios.get(`http://47.95.145.72:8083/subject/getSubjectGraphByName/addClass?subjectName=${encodeURI(subjectName)}&addDomainName=${encodeURI(addDomainName)}`);
+    },
 
 };
 
