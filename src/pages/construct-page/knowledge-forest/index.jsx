@@ -828,6 +828,7 @@ function KnowledgeForest() {
 
         if (currentTopic && insertFacet1) {
             insertFacet(currentTopic, insertFacet1);
+            message.info("分面增加成功！")
         }
   },[insertFacet1])
 
@@ -882,7 +883,7 @@ function KnowledgeForest() {
         //   }
         if(res){
             console.log("删除成功")
-              message.info(res.msg)
+              message.info("分面删除成功！")
               fetchMap();
         }
       }

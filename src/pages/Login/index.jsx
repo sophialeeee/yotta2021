@@ -60,6 +60,7 @@ function Login(){
         }
         if(login&&userName&&password){
           Login(userName,password);
+          localStorage.removeItem('state');//刷新清空状态量
         }
     },[login])
     

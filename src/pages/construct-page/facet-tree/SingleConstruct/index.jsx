@@ -337,7 +337,7 @@ function SingleConstruct() {
         if(topicName2 && insertFacet1){
             insertFacet(topicName2, insertFacet1);
         }
-  },[topicName2])
+  },[insertFacet1])
 
     // 插入主题
     useEffect(()=>{
