@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Badge, Divider, Modal, Alert, Input, message, Select, Drawer, Row, Col, Popconfirm} from 'antd';
+import {Card, Badge, Divider, Modal, Alert, Input, message, Select, Drawer, Row, Col, Popconfirm,Spin} from 'antd';
 import {Menu, Dropdown, Button, Space, Tooltip} from 'antd';
 import {DownOutlined, StopOutlined, EditOutlined, BlockOutlined} from '@ant-design/icons';
 
@@ -390,6 +390,7 @@ function KnowledgeForest() {
             return
         }
         setquitTopicSpider(0)
+        setSpiderTopicSpinning(1)
         setinsertINfo('启动爬虫，爬取主题：' + currInsertTopic + '相关的碎片')
         startSpider(currInsertTopic)
     };
@@ -399,7 +400,9 @@ function KnowledgeForest() {
             message.warn('当前并无正在爬取主题！')
         }
 
-        setTimeout(askSpiderTopicTimer)
+        if (askSpiderTopicTimer){
+            setTimeout(askSpiderTopicTimer)
+        }
         const resStop = await YottaAPI.stopSpider_zyl(currentSubjectDomain.domain, currInsertTopic);
         if (resStop) {
             if (resStop.code == 200) {
@@ -409,11 +412,10 @@ function KnowledgeForest() {
             }
         }
         setquitTopicSpider(0)
+        setSpiderTopicSpinning(0)
         setinsertINfo('')
+
     }
-    const success = () => {
-        // Dismiss manually and asynchronously
-    };
 
     async function getGenerateDependency() {
 
@@ -422,6 +424,10 @@ function KnowledgeForest() {
             return
         }
         const gen_F = message.loading('生成碎片关系...', 0);
+
+        if (askSpiderTopicTimer){
+            setTimeout(askSpiderTopicTimer)
+        }
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, currentTopic);
         setTimeout(gen_F, 1);
@@ -436,6 +442,7 @@ function KnowledgeForest() {
                 fetchMap()
                 setCurrInsertTopic('')
                 setDoTopicSpider(0)
+                setSpiderTopicSpinning(0)
             } else {
                 message.info(resGetGenerateDependency.msg)
                 willmounted=true
@@ -444,6 +451,7 @@ function KnowledgeForest() {
                 fetchMap()
                 setCurrInsertTopic('')
                 setDoTopicSpider(0)
+                setSpiderTopicSpinning(0)
             }
         } else {
             willmounted=true
@@ -452,6 +460,7 @@ function KnowledgeForest() {
             fetchMap()
             setCurrInsertTopic('')
             setDoTopicSpider(0)
+            setSpiderTopicSpinning(0)
 
         }
     }
@@ -479,6 +488,7 @@ function KnowledgeForest() {
         //爬取状态
         setquitTopicSpider(1)
         setDoTopicSpider(1)
+        setSpiderTopicSpinning(1)
 
         askSpiderTopicTimer = setInterval(async function () {
 
@@ -490,6 +500,7 @@ function KnowledgeForest() {
 
                     // setinsertINfo('爬取结束，共有' + caluNum(resIncremental.data) + '个碎片')
                     setquitTopicSpider(0)
+                    setSpiderTopicSpinning(0)
 
                     setTimeout(askSpiderTopicTimer)
                 } else if (resIncremental.code == 301) {
@@ -506,7 +517,7 @@ function KnowledgeForest() {
                     await sleep();
                     setinsertINfo('')
                     setquitTopicSpider(0)
-
+                    setSpiderTopicSpinning(0)
                     setTimeout(askSpiderTopicTimer)
 
                 }
@@ -539,10 +550,12 @@ function KnowledgeForest() {
         return new Promise(resolve => setTimeout(resolve, sleepTime))
     }
 
+    const [spiderTopicSpinning,setSpiderTopicSpinning]=useState(0);
     async function startSpider(topicName) {
 
         //显示
         setDoTopicSpider(1)
+        setSpiderTopicSpinning(1)
 
 
         setinsertINfo('启动爬虫，爬取主题：' + topicName + '相关的碎片')
@@ -1362,7 +1375,12 @@ function KnowledgeForest() {
                             right: "3%",
                             position: 'absolute',
                             zIndex: "100"
-                        }}>
+                        }}
+                              extra={
+                                  <Spin spinning={spiderTopicSpinning} />
+
+                              }
+                        >
 
                             <div>
                                 <Row>
@@ -1411,7 +1429,7 @@ function KnowledgeForest() {
 
                                     <Col span={7}>
                                         <Popconfirm placement="top" title={'确定对已经爬取碎片确定生成关系？'} onConfirm={getGenerateDependency}
-                                                    okText="Yes" cancelText="No">
+                                                    okText="是" cancelText="否">
                                             <button className="ant-btn ant-btn-ghost ant-btn-sm"
                                                     style={{
                                                         position: "absolute",
