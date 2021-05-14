@@ -280,6 +280,15 @@ function BatchConstruct() {
             console.log('batchData',batchData);
             setcurrentTopic(batchData[0]);
             console.log('当前主题题',currentTopic);
+            const res = await YottaAPI.getDynamicTopics(currentSubjectDomain.subject,currentSubjectDomain.domain);
+            const topicsData = res.data.data;
+            settopicsData(topicsData);
+            if(topicsData){
+                dataTemp = (topicsData.map((topic) =>topic.topicName
+               ));
+               dataTemp = dataTemp.filter((topic)=>topic!='B+树')
+            }
+            settopics(dataTemp);
         }
         if(deleteTopic1){
             deleteTopic();
@@ -326,7 +335,7 @@ function BatchConstruct() {
         if (currentSubjectDomain.domain) {
             fetchTopicsData();
         }
-    }, [deleteTopic1])
+    }, [])
 
     useEffect(() => {
         const topicNode = document.getElementById(`topicitem-${currentTopic}`);
@@ -368,7 +377,7 @@ function BatchConstruct() {
                                 console.log('已构建主题',finishedData);
                                 localStorage.setItem("finishedData", JSON.stringify(finishedData));
                                 localStorage.setItem("batchData", JSON.stringify(batchData));
-                                (index < topics.length) && (setcurrentTopic(topics[index+1]));
+                                // (index < topics.length) && (setcurrentTopic(topics[index+1]));
                             },3000)
 
                         },3000)
@@ -417,23 +426,30 @@ function BatchConstruct() {
                 var getfinishedData = JSON.parse(localStorage.getItem('finishedData'))
                 console.log('getfinishedData',getfinishedData)
                 console.log('getbatchData',getbatchData)
-                setfinishedNum(getfinishedData.length);
-                setcurrentTopic(getbatchData[1]);
-                console.log('currentTopic',currentTopic)
-                const index = topics.indexOf(getbatchData[1]);
-                console.log('indexxx', index);
-                var finishhhh = topics.slice(0,index);
-                for(var i=0; i<finishhhh.length;i++){
-                    console.log(finishhhh[i]);
-                    var finishedTopic = finishhhh[i];
-                    setfinishedTopic(finishedTopic);
-                    console.log('finishedTopic',finishedTopic)
-                    const topicNode = document.getElementById(`topicitem-${finishedTopic}`);
-                    console.log('topicNode',topicNode);
-                    topicNode.style.color = 'green';
+                if(getfinishedData){
+                    setfinishedNum(getfinishedData.length);
                 }
+                if(getbatchData){
+                    setcurrentTopic(getbatchData[1]);
+                    console.log('currentTopic',currentTopic)
+                    const index = topics.indexOf(getbatchData[1]);
+                    console.log('indexxx', index);
+                    var finishhhh = topics.slice(0,index);
+                    for(var i=0; i<finishhhh.length;i++){
+                        console.log(finishhhh[i]);
+                        var finishedTopic = finishhhh[i];
+                        setfinishedTopic(finishedTopic);
+                        console.log('finishedTopic',finishedTopic)
+                        const topicNode = document.getElementById(`topicitem-${finishedTopic}`);
+                        console.log('topicNode',topicNode);
+                        topicNode.style.color = 'green';
+                    }
                 console.log('getbatchData',getbatchData)
-                setcurrentTopic(getbatchData[1]);
+                }else{
+                    setcurrentTopic(topics[0])
+                    var num = 0;
+                    setfinishedNum(num);
+                }
             }else{
                 localStorage.setItem("visitedBatch", "yes")
                 console.log("This is the first time!")
