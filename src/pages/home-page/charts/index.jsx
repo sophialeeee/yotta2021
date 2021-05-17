@@ -72,7 +72,19 @@ function Charts(props) {
                 }
             }
     }; 
-    
+
+    //更新gephi图后重新渲染
+    async function update() {
+        var gephi = await YottaAPI.getSubjectGraph(currentSubjectDomain.subject);
+        console.log('gephi', gephi);
+        console.log('csd', currentSubjectDomain)
+        setGephi(gephi.data.data);
+        var domainsAndSubjects = await YottaAPI.getDomainsBySubject(cookie.load('userInfo'));
+        domainsAndSubjects = domainsAndSubjects.data.data;
+        console.log("+++++++", domainsAndSubjects)
+        if (domainsAndSubjects) { setSubjects(domainsAndSubjects) }
+    }
+
     function onAutoConstructClick(){
         let subject = '';
         let domain = '';
@@ -172,7 +184,7 @@ function Charts(props) {
                 {/* </Tooltip> */}
             </div>
             <div className={classes.chart}>
-                {gephi ? <Gephi subjectName={currentSubjectDomain.subject} gephi={gephi}/> : <div>该学科没有图谱</div>}
+                {gephi ? <Gephi subjectName={currentSubjectDomain.subject} gephi={gephi} update={update}/> : <div>该学科没有图谱</div>}
             </div>
 
         </div>
