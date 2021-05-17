@@ -5,14 +5,16 @@ import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/graph';
 import 'echarts/lib/component/title'
 import 'echarts/lib/component/legend';
+import 'echarts/lib/component/tooltip'
 import {useHistory} from 'react-router-dom';
 import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
 import confirm from 'antd/lib/modal/confirm';
 import YottaAPI from '../../apis/yotta-api';
 import Charts from '../../pages/home-page/charts';
+import { Tooltip } from 'antd';
 
 function Gephi(props) {
-    const { gephi, subjectName } = props;
+    const { gephi, subjectName, update } = props;   //update
     let graph = dataTool.gexf.parse(gephi);
     console.log('graph', graph)
     let categories = [];
@@ -40,14 +42,16 @@ function Gephi(props) {
                     onOk() {
                         YottaAPI.removeClass(currentSubjectDomain.subject, currentDomainName);
                         console.log(currentSubjectDomain.subject, currentDomainName)
-                        document.location.reload()
+                        //document.location.reload()
+                        update()
+                        update()
                     },
                     onCancel() {
 
                     }
                 })
             }
-        }
+        },
     }
 
     graph.nodes.forEach(function (node) {
@@ -90,7 +94,16 @@ function Gephi(props) {
             top: '90%',
             left: 'right'
         },
-        tooltip: {},
+        tooltip: {
+            show:true,
+            trigger: 'item',
+            formatter: function (params) {
+                if (params.dataType == 'node') {
+                    var tip ='<div style="padding:3px 12px 3px 12px;margin:-10px;border-radius:50px;background-color:#FFFFFF;color:#696969;border: 1.5px solid #696969;font-size:13px">点击查看，右键删除</div>'
+                    return tip
+                }
+            },
+        },
         legend: {
             // selectedMode: 'single',
             top: 'top',
@@ -138,7 +151,6 @@ function Gephi(props) {
             }
         ]
     };
-
     return (
         <ReactEchartsCore echarts={echarts} option={option} onEvents={onEvents}
             style={{ height: 800, width: 1100, margin: 'auto auto' }} />
