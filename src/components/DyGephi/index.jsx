@@ -10,6 +10,7 @@ import useCurrentSubjectDomainModel from '../../models/current-subject-domain';
 
 
 function Gephi(props) {
+    localStorage.removeItem('state');//刷新清空状态量
     const {gephi, subjectName} = props;
     const history = useHistory();
     const {currentSubjectDomain, setCurrentSubjectDomain} = useCurrentSubjectDomainModel();
