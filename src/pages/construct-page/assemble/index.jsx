@@ -97,7 +97,7 @@ function Assemble() {
 
     const treeStyle = {
         width:'50%',
-        height:'300px',
+        height:'350px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
@@ -107,11 +107,11 @@ function Assemble() {
 
     const chartStyle = {
         width:'50%',
-        height:'495px',
+        height:'445px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'310px',
+        top:'360px',
         overflow:"hidden"
     };
     const countStyle = {
@@ -795,7 +795,7 @@ function Assemble() {
     return (
         <>
              <Card title="主题分面树" style={treeStyle}>
-                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'200px'}}></svg> 
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg> 
             </Card>
             <Card title="圆形布局图" style={chartStyle}>
                 {
