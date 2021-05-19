@@ -201,12 +201,14 @@ const YottaAPI = {
     },
 
      async getMap(domainName){
-        return await axios.get(`http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}`);
+        return await axios.get(`http://47.95.145.72:8083/dependences/?domainName=${encodeURI(domainName)}`);
+        // 有缓存，无关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
 
     async generateMap(domainName){
         return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
+        // 无缓存，有关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
 
