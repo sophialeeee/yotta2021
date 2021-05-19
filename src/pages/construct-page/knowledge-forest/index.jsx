@@ -289,7 +289,7 @@ function KnowledgeForest() {
         async function fetchAssembleData3() {
             console.log("开始动态渲染");
             if (spiderAss) {
-                infoConstructing();
+                //infoConstructing();
                 var i = 0;
                 console.log("----------------");
                 for (var facet_index = 0; facet_index < spiderAss.data.children.length; facet_index++) {
@@ -1276,6 +1276,9 @@ function KnowledgeForest() {
                                             }}>
                                                 <StopOutlined/>
                                             </button>
+                                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"10%", textAlign:"left"}}>
+                                                <span style={{color:"#979693"}}>主题碎片总数：<span style={{color:"red"}}>{assnum}</span></span>
+                                            </div>
                                         </Drawer>
                                     </>
                                 ) :
@@ -1341,6 +1344,9 @@ function KnowledgeForest() {
                                             }}>
                                                 <StopOutlined/>
                                             </button>
+                                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"10%", textAlign:"left"}}>
+                                                <span style={{color:"#979693"}}>主题碎片总数：<span style={{color:"red"}}>{assnum}</span></span>
+                                            </div>
                                         </Drawer>
                                     </>
                                 )
