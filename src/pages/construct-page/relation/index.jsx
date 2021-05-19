@@ -458,7 +458,7 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,function(){console.log("relation page no click topic!")}, () => {},() => {},() => {},select,() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting");
                     },'relation',()=>{},()=>{});}
@@ -490,7 +490,7 @@ function Relation() {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
                     // console.log('res.data',res.data);
-                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                    drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,function(){console.log("relation page no click topic!")}, () => {},() => {},() => {},select,() => {},(a,b) => {
                         onDeleteRelation( a, b);
                         console.log("deleting");
                     },'relation',()=>{},()=>{});}
@@ -520,7 +520,7 @@ function Relation() {
                     }
                     else if(res.data&&mapRef&&mapRef.current){
                     console.log('res.data',res.data);
-                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() => {}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,function(){console.log("relation page no click topic!")}, () => {},() => {},() => {},select,() => {},(a,b) => {
                             onDeleteRelation( a, b);
                             console.log("deleting");
                         },'relation',()=>{},()=>{});
