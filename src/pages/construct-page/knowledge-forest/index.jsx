@@ -572,7 +572,10 @@ function KnowledgeForest() {
         textareaValueRef.current = '';
 
 
-        message.loading({content: '插入主题：' + topicName, key}, 1.5);
+        // message.info({content: '插入主题：' + topicName, key}, 0.5);
+        message.info('插入主题：' + topicName, key)
+        await sleep()
+
         const resInsertTopic = await YottaAPI.insertTopic_zyl(currentSubjectDomain.domain, topicName);
         if (resInsertTopic) {
             if (resInsertTopic.code == 200) {
@@ -582,7 +585,7 @@ function KnowledgeForest() {
                 startSpider(topicName)
 
             } else {
-                message.loading(resInsertTopic.msg, key)
+                message.info(resInsertTopic.msg, key)
             }
         }
     }
