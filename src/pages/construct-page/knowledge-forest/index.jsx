@@ -1,7 +1,14 @@
 import React from 'react';
 import {Card, Badge, Divider, Modal, Alert, Input, message, Select, Drawer, Row, Col, Popconfirm,Spin} from 'antd';
 import {Menu, Dropdown, Button, Space, Tooltip} from 'antd';
-import {DownOutlined, StopOutlined, EditOutlined, BlockOutlined,ApartmentOutlined} from '@ant-design/icons';
+import {
+    DownOutlined,
+    StopOutlined,
+    EditOutlined,
+    BlockOutlined,
+    ApartmentOutlined,
+    CloseSquareOutlined, CloseOutlined
+} from '@ant-design/icons';
 
 import {useState} from 'react';
 import {useEffect} from 'react';
@@ -400,14 +407,14 @@ function KnowledgeForest() {
         }
 
         if (askSpiderTopicTimer){
-            setTimeout(askSpiderTopicTimer)
+            clearInterval(askSpiderTopicTimer)
         }
         const resStop = await YottaAPI.stopSpider_zyl(currentSubjectDomain.domain, currInsertTopic);
         if (resStop) {
             if (resStop.code == 200) {
                 message.info('暂停爬取主题:' + currInsertTopic + '相关碎片！')
-            } else {
-                message.warn('暂停出错!')
+            } else if (resStop==302){
+                message.info(resStop.msg)
             }
         }
         setquitTopicSpider(0)
@@ -425,28 +432,34 @@ function KnowledgeForest() {
         const gen_F = message.loading('生成碎片关系...', 0);
 
         if (askSpiderTopicTimer){
-            setTimeout(askSpiderTopicTimer)
+            clearInterval(askSpiderTopicTimer)
         }
 
         const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, currentTopic);
         setTimeout(gen_F, 1);
         if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
+                if (resGetGenerateDependency.data.length==0){
+                    message.info('生成关系为数为0')
+
+                }else{
+                    message.loading({content: '刷新知识森林概览', key}, 1)
+                    willmounted=true
+                    fetchMap()
+                    setCurrInsertTopic('')
+                    setDoTopicSpider(0)
+                    setCurrTopicFNum(0)
+                    setSpiderTopicSpinning(0)
+                }
             } else {
                 message.info(resGetGenerateDependency.msg)
             }
         }
-        message.loading({content: '刷新知识森林概览', key}, 1)
-        willmounted=true
-        fetchMap()
-        setCurrInsertTopic('')
-        setDoTopicSpider(0)
-        setCurrTopicFNum(0)
-        setSpiderTopicSpinning(0)
+
     }
 
+    let [askSpiderTopicTimer,setAskSpiderTopicTimer] = useState(0);
 
-    var askSpiderTopicTimer = setInterval(ask_inner, 5000);
     const [currTopicFNum, setCurrTopicFNum] = useState(0);
 
 
@@ -459,40 +472,46 @@ function KnowledgeForest() {
         }
 
     }
-    async function ask_inner () {
-        let pre_num = 0
-        const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, currInsertTopic);
-        if (resIncremental) {
-            console.log(resIncremental)
-            if (resIncremental.code == 200) {
-                setquitTopicSpider(0)
-                setSpiderTopicSpinning(0)
 
-                setTimeout(askSpiderTopicTimer)
-            } else if (resIncremental.code == 301) {
-
-                let now_num = caluNum(resIncremental.data)
-                if (now_num > pre_num) {
-                    pre_num = now_num
-                    setCurrTopicFNum(pre_num)
-                }
-
-
-            } else if (resIncremental.code == 300) {
-                await sleep();
-                setquitTopicSpider(0)
-                setSpiderTopicSpinning(0)
-                setTimeout(askSpiderTopicTimer)
-            }
-        }
-    }
     async function askIncremental(topicName) {
+
+        let pre_num = 0
+
         setinsertINfo('爬取碎片中...')
         //爬取状态
         setquitTopicSpider(1)
         setDoTopicSpider(1)
         setSpiderTopicSpinning(1)
 
+        askSpiderTopicTimer = setInterval(async function () {
+            console.log('askSpiderTopicTimer working id:',askSpiderTopicTimer)
+            const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
+            if (resIncremental) {
+                console.log(resIncremental)
+                if (resIncremental.code == 200) {
+                    setquitTopicSpider(0)
+                    setSpiderTopicSpinning(0)
+                    clearInterval(askSpiderTopicTimer)
+
+                } else if (resIncremental.code == 301) {
+
+                    let now_num = caluNum(resIncremental.data)
+                    if (now_num > pre_num) {
+                        pre_num = now_num
+                        setCurrTopicFNum(pre_num)
+                    }
+
+                } else if (resIncremental.code == 300) {
+                    await sleep();
+                    setinsertINfo('')
+                    setquitTopicSpider(0)
+                    setSpiderTopicSpinning(0)
+                    clearInterval(askSpiderTopicTimer)
+
+                }
+            }
+        }, 5000);
+        setAskSpiderTopicTimer(askSpiderTopicTimer)
 
 
     }
@@ -503,8 +522,6 @@ function KnowledgeForest() {
 
         for (let i = 0; i < res.childrenNumber; i++) {
             let child = res.children[i]
-            total_num += 1
-
             for (let j = 0; j < child.children.length; j++) {
                 total_num += 1
             }
@@ -768,7 +785,6 @@ function KnowledgeForest() {
 
     useEffect(() => {
 
-        console.log("starttttt")
         setTimeout(hide, 0);
         reSet()
         init(currentSubjectDomain.domain)
@@ -1193,6 +1209,14 @@ function KnowledgeForest() {
     const showDrawer = () => {
         setvisibleDrawer(!visibleDrawer);
     };
+    const onCloseSpiderWindow = () => {
+        setCurrInsertTopic('')
+        setDoTopicSpider(0)
+        setCurrTopicFNum(0)
+        setSpiderTopicSpinning(0)
+        clearInterval(askSpiderTopicTimer)
+
+    }
 
 
     return (
@@ -1361,7 +1385,21 @@ function KnowledgeForest() {
                             zIndex: "100"
                         }}
                               extra={
-                                  <Spin spinning={spiderTopicSpinning} />
+                                  <div>
+                                      <Space>
+                                          <Spin spinning={spiderTopicSpinning} />
+                                          <Popconfirm placement="top" title={'确定退出主题添加？'} onConfirm={onCloseSpiderWindow}
+                                                      okText="是" cancelText="否">
+                                              <Button  size='small' type='link' >
+                                                  <CloseOutlined />
+                                              </Button>
+
+                                          </Popconfirm>
+
+                                      </Space>
+
+
+                                  </div>
 
                               }
                         >
