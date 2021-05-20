@@ -355,7 +355,7 @@ function BatchConstruct() {
                     topicNode.style.opacity = 1;
                 },6000)
                 async function fetchTreeData(){
-                    const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+                    const result = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,currentTopic);
                     if(result){
                         setTimeout(()=>{
                             // if(treeRef.current)
@@ -398,6 +398,7 @@ function BatchConstruct() {
 
     //画分面树
     useEffect(()=>{
+        // window.onresize = () => {
         if (treeRef && treeData) {
             if(treeData.childrenNumber === 0){
                 emptyChildren(treeRef.current);
@@ -412,7 +413,11 @@ function BatchConstruct() {
                 emptyChildren(treeRef.current);
             }
         }
-
+        // }
+        // return () => {
+        //     window.onresize = null;
+        //     console.log('resize.clear');
+        // }
 
     },[treeData])
 
@@ -551,7 +556,7 @@ function BatchConstruct() {
         console.log("currentTopic clickbranch",currentTopic);
          var topiccc = finishedData.slice(-1)
 
-        const treeData = await YottaAPI.getCompleteTopicByTopicName(topiccc);
+        const treeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,topiccc);
     window.flag = false;
     console.log("shanchuhou",window.flag);
         if(treeData){
@@ -602,7 +607,7 @@ function BatchConstruct() {
     useEffect(()=>{
         async function insertFacet(){
             await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topiccc, insertFacet1);
-      const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topiccc);
+      const treeData2 = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,topiccc);
     //   window.flag = false;
     //   console.log("shanchuhou", window.flag);
       if (treeData) {

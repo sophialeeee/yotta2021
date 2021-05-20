@@ -899,7 +899,7 @@ function KnowledgeForest() {
         //     }
         setcurrentTopic(topic => {
             (async () => {
-                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+                const treeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,topic);
                 console.log('t-tt', topic);
                 window.flag = false;
                 console.log("shanchuhou", window.flag);
