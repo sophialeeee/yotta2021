@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from './index.module.css';
-import { Modal, Select, Drawer, Switch} from "antd";
+import { Modal, Select, Drawer, Switch, Progress} from "antd";
 import {ExclamationCircleOutlined,PlusOutlined, CaretRightOutlined,PauseOutlined,MinusOutlined, EditOutlined, CloseOutlined,DeleteOutlined, StopOutlined} from '@ant-design/icons'
 import YottaAPI from '../../../apis/yotta-api';
 import { useState } from 'react';
@@ -17,7 +17,9 @@ const {confirm} = Modal;
 
 let pause = 0;
 let quit = 0;
-
+let topicChange = 1;
+let nextSpider = 0;
+let progress = 1;
 
 function Assemble() {
     const [learningPath,setlearningPath] = useState([]);  //学习路径
@@ -61,6 +63,9 @@ function Assemble() {
     const [showSpiderState, setshowSpiderState] = useState(0);
     const [spiderFinish, setspiderFinish] = useState(1);
     const [topicConfirmFlag, settopicConfirmFlag] = useState(0);   //0表示取消，1表示点击主题，2表示确定爬取该主题
+    const [finishedTopic, setfinishedTopic] = useState();
+    const [unfinishedTopic, setunfinishedTopic] = useState();
+    const [showProgress, setshowProgress] = useState(1);
 
     const {TextArea} = Input;
     
@@ -97,22 +102,23 @@ function Assemble() {
 
     const treeStyle = {
         width:'50%',
-        height:'350px',
+        height:'400px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'0px',
-        
+        top:'405px',
+        overflow:"hidden"
       };
 
     const chartStyle = {
         width:'50%',
-        height:'445px',
+        height:'380px',
         position: 'absolute',
         left: '0%',
         textAlign: 'center',
-        top:'360px',
-        overflow:"hidden"
+        top:'8px',
+        overflowX:"hidden",
+        overflowY:"auto"
     };
     const countStyle = {
         width:'25%',
@@ -139,6 +145,7 @@ function Assemble() {
         height:'618px',
         overflow: 'auto',
     }
+
     // 自动构建，临时
     useEffect(() => {
         async function ontopicConfirm(){
@@ -162,39 +169,24 @@ function Assemble() {
 
     },[topicConfirmFlag])
 
-    // const onAutoConstructClick = () => {
-    //     let currentTopic1 = '';
-    //     const onSelectChange = (e) => { 
-    //         currentTopic1 = e;  
-    //     }
-    //     confirm({
-    //         title: '请选择要装配的主题',
-    //         icon: <ExclamationCircleOutlined/>,
-    //         content: <>
-    //             <div style={{display: 'flex', flexDirection: 'column'}}>
-    //             <span>
-    //                 主题：
-    //             </span>
-    //                 <Select onSelect={onSelectChange}>
-    //                     {
-    //                         topics.map((topicName)=>(
-    //                         <option value={topicName} >{topicName}</option> 
-    //                         ))
-    //                     }
-    //                 </Select> 
-    //             </div>   
+    const onNextSpider = () => {
+        confirm({
+            title: '是否想要停止当前爬虫，并爬取下一个主题？',
+            icon: <ExclamationCircleOutlined/>,
+            okText: '确定',
+            cancelText: '取消',
+            onOk() {
+                setquitSpider(1); 
+                quit = 1;
+                nextSpider = 1;
+                setspiderText("");
+                setshowSpiderState(0);
+            },
+            onCancel() {
                 
-    //         </>,
-    //         okText: '开始装配',
-    //         cancelText: '取消',
-    //         onOk() {
-    //             setcurrentTopic(currentTopic1);
-    //         },
-    //         onCancel() {
-                
-    //         }
-    //     })
-    // };
+            }
+        })
+    };
 
     const onPlaySpider = () => {
         confirm({
@@ -313,30 +305,6 @@ function Assemble() {
         })
     };
 
-    const onUpdateAssemble = (assembleId1, assembleContent1,e) => {
-        console.log("碎片内容",assembleContent1);
-        confirm({
-            title: '请编辑碎片内容',
-            icon: <ExclamationCircleOutlined/>,
-            content: <>
-                <TextArea showCount maxLength={120} onChange={handleTextareaChange} defaultValue={assembleContent1}/>
-            </>,
-            okText: '确定',
-            cancelText: '取消',
-            onOk() {
-                const assembleContent = textareaValueRef.current;     // 新增碎片的内容
-                textareaValueRef.current = '';
-                setupdateAssembleId(assembleId1);
-                setupdateAssembleContent(assembleContent); 
-                console.log(assembleContent1);
-                console.log('updateAssemble',assembleId1);
-                
-            },
-            onCancel() {
-                
-            }
-        })
-    }; 
 
 
     //根据domainName,topicName获取分面信息
@@ -415,7 +383,7 @@ function Assemble() {
 
 
     useEffect(() => {
-        if (treeRef && treeData) {
+        if (treeRef.current && treeData) {
             drawTreeNumber(treeRef.current, treeData, clickFacet1);
             console.log("树",treeRef.current)
         }
@@ -441,49 +409,15 @@ function Assemble() {
             }
         }
         if (currentSubjectDomain.domain) {
+            setshowProgress(1);
             fetchTopicsData();
             // setcurrentTopic('树状数组');
         }
     }, [currentSubjectDomain.domain])
 
-    //画圆形图
-    useEffect(()=>{
-        async function fetchDependencesMap(){
-            const result = await YottaAPI.getMap(currentSubjectDomain.domain);
-            console.log("结果是：",result);
-            await YottaAPI.getMap(currentSubjectDomain.domain).then(
-                (res) => {
-                    // setmapdata(res.data);
-                    if(res.data&&mapRef.current&&treeRef1.current){
-                        drawMap(res.data, mapRef.current, treeRef1.current, currentSubjectDomain.domain, learningPath, clickTopic, clickFacet, deleteTopic, assembleTopic,()=>{}, ()=>{}, ()=>{}, 'assemble',()=>{},()=>{});
-                        //drawMap(res.data,mapRef.current,treeRef1.current,currentSubjectDomain.domain,learningPath,clickTopic, clickFacet, insertTopic, deleteTopic, assembleTopic);}
-                }
-            }
-        )
-    }
-    console.log("当前主题为",currentSubjectDomain.domain);
-    if (currentSubjectDomain)
-        fetchDependencesMap();
-
-    },[currentSubjectDomain.domain]);
    
 
 
-    async function clickFacet(facetId){
-        const res = await YottaAPI.getASsembleByFacetId(facetId);
-        setassembles(res);
-        //const res1 = await YottaAPI.getFacetName1(facetId);
-        //setfacet(res1.facetName);
-    }
-
-    async function clickTopic(topicId,topicName){
-        setcurrentTopic(topicName);
-        setstaticRenderAss(topicName);
-        console.log("点击主题");
-    }
-
-    async function deleteTopic(topicId){
-    }
 
     async function assembleTopic(topicId,topicName){
         console.log("成功啦成功啦");
@@ -571,6 +505,7 @@ function Assemble() {
             pause = 0;
             quit = 0;
             setshowSpiderState(1);
+            setshowProgress(1);
             setpauseSpider(0);
             setspiderText(" （正在爬取碎片...）");
             setspidernum(0);
@@ -583,6 +518,8 @@ function Assemble() {
                             if(quit===1){
                                 setshowSpiderState(0);
                                 YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                if(nextSpider == 1)
+                                    topicChange = 1;
                                 setrenderFinish(1);
                                 clearInterval(myvar1);
                             }
@@ -600,6 +537,9 @@ function Assemble() {
                                 setspiderFinish(1);
                                 infoSpiderFinish();
                                 YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                console.log("nextSpider:",nextSpider);
+                                if(result.code == 200 || nextSpider == 1)
+                                    topicChange = 1;
                                 clearInterval(myvar1);
 
                             }
@@ -617,10 +557,10 @@ function Assemble() {
                     }
                 },5000);
         }
-        if (currentTopic&&topicConfirmFlag===2) {
+        if (currentTopic) {
             fetchAssembleData2();
         }
-    }, [topicConfirmFlag]);
+    }, [dynamicSpider]);
 
 
     // 动态爬虫结果碎片 渲染
@@ -670,48 +610,6 @@ function Assemble() {
     }, [appendAssembleContentFlagToSort, deleteAssembleToSort, assembles, currentTopic])
 
 
-    // 自动构建时的fetch tree data
-    useEffect(() => {
-        console.log(autocurrentTopic);
-        async function autofetchTreeData() {
-            const autotreeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,autocurrentTopic);
-            console.log("fetch tree data:",autotreeData);
-            if (autotreeData)
-                setautotreeData(autotreeData);
-        }
-        autofetchTreeData();
-    }, [autocurrentTopic]);
-
-    // 自动构建时的draw tree data
-    useEffect(() => {
-        if (treeRef && autotreeData) {
-            if (treeData.childrenNumber === 0) {
-                alert("当前页面无分面树");
-            }
-            else{
-                console.log("autotreeData.children.length",autotreeData.children.length);
-                if (treeRef.current && autotreeData && autotreeData.children.length !==0) {
-                    drawTreeNumber(treeRef.current, autotreeData, d => { });
-                    console.log("树",treeRef.current);
-                }
-            }
-        }
-    }, [autotreeData])
-
-
-    // 自动构建时计算碎片个数
-    useEffect(() => {
-        async function autofetchAssembleData(){         
-            const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,autocurrentTopic);
-            if(res){
-                setassnum(res.length);
-                setassembles(res);
-                console.log("res.length",res.length);
-            }
-        }
-        autofetchAssembleData();
-    },[autocurrentTopic])
-
 
     useEffect(() => {
         async function fetchAutoConstruct() {
@@ -719,30 +617,31 @@ function Assemble() {
             if(topicsData){
                     var i=0;
                     var autoInterval = setInterval(()=>{
-                    if(i==topicsData.length){
-                        console.log("默认主题为",topicsData[0].topicName);
-                        setcurrentTopic(topicsData[0].topicName);
-                        clearInterval(autoInterval);
-                        localStorage.setItem("visitedAssemble", "yes")
-                        // if(constructType=='cool')
-                        // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
-                        //     setStep(0)
-                        // }else{
-                        //     setStep(3)
-                        // }}
-                        infoFinish();
-                        setfirstTime(1);
-                        setdata0(1);
-                    }else        
-                    { 
-                        setautocurrentTopic(topicsData[i].topicName);
-                        i++;
+                    if(topicChange==1){
+                        if(i==topicsData.length){
+                            //console.log("默认主题为",topicsData[0].topicName);
+                            //setcurrentTopic(topicsData[0].topicName);
+                            clearInterval(autoInterval);
+                            localStorage.setItem("visitedAssemble", "yes")
+                            infoFinish();
+                            setfirstTime(1);
+                            setdata0(1);
+                        }else        
+                        {
+                            setdynamicSpider(topicsData[i].topicName);  //设置当前爬取的主题
+                            setcurrentTopic(topicsData[i].topicName);
+                            setfinishedTopic(topicsData.slice(0,i));
+                            setunfinishedTopic(topicsData.slice(i+1,topicsData.length));
+                            topicChange = 0;
+                            nextSpider = 0;
+                            i++;
+                        }
                     }
-                },500);
+                },1000);
             }
         }
-        if (currentSubjectDomain.domain&&autoCons===0){
-            console.log("现在的autoCons为",autoCons);
+        if (currentSubjectDomain.domain&&autoCons===1){
+            console.log("现在的autoCons为",currentTopic);
             fetchAutoConstruct();
         }
     }, [autoCons])   
@@ -795,77 +694,133 @@ function Assemble() {
     return (
         <>
              <Card title="主题分面树" style={treeStyle}>
-                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg> 
-            </Card>
-            <Card title="圆形布局图" style={chartStyle}>
                 {
                     showSpiderState ? (
                         !pauseSpider ? (
                             <>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={showDrawer} style={{ position:"absolute",right:'5%', top:"15%", width:"120px",height:"28px",}}>
-                            展开爬虫小组件
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={showDrawer} style={{ position: "absolute", right: '5%', top: "15%", width: "110px", height: "28px", }}>
+                                    展开爬虫小组件
                             </button>
-                            <Drawer
-                            title={"爬虫控制小组件"}
-                            placement="right"
-                            closable={false}
-                            onClose={showDrawer}
-                            visible={visibleDrawer}
-                            getContainer={false}
-                            style={{ position: 'absolute'}}
-                          >
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>进行中</span></div>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>暂停爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPauseSpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
-                            <PauseOutlined />
-                            </button>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"6%", textAlign: 'left'}}><span style={{color:"#979693",}}>停止爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"44%", width:"30px",height:"22px",}}>
-                            <StopOutlined />
-                            </button>
-                            </Drawer>
+                                <Drawer
+                                    title={"爬虫控制小组件"}
+                                    placement="right"
+                                    closable={false}
+                                    onClose={showDrawer}
+                                    visible={visibleDrawer}
+                                    getContainer={false}
+                                    style={{ position: 'absolute'}}
+                                >
+                                    <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "5%", textAlign: 'left' }}>当前主题 &nbsp;&nbsp;<span style={{ color: "black" }}>{currentTopic}</span></div>
+                                    <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "5%", textAlign: 'left' }}>爬虫状态 &nbsp;&nbsp;<span style={{ color: "black" }}>进行中</span></div>
+                                    <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "8%", textAlign: "left" }}><span style={{ color: "#979693", }}>暂停爬取按钮</span></div>
+                                    <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPauseSpider} style={{ position: "absolute", right: '25%', top: "44%", width: "30px", height: "22px", }}>
+                                        <PauseOutlined />
+                                    </button>
+                                    <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "6%", textAlign: 'left' }}><span style={{ color: "#979693", }}>停止爬取按钮</span></div>
+                                    <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position: "absolute", right: '25%', top: "55%", width: "30px", height: "22px", }}>
+                                        <StopOutlined />
+                                    </button>
+                                    <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "6%", textAlign: 'left' }}><span style={{ color: "#979693", }}>爬取下一主题</span></div>
+                                    <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onNextSpider} style={{ position: "absolute", right: '25%', top: "65%", width: "30px", height: "22px", }}>
+                                        <CaretRightOutlined />
+                                    </button>
+                                </Drawer>
                             </>
-                        ):
+                        ) :
+                            (
+                                <>
+                                    <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={showDrawer} style={{ position: "absolute", right: '5%', top: "15%", width: "122px", height: "28px", }}>
+                                        展开爬虫小组件
+                                    </button>
+                                    <Drawer
+                                        title={"爬虫控制小组件"}
+                                        placement="right"
+                                        closable={false}
+                                        onClose={showDrawer}
+                                        visible={visibleDrawer}
+                                        getContainer={false}
+                                        style={{ position: 'absolute'}}
+                                    >
+                                        <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "5%", textAlign: 'left' }}>当前主题 &nbsp;&nbsp;<span style={{ color: "black" }}>{currentTopic}</span></div>
+                                        <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "5%", textAlign: 'left' }}>爬虫状态 &nbsp;&nbsp;<span style={{ color: "black" }}>暂停中</span></div>
+                                        <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "8%", textAlign: "left" }}><span style={{ color: "#979693", }}>继续爬取按钮</span></div>
+                                        <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position: "absolute", right: '25%', top: "44%", width: "30px", height: "22px", }}>
+                                            <CaretRightOutlined />
+                                        </button>
+                                        <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "6%", textAlign: 'left' }}><span style={{ color: "#979693", }}>停止爬取按钮</span></div>
+                                        <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position: "absolute", right: '25%', top: "55%", width: "30px", height: "22px", }}>
+                                            <StopOutlined />
+                                        </button>
+                                        <div style={{ fontSize: "18px", fontWeight: "bold", marginTop: "6%", textAlign: 'left' }}><span style={{ color: "#979693", }}>爬取下一主题</span></div>
+                                        <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onNextSpider} style={{ position: "absolute", right: '25%', top: "65%", width: "30px", height: "22px", }}>
+                                            <CaretRightOutlined />
+                                        </button>
+                                    </Drawer>
+                                </>
+                            )
+
+                    ) :
                         (
-                            <>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={showDrawer} style={{ position:"absolute",right:'5%', top:"15%", width:"120px",height:"28px",}}>
-                            展开爬虫小组件
-                            </button>
-                            <Drawer
-                            title={"爬虫控制小组件"}
-                            placement="right"
-                            closable={false}
-                            onClose={showDrawer}
-                            visible={visibleDrawer}
-                            getContainer={false}
-                            style={{ position: 'absolute' }}
-                          >
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>暂停中</span></div>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>继续爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
-                            <CaretRightOutlined />
-                            </button>
-                            <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"6%", textAlign: 'left'}}><span style={{color:"#979693",}}>停止爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"44%", width:"30px",height:"22px",}}>
-                            <StopOutlined />
-                            </button>
-                            </Drawer>
-                            </>
+                            <></>
                         )
-                        
+
+                }
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg> 
+            </Card>
+            <Card title="碎片状态展示" style={chartStyle}>
+
+                <Card.Grid style={{ width: '100%', height: '80px' }} >
+                    <div style={{position: 'relative', textAlign:"center", fontSize:"16px", height:"100%", width: '35%', float: 'left', paddingTop: '5px'}}>
+                        {currentTopic}
+                    </div>
+                    <div style={{position: 'relative', hight: '100%', width:"65%", float: 'left'}}>
+                        <Progress percent={50} status="active" style={{marginTop: '5px'}} />
+                    </div>
+                </Card.Grid>
+                {
+                    finishedTopic ? (
+                        finishedTopic.map(
+                            (topic) => (
+                                <>
+                                <Card.Grid style={{ width: '100%', height: '80px' }} >
+                                    <div style={{ position: 'relative', textAlign: "center", fontSize: "16px", height: "100%", width: '35%', float: 'left', paddingTop: '5px' }}>
+                                        {topic.topicName}
+                                    </div>
+                                    <div style={{ position: 'relative', hight: '100%', width: "65%", float: 'left' }}>
+                                        <Progress percent={100} style={{ marginTop: '5px' }} />
+                                    </div>
+                                </Card.Grid>
+                                </>
+                            )
+                        )
                     ):
                     (
                         <></>
                     )
-                    
                 }
-                 <div style={{ width: '100%', height: '670px' }} >
-                    <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%' }}></svg>
-                    <svg ref={ref => treeRef1.current = ref} style={{position:'absolute',left:'0',marginLeft:"125px",visibility: 'hidden',top:"20px", marginTop:"80px"}}></svg>
-                </div>
+                {
+                    unfinishedTopic ? (
+                        unfinishedTopic.map(
+                            (topic) => (
+                                <>
+                                <Card.Grid style={{ width: '100%', height: '80px' }} >
+                                    <div style={{ position: 'relative', textAlign: "center", fontSize: "16px", height: "100%", width: '35%', float: 'left', paddingTop: '5px' }}>
+                                        {topic.topicName}
+                                    </div>
+                                    <div style={{ position: 'relative', hight: '100%', width: "65%", float: 'left' }}>
+                                        <Progress percent={0} status="active" style={{ marginTop: '5px' }} />
+                                    </div>
+                                </Card.Grid>
+                                </>
+                            )
+                        )
+                    ):
+                    (
+                        <></>
+                    )
+                }
             </Card>
+
              <Card title="主题碎片数量统计" style={countStyle}>
                 <Card.Grid style={{width:'100%',height:'50px'}} >
                      类型：   碎片
@@ -917,6 +872,5 @@ function Assemble() {
         </>
     );
 }
-
 
 export default Assemble;
