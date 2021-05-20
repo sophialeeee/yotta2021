@@ -152,7 +152,7 @@ function SingleConstruct() {
             window.lock = true;
             console.log("lock",window.lock);
             async function fetchTreeData() {
-                const result = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+                const result = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,currentTopic);
                 console.log("画树用",result);
                 settreeData(result);          
       console.log(currentTopic);
@@ -325,7 +325,7 @@ function SingleConstruct() {
     useEffect(()=>{
         async function insertFacet(){
             await YottaAPI.insertFirstLayerFacet(currentSubjectDomain.domain, topicName2, insertFacet1);
-             const treeData2 = await YottaAPI.getCompleteTopicByTopicName(topicName2);
+             const treeData2 = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,topicName2);
     //   window.flag = false;
     //   console.log("shanchuhou", window.flag);
          if (treeData) {
@@ -410,7 +410,7 @@ function SingleConstruct() {
         setcurrentTopic(topic => {
             (async () => {
                 console.log("testing");
-                const treeData = await YottaAPI.getCompleteTopicByTopicName(topic);
+                const treeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,topic);
                 console.log('t-tt', topic);
                 window.flag = false;
                 console.log("shanchuhou", window.flag);

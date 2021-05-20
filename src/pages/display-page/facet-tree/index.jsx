@@ -39,7 +39,7 @@ function FacetTree() {
     useEffect(() => {
         console.log(currentTopic);
         async function fetchTreeData() {
-            const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+            const treeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentTopic);
             settreeData(treeData);
         }
         fetchTreeData();

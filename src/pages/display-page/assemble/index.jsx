@@ -263,7 +263,7 @@ function Assemble() {
 
     useEffect(() => {
         async function fetchTreeData() {
-            const treeData = await YottaAPI.getCompleteTopicByTopicName(currentTopic);
+            const treeData = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,currentTopic);
             settreeData(treeData);
             console.log(treeData);
         }
