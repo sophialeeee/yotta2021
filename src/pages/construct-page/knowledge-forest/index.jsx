@@ -446,7 +446,7 @@ function KnowledgeForest() {
     }
 
 
-    let  askSpiderTopicTimer = null
+    var askSpiderTopicTimer = setInterval(ask_inner, 5000);
     const [currTopicFNum, setCurrTopicFNum] = useState(0);
 
 
@@ -459,50 +459,40 @@ function KnowledgeForest() {
         }
 
     }
-
-    async function askIncremental(topicName) {
-
+    async function ask_inner () {
         let pre_num = 0
+        const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, currInsertTopic);
+        if (resIncremental) {
+            console.log(resIncremental)
+            if (resIncremental.code == 200) {
+                setquitTopicSpider(0)
+                setSpiderTopicSpinning(0)
 
+                setTimeout(askSpiderTopicTimer)
+            } else if (resIncremental.code == 301) {
+
+                let now_num = caluNum(resIncremental.data)
+                if (now_num > pre_num) {
+                    pre_num = now_num
+                    setCurrTopicFNum(pre_num)
+                }
+
+
+            } else if (resIncremental.code == 300) {
+                await sleep();
+                setquitTopicSpider(0)
+                setSpiderTopicSpinning(0)
+                setTimeout(askSpiderTopicTimer)
+            }
+        }
+    }
+    async function askIncremental(topicName) {
         setinsertINfo('爬取碎片中...')
         //爬取状态
         setquitTopicSpider(1)
         setDoTopicSpider(1)
         setSpiderTopicSpinning(1)
 
-        askSpiderTopicTimer = setInterval(async function () {
-
-
-            const resIncremental = await YottaAPI.spiderFacet_zyl(currentSubjectDomain.domain, topicName);
-            if (resIncremental) {
-                console.log(resIncremental)
-                if (resIncremental.code == 200) {
-
-                    // setinsertINfo('爬取结束，共有' + caluNum(resIncremental.data) + '个碎片')
-                    setquitTopicSpider(0)
-                    setSpiderTopicSpinning(0)
-
-                    setTimeout(askSpiderTopicTimer)
-                } else if (resIncremental.code == 301) {
-
-                    let now_num = caluNum(resIncremental.data)
-                    if (now_num > pre_num) {
-                        // setinsertINfo('已经爬取' + now_num + '个碎片...')
-                        pre_num = now_num
-                        setCurrTopicFNum(pre_num)
-                    }
-
-
-                } else if (resIncremental.code == 300) {
-                    await sleep();
-                    setinsertINfo('')
-                    setquitTopicSpider(0)
-                    setSpiderTopicSpinning(0)
-                    setTimeout(askSpiderTopicTimer)
-
-                }
-            }
-        }, 5000);
 
 
     }
