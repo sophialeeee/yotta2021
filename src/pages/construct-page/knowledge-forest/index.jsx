@@ -429,13 +429,17 @@ function KnowledgeForest() {
             message.info('请先插入主题，并爬取碎片')
             return
         }
+        if (quitTopicSpider){
+            message.info('请先暂停碎片爬取')
+            return
+        }
         const gen_F = message.loading('生成碎片关系...', 0);
 
         if (askSpiderTopicTimer){
             clearInterval(askSpiderTopicTimer)
         }
 
-        const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, currentTopic);
+        const resGetGenerateDependency = await YottaAPI.getGenerateDependency_zyl(currentSubjectDomain.domain, currInsertTopic);
         setTimeout(gen_F, 1);
         if (resGetGenerateDependency) {
             if (resGetGenerateDependency.code == 200) {
@@ -447,6 +451,7 @@ function KnowledgeForest() {
                     willmounted=true
                     fetchMap()
                     setCurrInsertTopic('')
+                    setquitTopicSpider(0)
                     setDoTopicSpider(0)
                     setCurrTopicFNum(0)
                     setSpiderTopicSpinning(0)

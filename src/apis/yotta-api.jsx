@@ -201,7 +201,7 @@ const YottaAPI = {
     },
 
      async getMap(domainName){
-        return await axios.get(`http://47.95.145.72:8083/dependences/?domainName=${encodeURI(domainName)}`);
+        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
         // 有缓存，无关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
@@ -296,7 +296,7 @@ const YottaAPI = {
     async getGenerateDependency_zyl(domainName,topicName){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8083/dependency/getGenerateDependencyWithNewTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:50000});
+            result = await axios.post(`http://47.95.145.72:8083/dependency/generateDependencyByDomainNameWithNewTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:50000});
             result = result.data;
         }
         catch(error){
