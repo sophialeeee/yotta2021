@@ -582,8 +582,8 @@ function Relation() {
             {(showLoading)?(
                   <Spin tip="Loading..." style={{ width: '100%', height: '680px' }}>
                   <Alert
-                    message="Alert message title"
-                    description="Further details about the context of this alert."
+                    message="正在建立主题间认知关系"
+                    description="请稍作等待，认知关系图稍后为您呈现..."
                     type="info"
                     style={{ width: '100%', height: '680px' }}
                   />
