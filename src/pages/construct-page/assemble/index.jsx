@@ -17,7 +17,7 @@ const {confirm} = Modal;
 
 let pause = 0;
 let quit = 0;
-
+let asslist = new Array();
 
 function Assemble() {
     const [learningPath,setlearningPath] = useState([]);  //学习路径
@@ -45,7 +45,7 @@ function Assemble() {
     const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
     const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
     const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
-    const {step,setStep} = useStepModel();
+    const {step,setStep} = useStepModel(); 
     const [firstTime,setfirstTime]=useState(0);
     const {constructType} = useConstructTypeModel();
     const [data0,setdata0]=useState(0);
@@ -63,7 +63,7 @@ function Assemble() {
     const [topicConfirmFlag, settopicConfirmFlag] = useState(0);   //0表示取消，1表示点击主题，2表示确定爬取该主题
 
     const {TextArea} = Input;
-
+    
 
     const mapRef = useRef();
     const treeRef = useRef();
@@ -73,7 +73,7 @@ function Assemble() {
         textareaValueRef.current = e.target.value;
     }
 
-
+  
     const onCloseDrawer = () => {
         setvisibleDrawer(!visibleDrawer);
     };
@@ -102,7 +102,7 @@ function Assemble() {
         left: '0%',
         textAlign: 'center',
         top:'0px',
-
+        
       };
 
     const chartStyle = {
@@ -150,7 +150,7 @@ function Assemble() {
                 onOk() {
                     setdynamicSpider(topicConfirm);    //动态爬虫
                     setcurrentTopic(topicConfirm);
-                    settopicConfirmFlag(2);
+                    settopicConfirmFlag(2); 
                 },
                 onCancel() {
                     settopicConfirmFlag(0);
@@ -164,8 +164,8 @@ function Assemble() {
 
     // const onAutoConstructClick = () => {
     //     let currentTopic1 = '';
-    //     const onSelectChange = (e) => {
-    //         currentTopic1 = e;
+    //     const onSelectChange = (e) => { 
+    //         currentTopic1 = e;  
     //     }
     //     confirm({
     //         title: '请选择要装配的主题',
@@ -178,12 +178,12 @@ function Assemble() {
     //                 <Select onSelect={onSelectChange}>
     //                     {
     //                         topics.map((topicName)=>(
-    //                         <option value={topicName} >{topicName}</option>
+    //                         <option value={topicName} >{topicName}</option> 
     //                         ))
     //                     }
-    //                 </Select>
-    //             </div>
-
+    //                 </Select> 
+    //             </div>   
+                
     //         </>,
     //         okText: '开始装配',
     //         cancelText: '取消',
@@ -191,7 +191,7 @@ function Assemble() {
     //             setcurrentTopic(currentTopic1);
     //         },
     //         onCancel() {
-
+                
     //         }
     //     })
     // };
@@ -205,12 +205,12 @@ function Assemble() {
             onOk() {
                 setpauseSpider(0);
                 pause = 0;
-                if (spiderText != "")
+                if (spiderText != "") 
                     setspiderText(" （正在爬取碎片...）");
                 YottaAPI.continueSpider(currentSubjectDomain.domain,currentTopic);
             },
             onCancel() {
-
+                
             }
         })
     };
@@ -229,7 +229,7 @@ function Assemble() {
                 YottaAPI.pauseSpider(currentSubjectDomain.domain,currentTopic);
             },
             onCancel() {
-
+                
             }
         })
     };
@@ -243,7 +243,7 @@ function Assemble() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setquitSpider(1);
+                setquitSpider(1); 
                 quit = 1;
                 setspiderText("");
                 setshowSpiderState(0);
@@ -255,7 +255,7 @@ function Assemble() {
 
     const onAppendAssemble = () => {
         let facetId = '';
-        const onSelectChange = (id) => {
+        const onSelectChange = (id) => { 
             facetId =  id;
         }
         confirm({
@@ -269,10 +269,10 @@ function Assemble() {
                     <Select onSelect={onSelectChange}>
                         {
                             facet.map((facet1)=>(
-                            <option value={facet1.facetId} >{facet1.facetName}</option>
+                            <option value={facet1.facetId} >{facet1.facetName}</option> 
                             ))
                         }
-                    </Select>
+                    </Select> 
                 </div>
                 <div>
                     <span>
@@ -288,15 +288,15 @@ function Assemble() {
                 textareaValueRef.current = '';
                 setappendAssembleContent(newAssemble);
                 setcurrentFacetId(facetId);
-                console.log(currentFacetId);
+                console.log(currentFacetId); 
                 console.log('newAssemble',newAssemble);
-
+                
             },
             onCancel() {
-
+                
             }
         })
-    };
+    }; 
 
     const onDeleteAssemble = (assembleId1, e) => {
         confirm({
@@ -305,10 +305,10 @@ function Assemble() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setdeleteAssemble(assembleId1);
+                setdeleteAssemble(assembleId1); 
             },
             onCancel() {
-
+                
             }
         })
     };
@@ -327,16 +327,16 @@ function Assemble() {
                 const assembleContent = textareaValueRef.current;     // 新增碎片的内容
                 textareaValueRef.current = '';
                 setupdateAssembleId(assembleId1);
-                setupdateAssembleContent(assembleContent);
+                setupdateAssembleContent(assembleContent); 
                 console.log(assembleContent1);
                 console.log('updateAssemble',assembleId1);
-
+                
             },
             onCancel() {
-
+                
             }
         })
-    };
+    }; 
 
 
     //根据domainName,topicName获取分面信息
@@ -350,7 +350,7 @@ function Assemble() {
     },[appendAssembleContent, deleteAssemble, currentTopic])
 
     //新增碎片
-    useEffect(() => {
+    useEffect(() => {                  
         async function append(){
             console.log("新增碎片",appendAssembleContent);
             await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
@@ -358,12 +358,12 @@ function Assemble() {
             setappendAssembleContentFlagToFetch(appendAssembleContent);
         }
         if(appendAssembleContent){
-            append();
+            append(); 
         }
     }, [appendAssembleContent])
 
     //删除碎片
-    useEffect(() => {
+    useEffect(() => {                  
         async function deleteAss(){
             console.log(deleteAssemble);
             await YottaAPI.deleteAssemble(deleteAssemble);
@@ -376,7 +376,7 @@ function Assemble() {
     }, [deleteAssemble])
 
     //编辑碎片
-    useEffect(() => {
+    useEffect(() => {                  
         async function updateAss(){
             console.log(updateAssembleId);
             console.log(updateAssembleContent);
@@ -388,7 +388,7 @@ function Assemble() {
     }, [updateAssembleId])
 
     //统计近一个月的新增碎片数
-    useEffect(() => {
+    useEffect(() => {                  
         async function countUpdateAss(){
             const res = await YottaAPI.countUpdateAssemble(currentSubjectDomain.domain);
             console.log("res:",res)
@@ -449,7 +449,7 @@ function Assemble() {
     //画圆形图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            const result = await YottaAPI.generateMap(currentSubjectDomain.domain);
+            const result = await YottaAPI.getMap(currentSubjectDomain.domain);
             console.log("结果是：",result);
             await YottaAPI.getMap(currentSubjectDomain.domain).then(
                 (res) => {
@@ -466,7 +466,7 @@ function Assemble() {
         fetchDependencesMap();
 
     },[currentSubjectDomain.domain]);
-
+   
 
 
     async function clickFacet(facetId){
@@ -494,7 +494,7 @@ function Assemble() {
 
     //新增和渲染完成后获取碎片列表
     useEffect(()=>{
-        async function fetchAssembleData(){
+        async function fetchAssembleData(){         
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
                 setassembles(res);
@@ -502,7 +502,7 @@ function Assemble() {
                 if (spiderFinish){
                     infoFinish();
                 }
-
+               
                 setappendAssembleContentFlagToSort(appendAssembleContentFlagToFetch);
             }
         }
@@ -511,12 +511,12 @@ function Assemble() {
 
     //删除碎片后，获取碎片列表
     useEffect(()=>{
-        async function fetchAssembleData(){
+        async function fetchAssembleData(){         
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
                 setassembles(res);
                 console.log("获取碎片");
-                infoFinish();
+                infoFinish(); 
                 setdeleteAssembleToSort(res);
             }
         }
@@ -526,7 +526,7 @@ function Assemble() {
 
     // 点击主题后调用后台数据渲染
     var arr=new Array();
-    useEffect(() => {
+    useEffect(() => {   
         async function fetchAssembleData2() {
             console.log("开始动态渲染");
             setrenderFinish(0);
@@ -541,16 +541,16 @@ function Assemble() {
                     setrenderFinish(1);
                     clearInterval(myvar);
 
-                }else
-                {
+                }else        
+                { 
                     arr.push(res[i]);
                     setassembles(arr);
                     setassnum(arr.length);
                     i++;
                 }
-
+                
             },100);
-
+                
             }
         }
         if (currentTopic) {
@@ -562,9 +562,10 @@ function Assemble() {
     // 右键点击装配，调用动态爬虫
     useEffect(() => {
         async function fetchAssembleData2() {
+            asslist=new Array();
             console.log("开始动态渲染");
             setrenderFinish(0);
-            const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
+            const r = await YottaAPI.startSpiderOld(currentSubjectDomain.domain,currentTopic);
             console.log("状态值:",r.status);
             setspiderText(" （准备爬取碎片...）");
             setquitSpider(1);
@@ -579,7 +580,7 @@ function Assemble() {
                 async function GDM() {
                     if(currentSubjectDomain.domain && currentTopic) {
                         console.log("pause2",pause);
-                        if (pause==1){
+                        if (pause==1){ 
                             if(quit===1){
                                 setshowSpiderState(0);
                                 YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
@@ -588,7 +589,7 @@ function Assemble() {
                             }
                         }
                         else{
-                            const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
+                            const result = await YottaAPI.getDynamicSingleOld(currentSubjectDomain.domain,currentTopic);
                             console.log('result.code',result.code);
                             if(result.code == 200 || quit===1){
                                 console.log("========================");
@@ -645,7 +646,6 @@ function Assemble() {
             }
         }
         if (currentTopic) {
-            var asslist=new Array();
             var arr1=new Array();
             fetchAssembleData3();
         }
@@ -701,7 +701,7 @@ function Assemble() {
 
     // 自动构建时计算碎片个数
     useEffect(() => {
-        async function autofetchAssembleData(){
+        async function autofetchAssembleData(){         
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,autocurrentTopic);
             if(res){
                 setassnum(res.length);
@@ -733,8 +733,8 @@ function Assemble() {
                         infoFinish();
                         setfirstTime(1);
                         setdata0(1);
-                    }else
-                    {
+                    }else        
+                    { 
                         setautocurrentTopic(topicsData[i].topicName);
                         i++;
                     }
@@ -745,16 +745,16 @@ function Assemble() {
             console.log("现在的autoCons为",autoCons);
             fetchAutoConstruct();
         }
-    }, [autoCons])
+    }, [autoCons])   
 
 
     useEffect(()=>{
       if (localStorage.getItem("visitedAssemble")) {
                 setautoCons(0);
             }else{
-                setautoCons(1);
+                setautoCons(1);            
         }
-    },[])
+    },[])  
 
     useEffect(()=>{
         if(constructType=='cool'&&firstTime===1)
@@ -791,11 +791,11 @@ function Assemble() {
         setvisibleDrawer(!visibleDrawer);
       };
 
-
+      
     return (
         <>
              <Card title="主题分面树" style={treeStyle}>
-                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg>
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg> 
             </Card>
             <Card title="圆形布局图" style={chartStyle}>
                 {
@@ -817,11 +817,11 @@ function Assemble() {
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>进行中</span></div>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>暂停爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPauseSpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPauseSpider} style={{ position:"absolute",right:'25%', top:"40%", width:"30px",height:"22px",}}>
                             <PauseOutlined />
                             </button>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"6%", textAlign: 'left'}}><span style={{color:"#979693",}}>停止爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"44%", width:"30px",height:"22px",}}>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"49%", width:"30px",height:"22px",}}>
                             <StopOutlined />
                             </button>
                             </Drawer>
@@ -844,22 +844,22 @@ function Assemble() {
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>当前主题 &nbsp;&nbsp;<span style={{color:"black"}}>{currentTopic}</span></div>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"5%", textAlign: 'left'}}>爬虫状态 &nbsp;&nbsp;<span style={{color:"black"}}>暂停中</span></div>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"8%", textAlign:"left"}}><span style={{color:"#979693",}}>继续爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'25%', top:"35.5%", width:"30px",height:"22px",}}>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onPlaySpider} style={{ position:"absolute",right:'25%', top:"40%", width:"30px",height:"22px",}}>
                             <CaretRightOutlined />
                             </button>
                             <div style={{fontSize:"18px", fontWeight:"bold", marginTop:"6%", textAlign: 'left'}}><span style={{color:"#979693",}}>停止爬取按钮</span></div>
-                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"44%", width:"30px",height:"22px",}}>
+                            <button class="ant-btn ant-btn-ghost ant-btn-sm" onClick={onQuitSpider} style={{ position:"absolute",right:'25%', top:"49%", width:"30px",height:"22px",}}>
                             <StopOutlined />
                             </button>
                             </Drawer>
                             </>
                         )
-
+                        
                     ):
                     (
                         <></>
                     )
-
+                    
                 }
                  <div style={{ width: '100%', height: '670px' }} >
                     <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '65%',height:'60%' }}></svg>
@@ -869,18 +869,18 @@ function Assemble() {
              <Card title="主题碎片数量统计" style={countStyle}>
                 <Card.Grid style={{width:'100%',height:'50px'}} >
                      类型：   碎片
-                </Card.Grid>
+                </Card.Grid> 
                 <Card.Grid style={{width:'100%',height:'50px'}} >
                      碎片个数：   <span style={{color:'red',fontWeight:'bolder'}}>{assnum}</span>
-                </Card.Grid>
-
+                </Card.Grid> 
+                
              </Card>
              <Card title="增量统计" style={increaseStyle}>
                 <Card.Grid style={{width:'100%',height:'100px'}} >
                     近一个月新增碎片数量：<span style={{color:'red',fontWeight:'bolder'}}>{newassnum}</span>
-                </Card.Grid>
+                </Card.Grid>  
              </Card>
-
+       
 
              <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onAppendAssemble}/>} title={"碎片"+spiderText} style={assembleStyle}>
                 {
@@ -906,8 +906,8 @@ function Assemble() {
                                             }
                                         </Card.Grid>
                                    )
-                            )
-
+                            ) 
+                  
                     ) :
                     (
                         <Alert style={{fontSize:'20px'}}message="请先选择需要装配的主题" type="info" />

@@ -20,8 +20,8 @@ let quit = 0;
 let topicChange = 1;
 let nextSpider = 0;
 let progress = 1;
-
-function Assemble() {
+let asslist = new Array()
+function AssembleFromZero() {
     const [learningPath,setlearningPath] = useState([]);  //学习路径
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
     const [currentTopic,setcurrentTopic] = useState();
@@ -383,18 +383,45 @@ function Assemble() {
 
 
     useEffect(() => {
-        if (treeRef.current && treeData) {
+        if (treeRef.current && treeData && treeData.childrenNumber !== 0) {
+            console.log("树",treeRef.current);
+            console.log("画出树画出树画出树");
             drawTreeNumber(treeRef.current, treeData, clickFacet1);
-            console.log("树",treeRef.current)
+            //emptyChildren(treeRef.current);
+            
         }
     }, [treeData])
 
     async function clickFacet1(facetId){
         const res = await YottaAPI.getASsembleByFacetId(facetId);
-        setassembles(res);
+        if(res){
+            setassembles(res);
+        }
     }
 
+    function emptyChildren(dom) {
+        if(dom)
+        {const children = dom.childNodes;
+        while (children.length > 0) {
+            dom.removeChild(children[0]);
+        }}
+    };
 
+    
+    // //画分面树
+    // useEffect(()=>{
+    //     if (treeRef && treeData) {
+    //         if(treeData.childrenNumber === 0){
+    //             emptyChildren(treeRef.current);
+    //             console.log("啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊")
+    //         }else{
+    //             if(treeRef.current){
+    //                 drawTreeNumber(treeRef.current, treeData, clickFacet1);
+    //             }
+    //             emptyChildren(treeRef.current);
+    //         }
+    //     }
+    // },[treeData])
 
 
     useEffect(() => {
@@ -496,6 +523,7 @@ function Assemble() {
     // 右键点击装配，调用动态爬虫
     useEffect(() => {
         async function fetchAssembleData2() {
+            asslist=new Array();
             console.log("开始动态渲染");
             setrenderFinish(0);
             const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
@@ -525,8 +553,9 @@ function Assemble() {
                             }
                         }
                         else{
+                            console.log("==================================================")
                             const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
-                            console.log('result.code',result.code);
+                            console.log('result.code',result.code,result)
                             if(result.code == 200 || quit===1){
                                 console.log("========================");
                                 setspiderAss(result);
@@ -536,7 +565,7 @@ function Assemble() {
                                 setshowSpiderState(0);
                                 setspiderFinish(1);
                                 infoSpiderFinish();
-                                YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                //YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
                                 console.log("nextSpider:",nextSpider);
                                 if(result.code == 200 || nextSpider == 1)
                                     topicChange = 1;
@@ -558,6 +587,7 @@ function Assemble() {
                 },5000);
         }
         if (currentTopic) {
+            console.log("yiyiyiyiyiyiyi",currentTopic);
             fetchAssembleData2();
         }
     }, [dynamicSpider]);
@@ -572,11 +602,14 @@ function Assemble() {
                 //infoConstructing();
                 var i=0;
                 console.log("----------------");
-                for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
-                    for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
-                        asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
+                if (spiderAss.data && spiderAss.data.children){
+                    for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
+                        for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
+                            asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
+                        }
                     }
                 }
+
 
                  //console.log(asslist);
                 setassembles(asslist);
@@ -585,7 +618,6 @@ function Assemble() {
             }
         }
         if (currentTopic) {
-            var asslist=new Array();
             var arr1=new Array();
             fetchAssembleData3();
         }
@@ -628,8 +660,9 @@ function Assemble() {
                             setdata0(1);
                         }else        
                         {
-                            setdynamicSpider(topicsData[i].topicName);  //设置当前爬取的主题
                             setcurrentTopic(topicsData[i].topicName);
+                            setdynamicSpider(topicsData[i].topicName);  //设置当前爬取的主题
+                            console.log("ererererererer:",topicsData[i].topicName);
                             setfinishedTopic(topicsData.slice(0,i));
                             setunfinishedTopic(topicsData.slice(i+1,topicsData.length));
                             topicChange = 0;
@@ -873,4 +906,4 @@ function Assemble() {
     );
 }
 
-export default Assemble;
+export default AssembleFromZero;

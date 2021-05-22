@@ -6,6 +6,7 @@ import classes from './index.module.css';
 
 import FacetTree from './facet-tree';
 import Assemble from './assemble';
+import AssembleFromZero from './assembleFromZero';
 import Relation from './relation';
 import KnowledgeForest from './knowledge-forest';
 import cookie from 'react-cookies';
@@ -32,13 +33,13 @@ function ConstructPage() {
             description: '抽取主题与分面，并组合成树状结构。',
             component: <FacetTree/>
         },  {
+            title: '碎片化知识装配',
+            description: '将文本及图像等碎片化知识装配到主题分面树上。',
+            component: <AssembleFromZero/>
+        }, {
             title: '认知关系挖掘',
             description: '挖掘知识主题之间的因果、参考、对比等认知关系。',
             component: <Relation/>
-        }, {
-            title: '碎片化知识装配',
-            description: '将文本及图像等碎片化知识装配到主题分面树上。',
-            component: <Assemble/>
         },{
             title: '知识森林概览',
             description: '实例化的主题分面树与认知关系共同构成知识森林。',

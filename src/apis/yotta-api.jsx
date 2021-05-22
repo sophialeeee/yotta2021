@@ -114,7 +114,7 @@ const YottaAPI = {
     async getDynamicSingle(domainName,topicName,flag){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            result = await axios.get(`http://47.95.145.72:8083/newSpiderFor2021/getAndCheckIncrementStatus?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -131,6 +131,30 @@ const YottaAPI = {
         }
         return result;
     },
+
+    // 输入课程名、主题名，爬取该主题下的分面树和分面下的碎片   旧版接口
+    async getDynamicSingleOld(domainName,topicName,flag){
+        let result = undefined;
+        try{
+            result = await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/incrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            console.log('构建好的树数据',result.data);
+            result = result.data;
+        }
+        catch(error){
+            console.log('动态构建的error0',error.response);
+            // console.log('动态构建的error',error.response.data);
+            if(error){
+                if(error.response){
+                    result = error.response.data;
+                }
+
+            }
+
+        }
+        return result;
+    },
+
+
     // 输入课程名、主题名，增量爬取该主题下的分面树和分面下的碎片
     async getDynamicMulti(domainName,topicName,flag){
         let result = undefined;
@@ -156,6 +180,9 @@ const YottaAPI = {
     },
 
     async startSpider(domainName,topicName){
+        return await axios.post(`http://47.95.145.72:8083/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
+    async startSpiderOld(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startIncrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
 
@@ -207,7 +234,7 @@ const YottaAPI = {
     },
 
     async generateMap(domainName){
-        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
+        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
         // 无缓存，有关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
@@ -296,7 +323,7 @@ const YottaAPI = {
     async getGenerateDependency_zyl(domainName,topicName){
         let result = undefined;
         try{
-            result = await axios.post(`http://47.95.145.72:8083/dependency/generateDependencyByDomainNameWithNewTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:50000});
+            result = await axios.post(`http://47.95.145.72:8083/dependency/getGenerateDependencyWithNewTopic?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`,{},{timeout:50000});
             result = result.data;
         }
         catch(error){
