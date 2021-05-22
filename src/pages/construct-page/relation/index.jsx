@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Input, Modal, message, Select, Button} from 'antd';
+import {Card, Input, Modal, message, Select, Button, Spin, Alert} from 'antd';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import YottaAPI from '../../../apis/yotta-api';
@@ -33,10 +33,10 @@ function Relation() {
     var topicInsertRef2 = useRef('');
     var [insertTopic1,setinsertTopic1] = useState();
     var [insertTopic2,setinsertTopic2] = useState();
+    const [showLoading, setLoading] = useState(0);
     const TopicEdit = 'yes';
     const RelationEdit = 'yes';
     const FacetEdit = 'yes';
-
     // var isEnglish = new Boolean(false);
     // const {TextArea} = Input;
     const infoFinish = () => {
@@ -278,21 +278,26 @@ function Relation() {
             // console.log("firstTime", firstTime);
             if (localStorage.getItem("visitedRelation")){
                 setdata(data1);
-                console.log("This is not the first time!")
+                console.log("This is not the first time!");
+                setLoading(0);
             }else{
-
+                setLoading(1);
                 var num = 1;
                 var maxlength = data1.length;
                 // setdata(data1.slice(-relationData.length));
                 const timer = setInterval(() => {
                     setdata(data1.slice(0, num));
                     num = num + 1;
+                    if (num >= maxlength) {
+                        setLoading(0);
+                    }
                     if (num === maxlength + 1) {
                         localStorage.setItem("visitedRelation", "yes")
                         infoFinish();
                         clearInterval(timer);
                         setfirstTime(1);
-                        setdata0(1)
+                        setdata0(1);
+                        setdata(data1)
                         // if(constructType=='cool')
                         // {if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
                         //     setStep(3)
@@ -534,8 +539,7 @@ function Relation() {
         }
         fetchDependencesMap();
 
-    },[currentSubjectDomain.domain])
-
+    },[currentSubjectDomain.domain, showLoading])
 
 
     return (
@@ -574,14 +578,24 @@ function Relation() {
                 }
             </Card> */}
         <Card title=" 主题间认知关系路径 " style={mapStyle}>
-            <div style={{ width: '100%', height: '680px' }} >
-                <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-                <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0', visibility: 'hidden', marginLeft: 22,marginTop: 65}}></svg>
+            
+            {(showLoading)?(
+                  <Spin tip="Loading..." style={{ width: '100%', height: '680px' }}>
+                  <Alert
+                    message="正在建立主题间认知关系"
+                    description="请稍作等待，认知关系图稍后为您呈现..."
+                    type="info"
+                    style={{ width: '100%', height: '680px' }}
+                  />
+                </Spin>
+            ):(<div style={{ width: '100%', height: '680px' }} >
+            <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
+            <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0', visibility: 'hidden', marginLeft: 22,marginTop: 65}}></svg>
 
-                {/* <div className={classes.chart}>
-                    {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
-                </div> */}
-            </div>
+            {/* <div className={classes.chart}>
+                {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
+            </div> */}
+            </div>)}
         </Card>
         </>
     );
