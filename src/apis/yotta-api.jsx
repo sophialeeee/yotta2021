@@ -234,7 +234,7 @@ const YottaAPI = {
     },
 
     async generateMap(domainName){
-        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
+        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
         // 无缓存，有关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
