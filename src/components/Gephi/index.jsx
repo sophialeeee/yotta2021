@@ -69,6 +69,7 @@ function Gephi(props) {
             }
         };
         node.symbolSize = node.symbolSize / 3 + 6;
+        node.y = -node.y;
     });
     let communitySize = [];
     for (var i = 0; i <= communityCount; i++) {
