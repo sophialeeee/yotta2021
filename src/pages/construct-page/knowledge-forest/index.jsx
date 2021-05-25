@@ -881,7 +881,6 @@ function KnowledgeForest() {
         console.log("构建删除树")
         if (facetId > 0) {
             const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-            console.log("传入删除id", facetId, res.data);
             //setassembles(res); res是提示信息... 这咋能set的
             // if (res.code == 200) {
             //       console.log("删除成功")
