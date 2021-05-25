@@ -115,6 +115,7 @@ const YottaAPI = {
         let result = undefined;
         try{
             result = await axios.get(`http://47.95.145.72:8083/newSpiderFor2021/getAndCheckIncrementStatus?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            //result = await axios.get(`http://yotta-test.cn.utools.club/newSpiderFor2021/getAndCheckIncrementStatus?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -179,12 +180,13 @@ const YottaAPI = {
         return result;
     },
 
-    async DeleteCompleteDomain(domainName){
+    async deleteCompleteDomain(domainName){
         return await axios.post(`http://47.95.145.72:8083/domain/deleteCompleteDomainByDomainName?domainName=${encodeURI(domainName)}`);
     },
 
     async startSpider(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8083/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        //return await axios.post(`http://yotta-test.cn.utools.club/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
     async startSpiderOld(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startIncrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
