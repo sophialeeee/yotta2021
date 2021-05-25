@@ -179,6 +179,10 @@ const YottaAPI = {
         return result;
     },
 
+    async DeleteCompleteDomain(domainName){
+        return await axios.post(`http://47.95.145.72:8083/domain/deleteCompleteDomainByDomainName?domainName=${encodeURI(domainName)}`);
+    },
+
     async startSpider(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8083/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
