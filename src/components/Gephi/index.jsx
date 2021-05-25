@@ -56,6 +56,9 @@ function Gephi(props) {
 
     graph.nodes.forEach(function (node) {
         communityCount = Math.max(communityCount, node.attributes.modularity_class);
+        if (subjectName !== '计算机科学') {
+            node.y = -node.y;
+        }
         node.itemStyle = null;
         // node.symbolSize = 1;
         node.value = node.symbolSize;
@@ -69,7 +72,6 @@ function Gephi(props) {
             }
         };
         node.symbolSize = node.symbolSize / 3 + 6;
-        node.y = -node.y;
     });
     let communitySize = [];
     for (var i = 0; i <= communityCount; i++) {
