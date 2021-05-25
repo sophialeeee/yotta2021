@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {notification, Steps, Row, Col, Modal,Switch,message} from 'antd';
 import {useHistory} from 'react-router-dom';
-
+import YottaAPI from '../../apis/yotta-api';
 import classes from './index.module.css';
 
 import FacetTree from './facet-tree';
@@ -89,8 +89,9 @@ function ConstructPage() {
                 },
             })
         }
-        setStep(0)
+        setStep(0);
     }, []);
+
     function onChange(checked) {
         
         if(checked){
@@ -110,6 +111,7 @@ function ConstructPage() {
         cpyStepStatus[step] = 'process';
         setStepStatus(cpyStepStatus);
     }, [step]);
+
     useEffect(() => {
         if(constructType==='cool'){
             infoFinish();
@@ -119,7 +121,7 @@ function ConstructPage() {
                         if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
                             setStep(0)
                         }else{
-                            setStep(3)
+                            setStep(3);
                         }
                      }else{
                         if(cookie.load('c-type')&&cookie.load('c-type')==='1'){
@@ -144,8 +146,10 @@ function ConstructPage() {
                     }
                 }else{
                     if(step!==0)
-                    {console.log("在这呢！！！")
-                        setStep(0)}
+                    {   
+                        setStep(0);
+                        
+                    }
                 }
             }            
             

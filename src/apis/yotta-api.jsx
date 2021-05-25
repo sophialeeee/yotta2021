@@ -1,3 +1,4 @@
+import { DeleteColumnOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import CONSTS from '../constants';
 
@@ -179,6 +180,11 @@ const YottaAPI = {
         return result;
     },
 
+
+    async deleteCompleteDomain(domainName){
+        return await axios.post(`http://47.95.145.72:8087/domain/deleteCompleteDomainByDomainName?domainName=${encodeURI(domainName)}`);
+    },
+
     async startSpider(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8087/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
@@ -246,7 +252,7 @@ const YottaAPI = {
     },
     // 根据分面id获取分面名
     async getFacetName1(facetId){
-        return await gets((`/facet/getFacetNameAndParentFacetNameByFacetId?facetId=${encodeURI(facetId)}`))
+        return await gets((`facet/getFacetNameAndParentFacetNameByFacetId?facetId=${encodeURI(facetId)}`))
     },
 
     // 分面页添加API,添加主题
