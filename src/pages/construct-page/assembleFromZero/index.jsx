@@ -21,6 +21,7 @@ let topicChange = 1;
 let nextSpider = 0;
 let progress = 1;
 let asslist = new Array()
+let ingNum = 0;
 function AssembleFromZero() {
     const [learningPath,setlearningPath] = useState([]);  //学习路径
     const {currentSubjectDomain} = useCurrentSubjectDomainModel();
@@ -66,9 +67,9 @@ function AssembleFromZero() {
     const [finishedTopic, setfinishedTopic] = useState();
     const [unfinishedTopic, setunfinishedTopic] = useState();
     const [showProgress, setshowProgress] = useState(1);
+    const [finalTopic, setfinalTopic] = useState();
 
     const {TextArea} = Input;
-    
 
     const mapRef = useRef();
     const treeRef = useRef();
@@ -526,6 +527,7 @@ function AssembleFromZero() {
             asslist=new Array();
             console.log("开始动态渲染");
             setrenderFinish(0);
+            console.log("开始爬虫 当前主题：",currentTopic);
             const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
             console.log("状态值:",r.status);
             setspiderText(" （准备爬取碎片...）");
@@ -538,6 +540,7 @@ function AssembleFromZero() {
             setspiderText(" （正在爬取碎片...）");
             setspidernum(0);
             setspiderFinish(0);
+            ingNum = 1;
             var myvar1 = setInterval(
                 async function GDM() {
                     if(currentSubjectDomain.domain && currentTopic) {
@@ -576,6 +579,9 @@ function AssembleFromZero() {
                                 setspiderAss(result);
                                 setdynamicRenderAss(result);
                                 setspiderFinish(0);
+                                if (ingNum<90){
+                                    ingNum += 9;
+                                }
                                 console.log("+++++++++++++++++++");
                                 //setassembles(result);
                             }
@@ -602,15 +608,15 @@ function AssembleFromZero() {
                 //infoConstructing();
                 var i=0;
                 console.log("----------------");
-                if (spiderAss.data && spiderAss.data.children){
-                    for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
-                        for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
-                            asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
-                        }
-                    }
-                }
-
-
+                // if (spiderAss.data && spiderAss.data.children){
+                //     for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
+                //         for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
+                //             asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
+                //         }
+                //     }
+                // }
+                
+                const asslist = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
                  //console.log(asslist);
                 setassembles(asslist);
                 setrenderFinish(1);
@@ -648,11 +654,13 @@ function AssembleFromZero() {
             const topicsData = await YottaAPI.getTopicsByDomainName(currentSubjectDomain.domain);
             if(topicsData){
                     var i=0;
+                    setfinalTopic(0);
                     var autoInterval = setInterval(()=>{
                     if(topicChange==1){
                         if(i==topicsData.length){
                             //console.log("默认主题为",topicsData[0].topicName);
                             //setcurrentTopic(topicsData[0].topicName);
+                            setfinalTopic(1);
                             clearInterval(autoInterval);
                             localStorage.setItem("visitedAssemble", "yes")
                             infoFinish();
@@ -803,11 +811,19 @@ function AssembleFromZero() {
             <Card title="碎片状态展示" style={chartStyle}>
 
                 <Card.Grid style={{ width: '100%', height: '80px' }} >
-                    <div style={{position: 'relative', textAlign:"center", fontSize:"16px", height:"100%", width: '35%', float: 'left', paddingTop: '5px'}}>
-                        {currentTopic}
-                    </div>
+                    {
+                        !finalTopic ? (
+                            <div style={{position: 'relative', textAlign:"center", fontSize:"16px", height:"100%", width: '35%', float: 'left', paddingTop: '5px'}}>
+                            {currentTopic}
+                            </div>
+                        ):
+                        (
+                            <></>
+                        )
+
+                    }
                     <div style={{position: 'relative', hight: '100%', width:"65%", float: 'left'}}>
-                        <Progress percent={50} status="active" style={{marginTop: '5px'}} />
+                        <Progress percent={ingNum} status="active" style={{marginTop: '5px'}} />
                     </div>
                 </Card.Grid>
                 {

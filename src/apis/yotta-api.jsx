@@ -115,6 +115,7 @@ const YottaAPI = {
         let result = undefined;
         try{
             result = await axios.get(`http://47.95.145.72:8083/newSpiderFor2021/getAndCheckIncrementStatus?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
+            //result = await axios.get(`http://yotta-test.cn.utools.club/newSpiderFor2021/getAndCheckIncrementStatus?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`)
             console.log('构建好的树数据',result.data);
             result = result.data;
         }
@@ -179,8 +180,13 @@ const YottaAPI = {
         return result;
     },
 
+    async deleteCompleteDomain(domainName){
+        return await axios.post(`http://47.95.145.72:8083/domain/deleteCompleteDomainByDomainName?domainName=${encodeURI(domainName)}`);
+    },
+
     async startSpider(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8083/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+        //return await axios.post(`http://yotta-test.cn.utools.club/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
     async startSpiderOld(domainName,topicName){
         return await axios.post(`http://47.95.145.72:8083/spiderDynamicOutput/startIncrementalSpiderFacetAssembleTreeByDomianAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
@@ -224,7 +230,7 @@ const YottaAPI = {
 
     // 结合麻珂欣师姐的知识关系抽取算法获取关系依赖
     async generateDependences(domainName, isEnglish){
-        return await posts(`dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
+        return await axios.post(`http://47.95.145.72:8083/dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
     },
 
      async getMap(domainName){
@@ -234,7 +240,7 @@ const YottaAPI = {
     },
 
     async generateMap(domainName){
-        return await axios.get(`http://47.95.145.72:8084/dependences/?domainName=${encodeURI(domainName)}`);
+        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
         // 无缓存，有关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },

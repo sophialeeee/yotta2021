@@ -160,10 +160,11 @@ function Relation() {
     useEffect(()=>{
         if(relationData){
             // setmaxShow(1);
-            console.log('relationData', relationData);
+            console.log('relationData', relationData.data.data);
             // setrelationPart(relationData.slice(0, maxShow));
             setrelationData(relationData);
-            relationData.map((relation,index)=>{
+            // console.log('relationData:', relationData);
+            relationData.data.data.map((relation,index)=>{
                 dataTemp.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
 
             })

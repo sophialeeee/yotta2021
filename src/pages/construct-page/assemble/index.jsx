@@ -633,12 +633,12 @@ function Assemble() {
                 //infoConstructing();
                 var i=0;
                 console.log("----------------");
-                for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
-                    for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
-                        asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
-                    }
-                }
-
+                // for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
+                //     for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
+                //         asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
+                //     }
+                // }
+                const asslist = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
                  //console.log(asslist);
                 setassembles(asslist);
                 setrenderFinish(1);
