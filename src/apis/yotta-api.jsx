@@ -230,11 +230,11 @@ const YottaAPI = {
 
     // 结合麻珂欣师姐的知识关系抽取算法获取关系依赖
     async generateDependences(domainName, isEnglish){
-        return await posts(`dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
+        return await axios.post(`http://47.95.145.72:8083/dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
     },
 
      async getMap(domainName){
-        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
+        return await axios.get(`http://47.95.145.72:8081/dependences/?domainName=${encodeURI(domainName)}`);
         // 有缓存，无关系抽取算法
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
