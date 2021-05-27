@@ -41,6 +41,7 @@ function Gephi(props) {
                     cancelText: '取消',
                     onOk() {
                         YottaAPI.removeClass(currentSubjectDomain.subject, currentDomainName);
+                        YottaAPI.deleteCompleteDomain(data.data.name);
                         console.log(currentSubjectDomain.subject, currentDomainName)
                         //document.location.reload()
                         update()

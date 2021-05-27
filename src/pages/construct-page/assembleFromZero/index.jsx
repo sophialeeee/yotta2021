@@ -813,18 +813,20 @@ function AssembleFromZero() {
                 <Card.Grid style={{ width: '100%', height: '80px' }} >
                     {
                         !finalTopic ? (
+                            <>
                             <div style={{position: 'relative', textAlign:"center", fontSize:"16px", height:"100%", width: '35%', float: 'left', paddingTop: '5px'}}>
                             {currentTopic}
                             </div>
+                            <div style={{position: 'relative', height: '100%', width:"65%", float: 'left'}}>
+                                <Progress percent={ingNum} status="active" style={{marginTop: '5px'}} />
+                            </div>
+                            </>
                         ):
                         (
                             <></>
                         )
 
                     }
-                    <div style={{position: 'relative', hight: '100%', width:"65%", float: 'left'}}>
-                        <Progress percent={ingNum} status="active" style={{marginTop: '5px'}} />
-                    </div>
                 </Card.Grid>
                 {
                     finishedTopic ? (
@@ -835,7 +837,7 @@ function AssembleFromZero() {
                                     <div style={{ position: 'relative', textAlign: "center", fontSize: "16px", height: "100%", width: '35%', float: 'left', paddingTop: '5px' }}>
                                         {topic.topicName}
                                     </div>
-                                    <div style={{ position: 'relative', hight: '100%', width: "65%", float: 'left' }}>
+                                    <div style={{ position: 'relative', height: '100%', width: "65%", float: 'left' }}>
                                         <Progress percent={100} style={{ marginTop: '5px' }} />
                                     </div>
                                 </Card.Grid>
@@ -856,7 +858,7 @@ function AssembleFromZero() {
                                     <div style={{ position: 'relative', textAlign: "center", fontSize: "16px", height: "100%", width: '35%', float: 'left', paddingTop: '5px' }}>
                                         {topic.topicName}
                                     </div>
-                                    <div style={{ position: 'relative', hight: '100%', width: "65%", float: 'left' }}>
+                                    <div style={{ position: 'relative', height: '100%', width: "65%", float: 'left' }}>
                                         <Progress percent={0} status="active" style={{ marginTop: '5px' }} />
                                     </div>
                                 </Card.Grid>
