@@ -326,23 +326,23 @@ function KnowledgeForest() {
         if (willmounted) {
             emptyChildren(mapRef.current)
             emptyChildren(treeRef.current)
-            const res_de = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
-            if (res_de) {
-                res_de.map((relation, index) => {
-                    dataTemp.push({
-                        'key': String(index + 1),
-                        '主题一': relation.startTopicName,
-                        '主题二': relation.endTopicName
-                    })
-                })
-                dataTemp = dataTemp.slice(-res_de.length)
-            }
+            // const res_de = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+            // if (res_de) {
+            //     res_de.map((relation, index) => {
+            //         dataTemp.push({
+            //             'key': String(index + 1),
+            //             '主题一': relation.startTopicName,
+            //             '主题二': relation.endTopicName
+            //         })
+            //     })
+            //     dataTemp = dataTemp.slice(-res_de.length)
+            // }
 
             await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 (res) => {
                     // setmapdata(res.data);
                     if (res.data && mapRef && mapRef.current && treeRef.current) {
-                        data_temp = res.data
+                        // data_temp = res.data
                         console.log("这里是构建3")
                         drawMap(res.data, mapRef.current, treeRef.current, currentSubjectDomain.domain,
                             learningPath,
@@ -675,7 +675,7 @@ function KnowledgeForest() {
         firstSelect_Name = ''
         secSelect_Name = ''
     };
-    let data_temp;
+    // let data_temp;
 
     function checkExitRelation() {
 
@@ -712,13 +712,13 @@ function KnowledgeForest() {
                     firstSelect_id = 0
                     return
                 }
-                let has = checkExitRelation()
-                if (has) {
-                    message.info("关系已经存在")
-                    setTimeout(hide, 0);
-                    reSet()
-                    return
-                }
+                // let has = checkExitRelation()
+                // if (has) {
+                //     message.info("关系已经存在")
+                //     setTimeout(hide, 0);
+                //     reSet()
+                //     return
+                // }
 
                 confirm({
                     title: "确认添加关系：" + firstSelect_Name + "--> " + secSelect_Name + " 吗？",
@@ -881,7 +881,6 @@ function KnowledgeForest() {
         console.log("构建删除树")
         if (facetId > 0) {
             const res = await YottaAPI.deleteAssembleByFacetId(facetId);
-            console.log("传入删除id", facetId, res.data);
             //setassembles(res); res是提示信息... 这咋能set的
             // if (res.code == 200) {
             //       console.log("删除成功")

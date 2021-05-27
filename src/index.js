@@ -7,7 +7,7 @@ import App from './pages';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-    <BrowserRouter basename={'/yotta-2020-87/login'}>
+    <BrowserRouter basename={'/yotta-2020/login'}>
         <App/>
     </BrowserRouter>,
     document.getElementById('root')

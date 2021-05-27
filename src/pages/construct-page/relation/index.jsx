@@ -160,11 +160,11 @@ function Relation() {
     useEffect(()=>{
         if(relationData){
             // setmaxShow(1);
-            console.log('relationData', relationData.data.data);
+            console.log('relationData', relationData);
             // setrelationPart(relationData.slice(0, maxShow));
             setrelationData(relationData);
             // console.log('relationData:', relationData);
-            relationData.data.data.map((relation,index)=>{
+            relationData.map((relation,index)=>{
                 dataTemp.push({'key':String(index+1),'主题一':relation.startTopicName,'主题二':relation.endTopicName})
 
             })
@@ -456,10 +456,11 @@ function Relation() {
                 };
             };
             const res = await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish);
+            // res = res.data
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.generateMap(currentSubjectDomain.domain, 8082).then(
+            await YottaAPI.generatesMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
@@ -491,7 +492,7 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.generateMap(currentSubjectDomain.domain, 8082).then(
+            await YottaAPI.generatesMap(currentSubjectDomain.domain).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
@@ -518,20 +519,19 @@ function Relation() {
     // 画认知关系图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            await YottaAPI.generateMap(currentSubjectDomain.domain, 8082).then(
+            await YottaAPI.generatesMap(currentSubjectDomain.domain).then(
                 (res) => {
+                    console.log('res.data', res.data)
                     setmapdata(res.data);
                     if(JSON.stringify(res.data.topics)=='{}'){
                         alert("该课程下无依赖关系！");
                     }
                     else if(res.data&&mapRef&&mapRef.current){
                     console.log('res.data',res.data);
-                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,function(){console.log("relation page no click topic!")}, () => {},() => {},() => {},select,() => {},(a,b) => {
+                        drawMap(res.data,mapRef.current,treeRef.current,currentSubjectDomain.domain,learningPath,() =>{}, () => {},() => {},() => {},select,() => {},(a,b) => {
                             onDeleteRelation( a, b);
                             console.log("deleting");
                         },'relation',()=>{},()=>{});
-
-
                     }
                 }
             )

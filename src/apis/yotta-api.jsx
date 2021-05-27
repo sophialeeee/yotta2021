@@ -239,11 +239,12 @@ const YottaAPI = {
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
 
-    // async generateMap(domainName){
-    //     return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
-    //     // 无缓存，有关系抽取算法
-    //     // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
-    // },
+    async generatesMap(domainName){
+        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
+        // 无缓存，有关系抽取算法
+        // 这个只是偶尔被需要
+        // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
+    },
 
     async generateMap(domainName, port){
         return await axios.get(`http://47.95.145.72:8083/django/dependences?domainName=${encodeURI(domainName)}&port=${encodeURI(port)}`);
