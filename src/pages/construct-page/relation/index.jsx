@@ -459,7 +459,7 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, 8082).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
@@ -491,7 +491,7 @@ function Relation() {
             setrelationData(res);
             emptyChildren(mapRef.current);
             emptyChildren(treeRef.current);
-            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, 8082).then(
                 (res) => {
                     setmapdata(res.data);
                     if(res.data&&mapRef&&mapRef.current){
@@ -518,7 +518,7 @@ function Relation() {
     // 画认知关系图
     useEffect(()=>{
         async function fetchDependencesMap(){
-            await YottaAPI.generateMap(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
+            await YottaAPI.generateMap(currentSubjectDomain.domain, 8082).then(
                 (res) => {
                     setmapdata(res.data);
                     if(JSON.stringify(res.data.topics)=='{}'){

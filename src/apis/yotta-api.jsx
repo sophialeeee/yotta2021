@@ -230,7 +230,7 @@ const YottaAPI = {
 
     // 结合麻珂欣师姐的知识关系抽取算法获取关系依赖
     async generateDependences(domainName, isEnglish){
-        return await axios.post(`http://47.95.145.72:8083/dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
+        return await posts(`dependency/generateDependencyByDomainName?domainName=${encodeURI(domainName)}&isEnglish=${encodeURI(isEnglish)}`);
     },
 
      async getMap(domainName){
@@ -239,11 +239,17 @@ const YottaAPI = {
         // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
     },
 
-    async generateMap(domainName){
-        return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
-        // 无缓存，有关系抽取算法
-        // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
+    // async generateMap(domainName){
+    //     return await axios.get(`http://47.95.145.72:8082/dependences/?domainName=${encodeURI(domainName)}`);
+    //     // 无缓存，有关系抽取算法
+    //     // return await axios.get('http://47.95.145.72/dependences/?domainName=${encodeURI(domainName)}');
+    // },
+
+    async generateMap(domainName, port){
+        return await axios.get(`http://47.95.145.72:8083/django/dependences?domainName=${encodeURI(domainName)}&port=${encodeURI(port)}`);
+        // port就写原来我们使用django服务的端口号，如8081,8082,8087
     },
+
 
     // 根据分面id获取碎片信息
     async getFacetName(facetId){

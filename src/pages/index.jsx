@@ -161,7 +161,7 @@ function App() {
                 cookie.save('c-type','0')
                 // ({pathname:'/construct-page',state:{login:true}});
                 history.push('/construct-page');
-                YottaAPI.deleteCompleteDomain(domain);
+                // YottaAPI.deleteCompleteDomain(domain);
             },
             onCancel() {
                 console.log('不构建了');
