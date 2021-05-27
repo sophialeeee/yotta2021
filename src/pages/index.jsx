@@ -162,6 +162,7 @@ function App() {
                 // ({pathname:'/construct-page',state:{login:true}});
                 YottaAPI.addClass(subject, domain);
                 history.push('/construct-page');
+                // YottaAPI.deleteCompleteDomain(domain);
             },
             onCancel() {
                 console.log('不构建了');
