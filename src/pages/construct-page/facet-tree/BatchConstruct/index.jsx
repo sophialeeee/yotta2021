@@ -357,13 +357,28 @@ function BatchConstruct() {
                 async function fetchTreeData(){
                     const result = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,currentTopic);
                     if(result){
+                        console.log('自动构建构建')
                         setTimeout(()=>{
                             // if(treeRef.current)
                             // {
                             // drawTree(treeRef.current,result,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
                             // }
                             // emptyChildren(treeRef.current);
-                            settreeData(result)
+                            if(result.childrenNumber==0){
+                                console.log('暂无分面信息')
+                                async function spiderFacet(){
+                                    const spiderResult = await YottaAPI.getFacetByDomainAndTopicName(currentSubjectDomain.domain,currentTopic)
+                                    console.log('爬取分面！')
+                                    console.log("爬取分面结果",spiderResult)
+                                    settreeData(spiderResult)
+                                    console.log("新树", treeData)
+                                }
+                                spiderFacet()
+                            }else{
+                                console.log('存在分面信息')
+                                settreeData(result)
+                            }
+                            // settreeData(result)
                             setTimeout(()=>{
 
                                 const index = topics.indexOf(currentTopic);
@@ -378,9 +393,9 @@ function BatchConstruct() {
                                 localStorage.setItem("finishedData", JSON.stringify(finishedData));
                                 localStorage.setItem("batchData", JSON.stringify(batchData));
                                 // (index < topics.length) && (setcurrentTopic(topics[index+1]));
-                            },3000)
+                            },2000)
 
-                        },3000)
+                        },4000)
                     }
                     console.log('result',result)
                 }
@@ -403,6 +418,7 @@ function BatchConstruct() {
             if(treeData.childrenNumber === 0){
                 emptyChildren(treeRef.current);
             }else{
+                console.log("treeData",treeData)
                 if(treeRef.current&&window.flag === true){
                     drawTree(treeRef.current,treeData,d =>{},onClickBranch,clickBranchAdd.bind(null, currentTopic),'facet-tree',200,false);
                 }
