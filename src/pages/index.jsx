@@ -160,6 +160,7 @@ function App() {
                 setCurrentSubjectDomain(subject, domain);
                 cookie.save('c-type','0');
                 // ({pathname:'/construct-page',state:{login:true}});
+                YottaAPI.addClass(subject, domain);
                 history.push('/construct-page');
             },
             onCancel() {
