@@ -88,6 +88,11 @@ const YottaAPI = {
     async getCompleteTopicByNameAndDomainName(domainName,topicName){
         return await gets(`topic/getCompleteTopicByNameAndDomainName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },
+ 
+    // 根据主题名爬起分面，获取画分面树的数据 new
+    async getFacetByDomainAndTopicName(domainName,topicName){
+        return await gets(`spiderDynamicOutput/getFacetByDomainAndTopicName?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
+    },
 
     // 根据主题名获取画分面树的数据（动态）
     async getDynamicTreeData(domainName,topicName,flag){
@@ -185,6 +190,7 @@ const YottaAPI = {
     },
 
     async startSpider(domainName,topicName){
+        // return await axios.post(`http://47.95.145.72:8083/newSpiderFor2021/crawlAssembleByCSDNOnly?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         return await axios.post(`http://47.95.145.72:8083/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
         //return await axios.post(`http://yotta-test.cn.utools.club/newSpiderFor2021/crawlAssemble?domainName=${encodeURI(domainName)}&topicName=${encodeURI(topicName)}`);
     },

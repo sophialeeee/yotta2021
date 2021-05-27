@@ -1,3 +1,6 @@
+
+
+
 import React from 'react';
 import { drawTree,drawTreeNumber,drawTreeDel } from '../../../../modules/facetTree_single';
 import { useEffect, useRef } from 'react';
@@ -5,7 +8,7 @@ import useCurrentSubjectDomainModel from '../../../../models/current-subject-dom
 import useStepModel from '../../../../models/construct-step';
 import { useState } from 'react';
 import YottaAPI from '../../../../apis/yotta-api';
-import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationCircleOutlined,PlusOutlined, EditOutlined, ContactsOutlined} from '@ant-design/icons';
 import { Card,Input,Modal,message,Button,Select } from 'antd';
 import cookie from 'react-cookies';
 import useConstructTypeModel from '../../../../models/construct-type';
@@ -153,9 +156,23 @@ function SingleConstruct() {
             console.log("lock",window.lock);
             async function fetchTreeData() {
                 const result = await YottaAPI.getCompleteTopicByNameAndDomainName(currentSubjectDomain.domain,currentTopic);
-                console.log("画树用",result);
-                settreeData(result);          
-      console.log(currentTopic);
+                console.log("分面请求结果",result)
+                if(result.childrenNumber==0){
+                    async function spiderFacet(){
+                        const spiderResult = await YottaAPI.getFacetByDomainAndTopicName(currentSubjectDomain.domain,currentTopic)
+                        console.log('爬取分面！')
+                        console.log("爬取分面结果",spiderResult)
+                        // settreeData(spiderResult)
+                    }
+                    spiderFacet()
+                }else{
+                    console.log("画树用",result);
+                    settreeData(result);          
+                    console.log(currentTopic);
+                }
+                // console.log("画树用",result);
+                // settreeData(result);          
+                // console.log(currentTopic);
             }
             if(currentTopic){
                 fetchTreeData();
