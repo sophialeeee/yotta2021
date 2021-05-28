@@ -172,16 +172,18 @@ function Relation() {
             // console.log('dataTemp', dataTemp)
             // for (var maxShow = 0; maxShow <= relationData.length; 1){
             // setdata(data.slice(-relationData.length));
-            if (dataTemp[0]['主题一'] === insertTopic1 && dataTemp[0]['主题二'] === insertTopic2){
-                console.log("Nothing");
-            }else{
-                for (var i=1; i < relationData.length; i++){
-                    if (dataTemp[i]['主题一'] === insertTopic1 && dataTemp[i]['主题二'] === insertTopic2){
-                        var dataChange = dataTemp[0];
-                        dataTemp[0] = dataTemp[i];
-                        dataTemp[i] = dataChange;
-                    }
-                };
+            if (dataTemp[0]['主题一']){
+                if (dataTemp[0]['主题一'] === insertTopic1 && dataTemp[0]['主题二'] === insertTopic2){
+                    console.log("Nothing");
+                }else{
+                    for (var i=1; i < relationData.length; i++){
+                        if (dataTemp[i]['主题一'] === insertTopic1 && dataTemp[i]['主题二'] === insertTopic2){
+                            var dataChange = dataTemp[0];
+                            dataTemp[0] = dataTemp[i];
+                            dataTemp[i] = dataChange;
+                        }
+                    };
+            }
             };
             // console.log("SubjectName:", currentSubjectDomain.subject);
             setdata1(dataTemp);
