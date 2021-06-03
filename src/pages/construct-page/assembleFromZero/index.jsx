@@ -48,7 +48,7 @@ function AssembleFromZero() {
     const [appendAssembleContentFlagToSort,setappendAssembleContentFlagToSort] = useState();   //新增碎片获取列表后，前往置顶步骤
     const [deleteAssembleToFetch,setdeleteAssembleToFetch] = useState();
     const [deleteAssembleToSort,setdeleteAssembleToSort] = useState();
-    const {step,setStep} = useStepModel(); 
+    const {step,setStep} = useStepModel();
     const [firstTime,setfirstTime]=useState(0);
     const {constructType} = useConstructTypeModel();
     const [data0,setdata0]=useState(0);
@@ -79,7 +79,7 @@ function AssembleFromZero() {
         textareaValueRef.current = e.target.value;
     }
 
-  
+
     const onCloseDrawer = () => {
         setvisibleDrawer(!visibleDrawer);
     };
@@ -158,7 +158,7 @@ function AssembleFromZero() {
                 onOk() {
                     setdynamicSpider(topicConfirm);    //动态爬虫
                     setcurrentTopic(topicConfirm);
-                    settopicConfirmFlag(2); 
+                    settopicConfirmFlag(2);
                 },
                 onCancel() {
                     settopicConfirmFlag(0);
@@ -177,14 +177,14 @@ function AssembleFromZero() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setquitSpider(1); 
+                setquitSpider(1);
                 quit = 1;
                 nextSpider = 1;
                 setspiderText("");
                 setshowSpiderState(0);
             },
             onCancel() {
-                
+
             }
         })
     };
@@ -198,12 +198,12 @@ function AssembleFromZero() {
             onOk() {
                 setpauseSpider(0);
                 pause = 0;
-                if (spiderText != "") 
+                if (spiderText != "")
                     setspiderText(" （正在爬取碎片...）");
                 YottaAPI.continueSpider(currentSubjectDomain.domain,currentTopic);
             },
             onCancel() {
-                
+
             }
         })
     };
@@ -222,7 +222,7 @@ function AssembleFromZero() {
                 YottaAPI.pauseSpider(currentSubjectDomain.domain,currentTopic);
             },
             onCancel() {
-                
+
             }
         })
     };
@@ -236,7 +236,7 @@ function AssembleFromZero() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setquitSpider(1); 
+                setquitSpider(1);
                 quit = 1;
                 setspiderText("");
                 setshowSpiderState(0);
@@ -248,7 +248,7 @@ function AssembleFromZero() {
 
     const onAppendAssemble = () => {
         let facetId = '';
-        const onSelectChange = (id) => { 
+        const onSelectChange = (id) => {
             facetId =  id;
         }
         confirm({
@@ -262,10 +262,10 @@ function AssembleFromZero() {
                     <Select onSelect={onSelectChange}>
                         {
                             facet.map((facet1)=>(
-                            <option value={facet1.facetId} >{facet1.facetName}</option> 
+                            <option value={facet1.facetId} >{facet1.facetName}</option>
                             ))
                         }
-                    </Select> 
+                    </Select>
                 </div>
                 <div>
                     <span>
@@ -281,15 +281,15 @@ function AssembleFromZero() {
                 textareaValueRef.current = '';
                 setappendAssembleContent(newAssemble);
                 setcurrentFacetId(facetId);
-                console.log(currentFacetId); 
+                console.log(currentFacetId);
                 console.log('newAssemble',newAssemble);
-                
+
             },
             onCancel() {
-                
+
             }
         })
-    }; 
+    };
 
     const onDeleteAssemble = (assembleId1, e) => {
         confirm({
@@ -298,10 +298,10 @@ function AssembleFromZero() {
             okText: '确定',
             cancelText: '取消',
             onOk() {
-                setdeleteAssemble(assembleId1); 
+                setdeleteAssemble(assembleId1);
             },
             onCancel() {
-                
+
             }
         })
     };
@@ -319,7 +319,7 @@ function AssembleFromZero() {
     },[appendAssembleContent, deleteAssemble, currentTopic])
 
     //新增碎片
-    useEffect(() => {                  
+    useEffect(() => {
         async function append(){
             console.log("新增碎片",appendAssembleContent);
             await YottaAPI.appendAssemble("人工",currentSubjectDomain.domain,currentFacetId,appendAssembleContent,"null");
@@ -327,12 +327,12 @@ function AssembleFromZero() {
             setappendAssembleContentFlagToFetch(appendAssembleContent);
         }
         if(appendAssembleContent){
-            append(); 
+            append();
         }
     }, [appendAssembleContent])
 
     //删除碎片
-    useEffect(() => {                  
+    useEffect(() => {
         async function deleteAss(){
             console.log(deleteAssemble);
             await YottaAPI.deleteAssemble(deleteAssemble);
@@ -345,7 +345,7 @@ function AssembleFromZero() {
     }, [deleteAssemble])
 
     //编辑碎片
-    useEffect(() => {                  
+    useEffect(() => {
         async function updateAss(){
             console.log(updateAssembleId);
             console.log(updateAssembleContent);
@@ -357,7 +357,7 @@ function AssembleFromZero() {
     }, [updateAssembleId])
 
     //统计近一个月的新增碎片数
-    useEffect(() => {                  
+    useEffect(() => {
         async function countUpdateAss(){
             const res = await YottaAPI.countUpdateAssemble(currentSubjectDomain.domain);
             console.log("res:",res)
@@ -389,7 +389,7 @@ function AssembleFromZero() {
             console.log("画出树画出树画出树");
             drawTreeNumber(treeRef.current, treeData, clickFacet1);
             //emptyChildren(treeRef.current);
-            
+
         }
     }, [treeData])
 
@@ -408,7 +408,7 @@ function AssembleFromZero() {
         }}
     };
 
-    
+
     // //画分面树
     // useEffect(()=>{
     //     if (treeRef && treeData) {
@@ -443,7 +443,7 @@ function AssembleFromZero() {
         }
     }, [currentSubjectDomain.domain])
 
-   
+
 
 
 
@@ -456,7 +456,7 @@ function AssembleFromZero() {
 
     //新增和渲染完成后获取碎片列表
     useEffect(()=>{
-        async function fetchAssembleData(){         
+        async function fetchAssembleData(){
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
                 setassembles(res);
@@ -464,7 +464,7 @@ function AssembleFromZero() {
                 if (spiderFinish){
                     infoFinish();
                 }
-               
+
                 setappendAssembleContentFlagToSort(appendAssembleContentFlagToFetch);
             }
         }
@@ -473,12 +473,12 @@ function AssembleFromZero() {
 
     //删除碎片后，获取碎片列表
     useEffect(()=>{
-        async function fetchAssembleData(){         
+        async function fetchAssembleData(){
             const res = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
             if(res){
                 setassembles(res);
                 console.log("获取碎片");
-                infoFinish(); 
+                infoFinish();
                 setdeleteAssembleToSort(res);
             }
         }
@@ -488,7 +488,7 @@ function AssembleFromZero() {
 
     // 点击主题后调用后台数据渲染
     var arr=new Array();
-    useEffect(() => {   
+    useEffect(() => {
         async function fetchAssembleData2() {
             console.log("开始动态渲染");
             setrenderFinish(0);
@@ -503,16 +503,16 @@ function AssembleFromZero() {
                     setrenderFinish(1);
                     clearInterval(myvar);
 
-                }else        
-                { 
+                }else
+                {
                     arr.push(res[i]);
                     setassembles(arr);
                     setassnum(arr.length);
                     i++;
                 }
-                
+
             },100);
-                
+
             }
         }
         if (currentTopic) {
@@ -528,69 +528,99 @@ function AssembleFromZero() {
             console.log("开始动态渲染");
             setrenderFinish(0);
             console.log("开始爬虫 当前主题：",currentTopic);
-            const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
-            console.log("状态值:",r.status);
-            setspiderText(" （准备爬取碎片...）");
-            setquitSpider(1);
-            pause = 0;
-            quit = 0;
-            setshowSpiderState(1);
-            setshowProgress(1);
-            setpauseSpider(0);
-            setspiderText(" （正在爬取碎片...）");
-            setspidernum(0);
-            setspiderFinish(0);
-            ingNum = 1;
-            var myvar1 = setInterval(
-                async function GDM() {
-                    if(currentSubjectDomain.domain && currentTopic) {
-                        console.log("pause2",pause);
-                        if (pause==1){ 
-                            if(quit===1){
-                                setshowSpiderState(0);
-                                YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
-                                if(nextSpider == 1)
-                                    topicChange = 1;
-                                setrenderFinish(1);
-                                clearInterval(myvar1);
-                            }
-                        }
-                        else{
-                            console.log("==================================================")
-                            const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
-                            console.log('result.code',result.code,result)
-                            if(result.code == 200 || quit===1){
-                                console.log("========================");
-                                setspiderAss(result);
-                                setdynamicRenderAss(result);
-                                setrenderFinish(1);
-                                setspiderText("");
-                                setshowSpiderState(0);
-                                setspiderFinish(1);
-                                infoSpiderFinish();
-                                //YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
-                                console.log("nextSpider:",nextSpider);
-                                if(result.code == 200 || nextSpider == 1)
-                                    topicChange = 1;
-                                clearInterval(myvar1);
 
-                            }
-                            else {
-                                setspiderAss(result);
-                                setdynamicRenderAss(result);
-                                setspiderFinish(0);
-                                if (ingNum<90){
-                                    ingNum += 9;
-                                }
-                                console.log("+++++++++++++++++++");
-                                //setassembles(result);
-                            }
+            const r = await YottaAPI.startSpider(currentSubjectDomain.domain,currentTopic);
+            if (r){
+                if (r.code==211){
+                    // 已经爬取过了
+                    message.success(r.msg)
+                    // 取一次数据
+                    const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
+                    if (result){
+                        console.log('result.code',result.code,result)
+                        if(result.code == 200 || quit===1) {
+                            console.log("========================");
+                            setspiderAss(result);
+                            setdynamicRenderAss(result);
+                            setrenderFinish(1);
+                            setspiderText("");
+                            setshowSpiderState(0);
+                            setspiderFinish(1);
+                            infoSpiderFinish();
+                            console.log("nextSpider:", nextSpider);
+                            if (result.code == 200 || nextSpider == 1)
+                                topicChange = 1;
                         }
                     }
-                    else{
-                        clearInterval(myvar1);
+                }
+                else if (r.code==200){
+                    // 未爬取未启动
+                    console.log("状态值:",r.status);
+                    setspiderText(" （准备爬取碎片...）");
+                    setquitSpider(1);
+                    pause = 0;
+                    quit = 0;
+                    setshowSpiderState(1);
+                    setshowProgress(1);
+                    setpauseSpider(0);
+                    setspiderText(" （正在爬取碎片...）");
+                    setspidernum(0);
+                    setspiderFinish(0);
+                    ingNum = 1;
+
+
+                    while (true){
+                            if(currentSubjectDomain.domain && currentTopic) {
+                                console.log("pause2",pause);
+                                if (pause==1){
+                                    if(quit===1){
+                                        setshowSpiderState(0);
+                                        YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                        if(nextSpider == 1)
+                                            topicChange = 1;
+                                        setrenderFinish(1);
+                                        break
+                                        // clearInterval(myvar1);
+                                    }
+                                }
+                                else{
+                                    console.log("==================================================")
+                                    const result = await YottaAPI.getDynamicSingle(currentSubjectDomain.domain,currentTopic);
+                                    console.log('result.code',result.code,result)
+                                    if(result.code == 200 || quit===1){
+                                        console.log("========================");
+                                        setspiderAss(result);
+                                        setdynamicRenderAss(result);
+                                        setrenderFinish(1);
+                                        setspiderText("");
+                                        setshowSpiderState(0);
+                                        setspiderFinish(1);
+                                        infoSpiderFinish();
+                                        //YottaAPI.stopSpider(currentSubjectDomain.domain,currentTopic);
+                                        console.log("nextSpider:",nextSpider);
+                                        if(result.code == 200 || nextSpider == 1)
+                                            topicChange = 1;
+                                        // clearInterval(myvar1);
+                                        break
+                                    }
+                                    else {
+                                        setspiderAss(result);
+                                        setdynamicRenderAss(result);
+                                        setspiderFinish(0);
+                                        if (ingNum<90){
+                                            ingNum += 9;
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                // clearInterval(myvar1);
+                                break
+                            }
+
                     }
-                },5000);
+                    }
+            }
         }
         if (currentTopic) {
             console.log("yiyiyiyiyiyiyi",currentTopic);
@@ -615,7 +645,7 @@ function AssembleFromZero() {
                 //         }
                 //     }
                 // }
-                
+
                 const asslist = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
                  //console.log(asslist);
                 setassembles(asslist);
@@ -666,7 +696,7 @@ function AssembleFromZero() {
                             infoFinish();
                             setfirstTime(1);
                             setdata0(1);
-                        }else        
+                        }else
                         {
                             setcurrentTopic(topicsData[i].topicName);
                             setdynamicSpider(topicsData[i].topicName);  //设置当前爬取的主题
@@ -685,16 +715,16 @@ function AssembleFromZero() {
             console.log("现在的autoCons为",currentTopic);
             fetchAutoConstruct();
         }
-    }, [autoCons])   
+    }, [autoCons])
 
 
     useEffect(()=>{
       if (localStorage.getItem("visitedAssemble")) {
                 setautoCons(0);
             }else{
-                setautoCons(1);            
+                setautoCons(1);
         }
-    },[])  
+    },[])
 
     useEffect(()=>{
         if(constructType=='cool'&&firstTime===1)
@@ -731,7 +761,7 @@ function AssembleFromZero() {
         setvisibleDrawer(!visibleDrawer);
       };
 
-      
+
     return (
         <>
              <Card title="主题分面树" style={treeStyle}>
@@ -806,7 +836,7 @@ function AssembleFromZero() {
                         )
 
                 }
-                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg> 
+                 <svg ref={ref => treeRef.current = ref} style={{width:'100%',height:'250px'}}></svg>
             </Card>
             <Card title="碎片状态展示" style={chartStyle}>
 
@@ -875,18 +905,18 @@ function AssembleFromZero() {
              <Card title="主题碎片数量统计" style={countStyle}>
                 <Card.Grid style={{width:'100%',height:'50px'}} >
                      类型：   碎片
-                </Card.Grid> 
+                </Card.Grid>
                 <Card.Grid style={{width:'100%',height:'50px'}} >
                      碎片个数：   <span style={{color:'red',fontWeight:'bolder'}}>{assnum}</span>
-                </Card.Grid> 
-                
+                </Card.Grid>
+
              </Card>
              <Card title="增量统计" style={increaseStyle}>
                 <Card.Grid style={{width:'100%',height:'100px'}} >
                     近一个月新增碎片数量：<span style={{color:'red',fontWeight:'bolder'}}>{newassnum}</span>
-                </Card.Grid>  
+                </Card.Grid>
              </Card>
-       
+
 
              <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onAppendAssemble}/>} title={"碎片"+spiderText} style={assembleStyle}>
                 {
@@ -912,8 +942,8 @@ function AssembleFromZero() {
                                             }
                                         </Card.Grid>
                                    )
-                            ) 
-                  
+                            )
+
                     ) :
                     (
                         <Alert style={{fontSize:'20px'}}message="请先选择需要装配的主题" type="info" />
