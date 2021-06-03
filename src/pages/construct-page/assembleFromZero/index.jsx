@@ -540,6 +540,7 @@ function AssembleFromZero() {
                         console.log('result.code',result.code,result)
                         if(result.code == 200 || quit===1) {
                             console.log("========================");
+
                             setspiderAss(result);
                             setdynamicRenderAss(result);
                             setrenderFinish(1);
@@ -590,6 +591,7 @@ function AssembleFromZero() {
                                     if(result.code == 200 || quit===1){
                                         console.log("========================");
                                         setspiderAss(result);
+
                                         setdynamicRenderAss(result);
                                         setrenderFinish(1);
                                         setspiderText("");
@@ -638,16 +640,17 @@ function AssembleFromZero() {
                 //infoConstructing();
                 var i=0;
                 console.log("----------------");
-                // if (spiderAss.data && spiderAss.data.children){
-                //     for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
-                //         for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
-                //             asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
-                //         }
-                //     }
-                // }
+                asslist=new Array()
+                if (spiderAss.data && spiderAss.data.children){
+                    for (var facet_index=0; facet_index < spiderAss.data.children.length; facet_index++){
+                        for (var ass_index=0; ass_index < spiderAss.data.children[facet_index].children.length; ass_index++){
+                            asslist.push(spiderAss.data.children[facet_index].children[ass_index]);
+                        }
+                    }
+                }
 
-                const asslist = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
-                 //console.log(asslist);
+                const asslist1 = await YottaAPI.getAssembleByName(currentSubjectDomain.domain,currentTopic);
+                 console.log(asslist1);
                 setassembles(asslist);
                 setrenderFinish(1);
 
