@@ -150,9 +150,13 @@ function Relation() {
 
     useEffect(()=>{
         async function fetchrelationData(){
+            setLoading(1);
             await YottaAPI.generateDependences(currentSubjectDomain.domain, nameCheck(currentSubjectDomain.domain).isEnglish).then(
                 res=>setrelationData(res)
-            )
+            );
+            // if(res){
+            //     setLoading(0);
+            // }
         }
         fetchrelationData();
     },[currentSubjectDomain.domain])
@@ -172,16 +176,18 @@ function Relation() {
             // console.log('dataTemp', dataTemp)
             // for (var maxShow = 0; maxShow <= relationData.length; 1){
             // setdata(data.slice(-relationData.length));
-            if (dataTemp[0]['主题一'] === insertTopic1 && dataTemp[0]['主题二'] === insertTopic2){
-                console.log("Nothing");
-            }else{
-                for (var i=1; i < relationData.length; i++){
-                    if (dataTemp[i]['主题一'] === insertTopic1 && dataTemp[i]['主题二'] === insertTopic2){
-                        var dataChange = dataTemp[0];
-                        dataTemp[0] = dataTemp[i];
-                        dataTemp[i] = dataChange;
-                    }
-                };
+            if (dataTemp[0]['主题一']){
+                if (dataTemp[0]['主题一'] === insertTopic1 && dataTemp[0]['主题二'] === insertTopic2){
+                    console.log("Nothing");
+                }else{
+                    for (var i=1; i < relationData.length; i++){
+                        if (dataTemp[i]['主题一'] === insertTopic1 && dataTemp[i]['主题二'] === insertTopic2){
+                            var dataChange = dataTemp[0];
+                            dataTemp[0] = dataTemp[i];
+                            dataTemp[i] = dataChange;
+                        }
+                    };
+            }
             };
             // console.log("SubjectName:", currentSubjectDomain.subject);
             setdata1(dataTemp);
@@ -545,13 +551,28 @@ function Relation() {
 
     return (
         <>
+
         <Card title="主题关系数量统计" style={countStyle1}>
             <Card.Grid style={{ width: '100%', height: '50px' }} >
                 关系个数：   <span style={{ color: 'red', fontWeight: 'bolder' }}>{data.length}</span>
             </Card.Grid>
         </Card>
 
-        <Card extra={<PlusOutlined style={{top: '50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
+        {(showLoading & !relationData)?(
+            <Card extra={<PlusOutlined style={{top: '50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
+             <Card.Grid  style={{width: '100%', opacity:1, visibility: 'visible',}}>
+                  <Spin tip="Loading..." style={{ width: '100%', height: '680px' }}>
+                  <Alert
+                    message="正在挖掘主题间认知关系"
+                    description="时间可能较长，请稍作等待..."
+                    type="info"
+                    style={{ width: '100%', height: '680px' }}
+                  />
+                </Spin>
+            </Card.Grid>
+            </Card>
+            ):(
+            <Card extra={<PlusOutlined style={{top: '50px'}} onClick={onInsertRelation} />} title="认知关系挖掘" style={relationStyle}>
             {
                 data.map(
                     (relation, index) =>
@@ -567,7 +588,8 @@ function Relation() {
                         )
                 )
             }
-        </Card>
+            </Card>)
+        }
         {/* <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
                 {
                     topics.map(
@@ -578,27 +600,26 @@ function Relation() {
                     )
                 }
             </Card> */}
-        <Card title=" 主题间认知关系路径 " style={mapStyle}>
-            
-            {(showLoading)?(
-                  <Spin tip="Loading..." style={{ width: '100%', height: '680px' }}>
-                  <Alert
-                    message="正在建立主题间认知关系"
-                    description="请稍作等待，认知关系图稍后为您呈现..."
-                    type="info"
-                    style={{ width: '100%', height: '680px' }}
-                  />
-                </Spin>
-            ):(<div style={{ width: '100%', height: '680px' }} >
-            <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
-            <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0', visibility: 'hidden', marginLeft: 22,marginTop: 65}}></svg>
 
-            {/* <div className={classes.chart}>
-                {gephi ? <Gephi subjectName={currentSubjectDomain.domain} gephi={gephi}/> : <div>该学科没有图谱</div>}
-            </div> */}
-            </div>)}
-        </Card>
-        </>
+        {(showLoading)?(
+                    <Card title=" 主题间认知关系路径 " style={mapStyle}>
+                    <Spin tip="Loading..." style={{ width: '100%', height: '680px' }}>
+                    <Alert
+                        message="正在挖掘主题间认知关系"
+                        description="请稍作等待，认知关系图稍后为您呈现..."
+                        type="info"
+                        style={{ width: '100%', height: '680px' }}
+                    />
+                    </Spin>
+                    </Card>
+                ):(<Card title=" 主题间认知关系路径 " style={mapStyle}>
+                    <div style={{ width: '100%', height: '680px' }} >
+                <svg ref={ref => mapRef.current = ref} id='map' style={{ width: '100%',height:'100%' }}></svg>
+                <svg ref={ref => treeRef.current = ref} id='tree' style={{position:'absolute',left:'-0', visibility: 'hidden', marginLeft: 22,marginTop: 65}}></svg>
+                </div>
+            </Card>)
+        }
+    </>
     );
 }
 

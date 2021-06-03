@@ -7,7 +7,7 @@ import { useState } from 'react';
 import YottaAPI from '../../../../apis/yotta-api';
 import {ExclamationCircleOutlined,PlusOutlined,DeleteOutlined, CompassOutlined} from '@ant-design/icons';
 import { Card,Descriptions,Input,message,Modal, Select } from 'antd';
-import {Menu,Dropdown,Button,notification,Alert} from 'antd';
+import {Menu,Dropdown,Button,notification,Alert,Spin} from 'antd';
 import ReactDOM from 'react-dom'
 import cookie from 'react-cookies';
 import useConstructTypeModel from '../../../../models/construct-type';
@@ -650,9 +650,18 @@ function BatchConstruct() {
                 </Button>
         </Card>
       <Card title='已构建主题数量统计' style={countStyle1}>
-        <Card.Grid style={{ width: '100%', height: '50px' }}>
-          已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{finishedNum}{'/'}{topics.length}</span>
-        </Card.Grid>
+          {
+            finishedPrepare?(
+                <Card.Grid style={{ width: '100%', height: '50px' }}>
+                    已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{finishedNum}{'/'}{topics.length}</span>
+                </Card.Grid>
+            ):
+            (
+                <Card.Grid style={{ width: '100%', height: '50px' }}>
+                    已构建主题个数： <span style={{color:'red', fontWeight:'bolder'}}>{"等待获取完整主题列表"}</span>
+                </Card.Grid>
+            )
+          }
       </Card>
             <Card  extra={<PlusOutlined style={{top:'50px'}} onClick={onInsertTopic}/>} title="主题列表" style={topicsStyle}>
                 {
@@ -679,6 +688,14 @@ function BatchConstruct() {
                 ):
                 (
                     <Card.Grid style={{ width: '100%', height: '850px' }} hoverable={false}>
+                        <Spin tip="Loading..." style={{ width: '100%', height: '680px' }}>
+                            <Alert
+                                message="正在获取主题信息"
+                                description="请稍作等待，主题列表稍后为您呈现..."
+                                type="info"
+                                style={{ width: '100%', height: '680px' }}
+                            />
+                        </Spin>
                         <Alert style={{fontSize:'20px'}}message="请等待主题列表构建完成, 待主题列表获取成功后将自动进行主题分面树的构建！" type="info" />
                     </Card.Grid>
                 )
