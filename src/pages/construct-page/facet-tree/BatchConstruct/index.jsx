@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom'
 import cookie from 'react-cookies';
 import useConstructTypeModel from '../../../../models/construct-type';
 import useStepModel from '../../../../models/construct-step';
+import {useMountedState} from '../../../../lib/use-state-if-mounted'
 
 const topicsStyle = {
     width: '35%',
@@ -53,47 +54,47 @@ function BatchConstruct() {
     });
     console.log('程序处于批量更新页面')
     const { currentSubjectDomain } = useCurrentSubjectDomainModel();
-    const [topics, settopics] = useState([]);
-    const [topicss, settopicss] = useState([]);
-    const [topicsData,settopicsData] = useState();
-    const [currentTopic, setcurrentTopic] = useState();
-    const [treeData, settreeData] = useState();
+    const [topics, settopics] = useMountedState([]);
+    const [topicss, settopicss] = useMountedState([]);
+    const [topicsData,settopicsData] = useMountedState();
+    const [currentTopic, setcurrentTopic] = useMountedState();
+    const [treeData, settreeData] = useMountedState();
     const textareaValueRef = useRef('');
-    const [insertTopic1,setinsertTopic1] = useState();
+    const [insertTopic1,setinsertTopic1] = useMountedState();
     const {confirm} = Modal;
     const {TextArea} = Input;
     const resultTree = useRef();
-    const [assembles,setassembles] = useState();
-    const [topiclength, settopiclength] = useState();  //判断topic列表长度
-    const [deleteTopic1,setdeleteTopic1] = useState();
-    const [deleteTopic2,setdeleteTopic2] = useState();
+    const [assembles,setassembles] = useMountedState();
+    const [topiclength, settopiclength] = useMountedState();  //判断topic列表长度
+    const [deleteTopic1,setdeleteTopic1] = useMountedState();
+    const [deleteTopic2,setdeleteTopic2] = useMountedState();
 
-    const [insertFacet1,setinsertFacet1] = useState();
-    const [topicName2,settopicName2] = useState();
-    const [firstTime,setfirstTime] = useState();
-    const [batchData,setbatchData] = useState([]);
+    const [insertFacet1,setinsertFacet1] = useMountedState();
+    const [topicName2,settopicName2] = useMountedState();
+    const [firstTime,setfirstTime] = useMountedState();
+    const [batchData,setbatchData] = useMountedState([]);
     const {step,setStep} = useStepModel();
     const {constructType} = useConstructTypeModel();
-    const [done,setdone]=useState(0)
+    const [done,setdone]=useMountedState(0)
 
-    const [finishedData,setfinishedData] = useState([]);
-    const [data1,setdata1] = useState();
-    var [notInsert, setnotInsert] = useState();
-    var [continueIndex, setcontinueIndex] = useState();
-    var [dataTemp,setdataTemp] = useState();
-    var [onstop,setonstop] = useState();
-    var [finishedTopic, setfinishedTopic] = useState();
+    const [finishedData,setfinishedData] = useMountedState([]);
+    const [data1,setdata1] = useMountedState();
+    var [notInsert, setnotInsert] = useMountedState();
+    var [continueIndex, setcontinueIndex] = useMountedState();
+    var [dataTemp,setdataTemp] = useMountedState();
+    var [onstop,setonstop] = useMountedState();
+    var [finishedTopic, setfinishedTopic] = useMountedState();
 
-    var [finishedNum,setfinishedNum] = useState();
-    var [finishedPrepare,setfinishedPrepare] = useState();
+    var [finishedNum,setfinishedNum] = useMountedState();
+    var [finishedPrepare,setfinishedPrepare] = useMountedState();
 
-    var [topicData, settopicData] = useState();
-    var [batchConstruct, setbatchConstruct] = useState();
-    var [stop,setstop] = useState();
-    var [stopCommand,setstopCommand] = useState();
+    var [topicData, settopicData] = useMountedState();
+    var [batchConstruct, setbatchConstruct] = useMountedState();
+    var [stop,setstop] = useMountedState();
+    var [stopCommand,setstopCommand] = useMountedState();
 
-    var [data, setdata] = useState([]);
-    // var [dataTemp,setdataTemp] = useState();
+    var [data, setdata] = useMountedState([]);
+    // var [dataTemp,setdataTemp] = useMountedState();
     var flag;
     // window.lock = false;
     const handleTextareaChange= (e)=>{
@@ -101,7 +102,7 @@ function BatchConstruct() {
     }
     // 将请求的状态码设置为全局状态
     const statusCode = useRef();
-    const [data0,setdata0]=useState(0);
+    const [data0,setdata0]=useMountedState(0);
     const infoFinish = () => {
     message.success('主题已全部获取，开始自动构建主题分面树！')
     };
